@@ -17,6 +17,7 @@ venv/
 .DS_Store
 Thumbs.db
 
-
+# Storage and assets
 medauth_ui_slides_separate_images/
 data/
+backend/storage/

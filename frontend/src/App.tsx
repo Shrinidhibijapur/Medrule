@@ -11,6 +11,7 @@ import { DetailedAnalysisView } from './views/DetailedAnalysisView';
 import { AuthorizationDecisionView } from './views/AuthorizationDecisionView';
 import { CasesHistoryView } from './views/CasesHistoryView';
 import { AskMedRuleView } from './views/AskMedRuleView';
+import { PolicyLibraryView } from './views/PolicyLibraryView';
 
 export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -41,7 +42,7 @@ export const App: React.FC = () => {
       case 'ask_medrule':
         return <AskMedRuleView onNavigate={setCurrentView} />;
       case 'policy_library':
-        return <DetailedAnalysisView onNavigate={setCurrentView} />;
+        return <PolicyLibraryView onNavigate={setCurrentView} />;
       case 'terminology':
       case 'settings':
         return <CasesHistoryView onNavigate={setCurrentView} />;

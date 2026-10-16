@@ -15,6 +15,12 @@ class Verdict(str, Enum):
     NOT_APPROVED = "NOT_APPROVED"
     CANNOT_BE_DETERMINED = "CANNOT_BE_DETERMINED"
 
+class DecisionOutcome(str, Enum):
+    APPROVED = "APPROVED"
+    DENIED = "DENIED"
+    ADDITIONAL_DOCUMENTATION_REQUIRED = "ADDITIONAL_DOCUMENTATION_REQUIRED"
+    CANNOT_BE_DETERMINED = "CANNOT_BE_DETERMINED"
+
 class CriterionEvaluationResult(BaseModel):
     rule_id: str
     criterion_name: str
@@ -26,6 +32,10 @@ class CriterionEvaluationResult(BaseModel):
     ui_symbol: str  # "✅" or "❌" or "–"
     ui_label: str   # "Satisfied", "Not met", "Not documented", etc.
     comment: str
+    policy_citation: Optional[str] = None
+    logic_group: Optional[str] = None
+    plain_english_rationale: Optional[str] = None
+    is_exclusion: bool = False
 
 class EvaluationReport(BaseModel):
     case_id: str
@@ -41,3 +51,6 @@ class EvaluationReport(BaseModel):
     verdict_sentence: str
     requires_human_review: bool
     review_reasons: List[str] = Field(default_factory=list)
+    decision_outcome: Optional[DecisionOutcome] = None
+    policy_checksum: Optional[str] = None
+    verification_gate_verified: bool = True
