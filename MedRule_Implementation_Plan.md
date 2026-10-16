@@ -22,6 +22,9 @@ This version was reviewed against the original stakeholder requirements (the voi
 | 7 | No way to check output against the owner's known results | Added expected-vs-actual verification harness | §10.5 |
 | 8 | Question wording could be ambiguous or manipulate the evaluation | Added question-parsing and follow-up contracts | §9.5, §9.6 |
 | 9 | Definition of done and decisions list missed the above | Updated | §12, §13, §14 |
+| 10 | Rules encoded incorrectly from the PDFs would silently corrupt every answer | Added a mandatory policy verification gate before any note can be assessed | §7 (gate), §13 |
+| 11 | Missing evidence could read as the patient clinically failing, and unresolved cases were only "flagged" | Documentation-only shortfalls get their own verdict label and are always routed to human review; the policy's own missing-information rule takes precedence | §3.3, §4.1 |
+| 12 | Scope was too broad for a first release (CT and MRI, several plans) | Staged scope: one policy and CT first, MRI and further plans after CT passes verification | §10.5, §12, §13 |
 
 ---
 
@@ -309,7 +312,9 @@ The engine must preserve the policy's exact meaning. Do not assume that every po
 - Run a validation step to ensure that the written conclusion matches the engine's result.
 - The final verdict is one of: **Approved**, **Not approved**, or (rarely) **Cannot be determined**.
 - If the policy's logic is satisfied using only criteria marked Met, the verdict is Approved.
-- If it is not satisfied, the verdict is Not approved. When the reason is only missing or unclear documentation, say so explicitly ("required evidence not found in the note") and flag the case for human review rather than implying the patient failed a clinical test.
+- If it is not satisfied, the verdict is Not approved.
+- **Documentation-only shortfall:** if every unsatisfied criterion is Not documented or Unclear (none is Not met), the verdict is shown as **Not approved — documentation insufficient**, the case is automatically routed to human review, and the report states "required evidence not found in the note". It must never imply the patient failed a clinical criterion.
+- **Precedence:** if the rulebook itself says how missing information must be handled (for example "request additional records" or "pend the request"), that instruction overrides the default above and is cited.
 - **Cannot be determined** is used only for Policy ambiguity, an unreadable note, or a rulebook/plan/procedure mismatch. It always routes to human review.
 - If the policy explicitly defines a different outcome for missing information, follow that policy and cite it.
 - If the policy explicitly defines a different outcome for missing information, follow that policy and cite it.
@@ -333,7 +338,7 @@ The reasoning always comes before the verdict, never after.
 
 - **Approved:** "Approval of a [CT scan] requires [the rulebook's logic, stated exactly]. Conditions [IDs] are satisfied and meet that minimum. Therefore the [CT scan] request can be approved."
 - **Not approved:** "Not all the conditions and sub-conditions required as the minimum for approval of a [CT scan] have been satisfied. Not satisfied: [IDs and reasons]. Therefore the [CT scan] request is not approved."
-- **Not approved, documentation only:** same as above, adding "The note does not contain the evidence required for [IDs]; the request may be re-assessed if that documentation is provided." The case is flagged for human review.
+- **Not approved, documentation only:** same as above, adding "The note does not contain the evidence required for [IDs]; the request may be re-assessed if that documentation is provided." The case is automatically routed to human review (status: Not approved — documentation insufficient).
 
 ## 4.2 Structural illustration
 
@@ -682,6 +687,19 @@ This is a schema illustration only. Do not use the example rule or its logic as 
 
 ### Exit criteria
 A policy reviewer can explain every encoded rule and verify it against the original PDF. Automated tests demonstrate that AND/OR/group/threshold logic works as intended.
+
+## Policy verification gate (between Phase 2 and Phase 3)
+
+No doctor's note may be assessed against a policy until this gate is passed and recorded. A wrongly extracted or encoded rule corrupts every later answer, so this is the most important control in the project.
+
+1. **Side-by-side review:** a reviewer compares every encoded criterion with the original PDF page, line by line.
+2. **Completeness count:** the number of criteria, sub-conditions, and groups in the PDF equals the number encoded, with none added and none dropped. Record both counts.
+3. **Logic check by a second reviewer:** every AND / OR / "at least N" / exception relationship is verified independently of the person who encoded it.
+4. **Plain-English round trip:** regenerate a readable description of each encoded rule and have a reviewer confirm it says exactly what the rulebook says.
+5. **Tables, footnotes, and numbering:** spot-check the places extraction most often fails (tables, nested lists, footnotes, page breaks).
+6. **Rulebook's own examples:** if the rulebook contains worked examples, they must reproduce correctly as unit tests.
+7. **Traceability matrix:** 100% of rules link to a source page and section.
+8. **Sign-off:** named approvers, date, and checksum of the PDF are recorded. Any change to the PDF or ruleset creates a new version that must pass the gate again.
 
 ## Phase 3 — Doctor's-note upload, parsing, and fact extraction
 
@@ -1070,7 +1088,7 @@ The project owner knows the correct result for the supplied doctor's notes. This
 1. For each doctor's note, store an **expected-result file**: insurer, plan, procedure, policy version, the expected status of every criterion and sub-condition, and the expected verdict.
 2. A runner submits each note through the normal MedRule flow and compares actual against expected, producing a **comparison table**: criterion, expected, actual, match, with a summary of verdict agreement and per-criterion agreement.
 3. Triage every mismatch by layer before fixing: note extraction error, criterion matching error, rule encoding error, or an error in the expected result itself. Fix the cause at its layer. Never tune prompts only to make a test pass.
-4. Cover approved, not approved, borderline, missing-documentation, and conflicting-evidence cases, for both CT and MRI.
+4. Cover approved, not approved, borderline, missing-documentation, and conflicting-evidence cases. The MVP covers CT; add MRI cases when MRI is introduced.
 5. Hold out some notes that are not used during development.
 6. Re-run the full set after any change to the rulebook, ruleset, prompts, or model.
 7. The owner can also check manually by uploading a note, asking the question in the chat, and comparing the chart with the known answer.
@@ -1102,7 +1120,7 @@ For a credible MVP, prioritize the smallest end-to-end workflow rather than buil
 
 ### MVP milestone 1 — One policy, one procedure
 - One supplied rulebook.
-- One procedure, such as CT or MRI.
+- One procedure: CT scan first. MRI follows only after CT passes verification.
 - Human-validated criteria and logic.
 - Policy source citations.
 - A small, expert-reviewed set of doctor's notes with known expected outcomes.
@@ -1129,6 +1147,7 @@ For a credible MVP, prioritize the smallest end-to-end workflow rather than buil
 - Controlled pilot with authorized reviewers.
 
 ### After the MVP
+- MRI as the second procedure, reusing the same pipeline once CT passes verification (§10.5).
 - Additional insurers, plans, procedures, and policy versions.
 - Terminology-only lookup from approved sources.
 - Policy administration improvements.
@@ -1161,11 +1180,13 @@ The MVP is complete only when:
 - [ ] Authentication, authorization, audit, and sensitive-document protections are tested.
 - [ ] The system passes the agreed gold-standard evaluation with domain-expert sign-off.
 - [ ] The product clearly distinguishes preliminary decision support from an official authorization decision.
-- [ ] A user can upload a doctor's note, ask "Can the CT scan be approved?" or "Can the MRI be approved?" in a chat-style interface, and receive the structured answer.
+- [ ] A user can upload a doctor's note, ask "Can the CT scan be approved?" in a chat-style interface, and receive the structured answer. (MRI uses the same flow and is added in the next release after CT passes verification.)
 - [ ] The chart lists every condition and sub-condition grouped as in the rulebook, with ✅ for satisfied and ❌ (with reason sub-label) for not satisfied.
 - [ ] The detailed reasoning appears before the verdict, and the conclusion names the minimum requirement and which parts were or were not satisfied.
 - [ ] Follow-up questions are answered only from the rulebook and the stored assessment.
 - [ ] The verification harness (§10.5) reproduces the owner's known results for the supplied notes, with every mismatch explained.
+- [ ] The policy verification gate (§7) is completed and signed off for the rulebook and version in use, before any note is assessed.
+- [ ] Documentation-only shortfalls show as "Not approved — documentation insufficient" and are routed to human review.
 
 ---
 

@@ -1,0 +1,43 @@
+from enum import Enum
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field
+
+class CriterionStatus(str, Enum):
+    MET = "MET"
+    NOT_MET = "NOT_MET"
+    NOT_DOCUMENTED = "NOT_DOCUMENTED"
+    UNCLEAR_CONFLICTING = "UNCLEAR_CONFLICTING"
+    POLICY_AMBIGUITY = "POLICY_AMBIGUITY"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+class Verdict(str, Enum):
+    APPROVED = "APPROVED"
+    NOT_APPROVED = "NOT_APPROVED"
+    CANNOT_BE_DETERMINED = "CANNOT_BE_DETERMINED"
+
+class CriterionEvaluationResult(BaseModel):
+    rule_id: str
+    criterion_name: str
+    section: str
+    requirement: str
+    evidence_excerpt: str
+    source_page: Optional[int] = None
+    status: CriterionStatus
+    ui_symbol: str  # "✅" or "❌" or "–"
+    ui_label: str   # "Satisfied", "Not met", "Not documented", etc.
+    comment: str
+
+class EvaluationReport(BaseModel):
+    case_id: str
+    patient_name: str
+    procedure: str
+    insurer: str
+    policy_id: str
+    policy_version: str
+    evaluation_date: str
+    criteria_results: List[CriterionEvaluationResult]
+    key_reasoning: List[str]
+    verdict: Verdict
+    verdict_sentence: str
+    requires_human_review: bool
+    review_reasons: List[str] = Field(default_factory=list)

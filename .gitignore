@@ -1,2 +1,22 @@
-medauth_ui_slides_separate_images/
+# Dependencies
+node_modules/
+dist/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+env/
+venv/
+
+# Environment and local IDE
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+
+medauth_ui_slides_separate_images/
+data/
