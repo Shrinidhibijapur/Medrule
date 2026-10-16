@@ -123,6 +123,7 @@ class ClinicalNoteExtractorService:
         facility_override: Optional[str] = None,
         procedure_requested_override: Optional[str] = None,
         insurance_plan: Optional[str] = None,
+        organization_id: Optional[str] = "org_riverside",
     ) -> ClinicalNoteRecord:
         """
         Main extraction entrypoint:
@@ -252,6 +253,7 @@ class ClinicalNoteExtractorService:
             insurance_plan=insurance_plan or "United Healthcare",
             policy_id=policy_id,
             policy_version="2026.1",
+            organization_id=organization_id or "org_riverside",
             chief_complaint=chief_complaint.strip() if chief_complaint else None,
             history_of_present_illness=hpi.strip() if hpi else None,
             clinical_findings=[

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ViewMode, ReviewCase, ClinicalNoteRecord, EvaluationReport, CriterionEvaluationResult } from '../types';
 import { mockJohnDoeCase, mockJaneSmithUnmetCase, mockRobertChenMissingDocCase } from '../mockData';
+import { apiFetch } from '../api/client';
 
 interface CriteriaEvaluationViewProps {
   onNavigate: (view: ViewMode) => void;
@@ -45,7 +46,7 @@ export const CriteriaEvaluationView: React.FC<CriteriaEvaluationViewProps> = ({
     if (selectedCaseId === 'active' && caseRecord?.case_id) {
       setLoading(true);
       setServerError(null);
-      fetch(`http://localhost:8000/api/cases/${caseRecord.case_id}/evaluate`, {
+      apiFetch(`http://localhost:8000/api/cases/${caseRecord.case_id}/evaluate`, {
         method: 'POST'
       })
         .then(async (res) => {

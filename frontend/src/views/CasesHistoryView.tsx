@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Download, RefreshCw, AlertCircle, FileText, Filter, ArrowRight } from 'lucide-react';
 import { ViewMode, ClinicalNoteRecord } from '../types';
+import { apiFetch } from '../api/client';
 
 interface CasesHistoryViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
   onSelectCaseRecord?: (record: ClinicalNoteRecord) => void;
 }
 
 export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, onSelectCaseRecord }) => {
+  const navigate = useNavigate();
   const [cases, setCases] = useState<ClinicalNoteRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +21,7 @@ export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8000/api/cases');
+      const res = await apiFetch('http://localhost:8000/api/cases');
       if (!res.ok) {
         throw new Error(`Failed to load cases from server (HTTP ${res.status})`);
       }
@@ -40,13 +43,14 @@ export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, 
     if (onSelectCaseRecord) {
       onSelectCaseRecord(record);
     }
-    onNavigate('authorization_decision');
+    navigate(`/cases/${record.case_id}/decision`);
+    if (onNavigate) onNavigate('authorization_decision');
   };
 
   const handleExportCase = async (e: React.MouseEvent, caseId: string, patientName: string) => {
     e.stopPropagation();
     try {
-      const res = await fetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
+      const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
       if (!res.ok) {
         throw new Error('Server export endpoint failed');
       }
@@ -256,7 +260,10 @@ export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, 
                   <FileText size={24} style={{ margin: '0 auto 8px', display: 'block', color: 'var(--text-muted)' }} />
                   <div>No matching authorization cases found.</div>
                   <button
-                    onClick={() => onNavigate('new_review')}
+                    onClick={() => {
+                      navigate('/review/new');
+                      if (onNavigate) onNavigate('new_review');
+                    }}
                     className="btn btn-primary"
                     style={{ marginTop: '12px', fontSize: '13px' }}
                   >

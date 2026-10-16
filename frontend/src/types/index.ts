@@ -322,4 +322,21 @@ export interface EvaluationReport {
   governance_notice: string;
 }
 
+export type UserRole = 'Reviewer MD' | 'Nurse Auditor' | 'Compliance Officer' | 'System Admin';
+
+export interface UserProfile {
+  user_id: string;
+  username: string;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  organization_id: string;
+  permissions: string[];
+}
+
+export interface CSRFTokenResponse {
+  csrf_token: string;
+  header_name: string;
+}
+
 

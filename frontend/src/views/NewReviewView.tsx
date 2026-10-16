@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileUp,
   ChevronDown,
@@ -12,9 +13,10 @@ import {
   Info
 } from 'lucide-react';
 import { ViewMode, ClinicalNoteRecord } from '../types';
+import { apiFetch } from '../api/client';
 
 interface NewReviewViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
   onSelectCaseRecord: (record: ClinicalNoteRecord) => void;
   activeCaseRecord: ClinicalNoteRecord | null;
 }
@@ -24,6 +26,7 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
   onSelectCaseRecord,
   activeCaseRecord,
 }) => {
+  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState('United Healthcare');
   const [selectedProcedure, setSelectedProcedure] = useState('CT Scan of Head with Contrast');
   const [selectedPolicyId, setSelectedPolicyId] = useState('P-UHC-CT-2026');
@@ -52,7 +55,7 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
     formData.append('insurance_plan', selectedPlan);
 
     try {
-      const response = await fetch('http://localhost:8000/api/notes/upload', {
+      const response = await apiFetch('http://localhost:8000/api/notes/upload', {
         method: 'POST',
         body: formData,
       });
@@ -79,7 +82,7 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
 
     try {
       if (demoKey === 'case_001') {
-        const resp = await fetch('http://localhost:8000/api/notes/CASE-2026-001');
+        const resp = await apiFetch('http://localhost:8000/api/notes/CASE-2026-001');
         if (resp.ok) {
           const rec: ClinicalNoteRecord = await resp.json();
           onSelectCaseRecord(rec);
@@ -90,7 +93,7 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
       }
 
       // If backend note endpoint doesn't have it yet, query list or generate synthetic record
-      const respAll = await fetch('http://localhost:8000/api/cases');
+      const respAll = await apiFetch('http://localhost:8000/api/cases');
       if (respAll.ok) {
         const cases: ClinicalNoteRecord[] = await respAll.json();
         if (cases && cases.length > 0) {
@@ -448,7 +451,11 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
         </button>
 
         <button
-          onClick={() => onNavigate('extracted_doc')}
+          onClick={() => {
+            const targetCaseId = activeCaseRecord?.case_id || 'CASE-2026-001';
+            navigate(`/cases/${targetCaseId}/document`);
+            if (onNavigate) onNavigate('extracted_doc');
+          }}
           className="btn btn-primary"
           style={{ padding: '12px 28px', fontSize: '15px' }}
         >

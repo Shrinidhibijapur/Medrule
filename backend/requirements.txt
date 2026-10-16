@@ -7,3 +7,5 @@ pypdf>=4.0.0
 python-multipart>=0.0.9
 fpdf2>=2.8.0
 pillow>=10.0.0
+pyjwt>=2.8.0
+cryptography>=42.0.0

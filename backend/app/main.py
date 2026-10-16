@@ -4,12 +4,23 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, JSONResponse
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
+
+from app.core.config import settings
+from app.core.deps import (
+    get_current_user,
+    require_permission,
+    require_role,
+    verify_csrf_if_cookie,
+)
+from app.models.auth import Permission, AuthenticatedUser, UserRole, AuditEvent
+from app.services.audit_service import audit_service
+from app.api.auth import router as auth_router
 
 from app.models.policy import (
     Policy,
@@ -57,19 +68,73 @@ app = FastAPI(
     description="Rulebook-Driven Medical Insurance Authorization & Policy Registry Engine"
 )
 
+# Apply CORS with explicit allowed origins for secure cookie authentication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Apply standard Security Headers Middleware
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "style-src 'self' 'unsafe-inline'; "
+        "script-src 'self'; "
+        "frame-ancestors 'none';"
+    )
+    return response
+
+# Mount Authentication Router (OIDC PKCE, session management, CSRF)
+app.include_router(auth_router)
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 registry_service = PolicyRegistryService()
 criteria_service = CriteriaService(DATA_DIR)
 note_extractor_service = ClinicalNoteExtractorService(data_dir=DATA_DIR)
 terminology_service = TerminologyService(data_dir=DATA_DIR)
+
+def check_case_tenant(case_record: ClinicalNoteRecord, current_user: AuthenticatedUser) -> None:
+    """Enforces tenant isolation. Users cannot view or modify cases outside their organization."""
+    case_org = getattr(case_record, "organization_id", None) or "org_riverside"
+    if not current_user.can_access_tenant(case_org):
+        audit_service.log_event(
+            action="TENANT_ACCESS_DENIED",
+            user=current_user,
+            resource=f"case:{case_record.case_id}",
+            status="DENIED",
+            details={
+                "case_organization": case_org,
+                "user_organization": current_user.organization_id
+            }
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Tenant Access Denied: Case '{case_record.case_id}' belongs to organization '{case_org}'."
+        )
+
+@app.get("/api/audit/logs", response_model=List[AuditEvent])
+def get_audit_logs(
+    limit: int = Query(100, ge=1, le=500),
+    action: Optional[str] = Query(None),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.AUDIT_VIEW_COMPLIANCE))
+):
+    """
+    Retrieves system security and clinical governance audit trail.
+    Restricted to Compliance Officers and System Administrators.
+    """
+    return audit_service.get_events(user=current_user, limit=limit, action_filter=action)
+
 
 class EvaluateRequest(BaseModel):
     case_id: str
@@ -94,7 +159,8 @@ def health_check():
 @app.get("/api/policies", response_model=List[Policy])
 def list_policies(
     lifecycle_status: Optional[PolicyLifecycleStatus] = None,
-    insurer: Optional[str] = None
+    insurer: Optional[str] = None,
+    current_user: AuthenticatedUser = Depends(get_current_user)
 ):
     policies = registry_service.get_all(status=lifecycle_status)
     if insurer:
@@ -108,7 +174,10 @@ def list_policies(
         404: {"description": "Policy not found"}
     }
 )
-def get_policy(policy_id: str):
+def get_policy(
+    policy_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     policy = registry_service.get_by_id(policy_id)
     if not policy:
         raise HTTPException(status_code=404, detail=f"Policy '{policy_id}' not found.")
@@ -134,7 +203,9 @@ async def upload_policy_pdf(
     procedure_full_name: str = Form(...),
     effective_date: str = Form(...),
     plan: str = Form("Commercial & Medicare Advantage Plans"),
-    cpt_codes: str = Form("")
+    cpt_codes: str = Form(""),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.POLICY_ADMIN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
 ):
     """
     Secure Policy PDF Ingestion:
@@ -193,6 +264,13 @@ async def upload_policy_pdf(
             quality_report=quality_report,
             checksum=checksum
         )
+        audit_service.log_event(
+            action="POLICY_UPLOAD",
+            user=current_user,
+            resource=policy.id,
+            status="SUCCESS",
+            details={"policy_name": policy.policy_name, "version": policy.version, "checksum": policy.sha256_checksum}
+        )
         return policy
     except DuplicatePolicyError as e:
         raise HTTPException(status_code=409, detail=str(e))
@@ -202,19 +280,34 @@ async def upload_policy_pdf(
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @app.patch("/api/policies/{policy_id}/status", response_model=Policy)
-def update_policy_lifecycle(policy_id: str, payload: StatusUpdatePayload):
+def update_policy_lifecycle(
+    policy_id: str,
+    payload: StatusUpdatePayload,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.POLICY_ADMIN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """
     Policy Activation Workflow:
     Transitions state: DRAFT -> PROCESSING -> NEEDS_REVIEW -> APPROVED_FOR_USE -> ARCHIVED.
     """
     try:
         updated = registry_service.update_status(policy_id, payload.status)
+        audit_service.log_event(
+            action="POLICY_STATUS_CHANGE",
+            user=current_user,
+            resource=policy_id,
+            status="SUCCESS",
+            details={"new_status": payload.status.value}
+        )
         return updated
     except PolicyRegistryError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
 @app.get("/api/policies/{policy_id}/file")
-def get_original_policy_file(policy_id: str):
+def get_original_policy_file(
+    policy_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """Downloads or streams the canonical stored original PDF."""
     policy = registry_service.get_by_id(policy_id)
     if not policy or not policy.storage_path:
@@ -237,7 +330,8 @@ def get_original_policy_file(policy_id: str):
 def search_policy_sections(
     query: str = Query(..., min_length=2),
     approved_only: bool = Query(True),
-    insurer: Optional[str] = Query(None)
+    insurer: Optional[str] = Query(None),
+    current_user: AuthenticatedUser = Depends(get_current_user)
 ):
     """Searches extracted sections across active/approved policies with citations."""
     return registry_service.search_sections(
@@ -249,7 +343,10 @@ def search_policy_sections(
 # --- Phase 2: Policy Criteria Encoding & Verification Gate Endpoints ---
 
 @app.get("/api/policies/{policy_id}/criteria", response_model=PolicyRuleset)
-def get_policy_criteria(policy_id: str):
+def get_policy_criteria(
+    policy_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """Retrieves structured criteria ruleset and verification status for a policy."""
     policy = registry_service.get_by_id(policy_id)
     if not policy:
@@ -291,7 +388,12 @@ def get_policy_criteria(policy_id: str):
     return ruleset
 
 @app.post("/api/policies/{policy_id}/criteria", response_model=PolicyRuleset)
-def save_policy_criteria(policy_id: str, payload: PolicyRuleset):
+def save_policy_criteria(
+    policy_id: str,
+    payload: PolicyRuleset,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.POLICY_ADMIN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """Proposes or updates structured criteria ruleset for a policy (defaults to DRAFT)."""
     policy = registry_service.get_by_id(policy_id)
     if not policy:
@@ -305,7 +407,12 @@ def save_policy_criteria(policy_id: str, payload: PolicyRuleset):
     return criteria_service.save_ruleset(payload)
 
 @app.post("/api/policies/{policy_id}/criteria/verify-gate", response_model=PolicyRuleset)
-def verify_policy_criteria_gate(policy_id: str, req: VerificationGateRequest):
+def verify_policy_criteria_gate(
+    policy_id: str,
+    req: VerificationGateRequest,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.POLICY_ADMIN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """
     Policy Verification Gate:
     Enforces side-by-side verification, count completeness, independent 2nd reviewer sign-off,
@@ -317,12 +424,22 @@ def verify_policy_criteria_gate(policy_id: str, req: VerificationGateRequest):
 
     try:
         updated_ruleset = criteria_service.verify_ruleset_gate(policy, req)
+        audit_service.log_event(
+            action="POLICY_GATE_VERIFICATION",
+            user=current_user,
+            resource=policy_id,
+            status="SUCCESS",
+            details={"primary_reviewer": req.primary_reviewer, "secondary_reviewer": req.secondary_reviewer}
+        )
         return updated_ruleset
     except PolicyVerificationGateError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
 @app.post("/api/criteria/evaluate", response_model=EvaluationReport)
-def evaluate_criteria(req: CriteriaEvaluationRequest):
+def evaluate_criteria(
+    req: CriteriaEvaluationRequest,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.EVALUATION_RUN))
+):
     """
     Phase 2 & Phase 4 Deterministic Criteria Evaluator:
     Enforces Policy Verification Gate, evaluates logic trees/thresholds/exclusions,
@@ -337,6 +454,7 @@ def evaluate_criteria(req: CriteriaEvaluationRequest):
     if (facts is None or len(facts) == 0) and req.case_id:
         note_record = note_extractor_service.get_note_record(req.case_id)
         if note_record:
+            check_case_tenant(note_record, current_user)
             try:
                 return criteria_service.evaluate_note_record(policy=policy, note_record=note_record)
             except PolicyVerificationGateError as e:
@@ -356,7 +474,11 @@ def evaluate_criteria(req: CriteriaEvaluationRequest):
 # --- Decision Evaluation & Case Endpoints ---
 
 @app.post("/api/evaluate", response_model=EvaluationReport)
-def evaluate_request(req: EvaluateRequest):
+def evaluate_request(
+    req: EvaluateRequest,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.EVALUATION_RUN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     policy = registry_service.get_by_id(req.policy_id)
     if not policy:
         raise HTTPException(status_code=404, detail=f"Policy '{req.policy_id}' not found.")
@@ -389,19 +511,29 @@ def evaluate_request(req: EvaluateRequest):
             )
         )
     try:
-        return criteria_service.evaluate_policy_case(
+        report = criteria_service.evaluate_policy_case(
             policy=policy,
             case_id=req.case_id,
             patient_name=req.patient_name,
             facts=req.facts
         )
+        audit_service.log_event(
+            action="EVALUATION_RUN",
+            user=current_user,
+            resource=f"case:{req.case_id}",
+            status="SUCCESS",
+            details={"policy_id": req.policy_id, "verdict": report.verdict.value}
+        )
+        return report
     except PolicyVerificationGateError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 # --- Phase 3: Doctor's Note Ingestion, Fact Extraction & Evidence Review ---
 
 @app.get("/api/notes/ocr-status")
-def get_ocr_status():
+def get_ocr_status(
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Reports the status of the OCR subsystem and any unconfigured components.
     Gracefully flags when OCR binary is unavailable and reports fallback mode.
@@ -423,6 +555,8 @@ async def upload_clinical_note(
     facility: Optional[str] = Form(None),
     procedure_requested: Optional[str] = Form(None),
     insurance_plan: Optional[str] = Form("United Healthcare"),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_UPLOAD)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
 ):
     """
     Secure Doctor's Note Upload & Fact Extraction:
@@ -434,6 +568,7 @@ async def upload_clinical_note(
     - Extracts only facts required by the policy's approved evidence schema
     - Detects contradictions, ambiguities, and abbreviations
     - Saves record with DEVELOPMENT/DEMO synthetic governance watermark
+    - Attaches organization_id for tenant isolation
     """
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
@@ -466,6 +601,19 @@ async def upload_clinical_note(
             facility_override=facility,
             procedure_requested_override=procedure_requested,
             insurance_plan=insurance_plan,
+            organization_id=current_user.organization_id,
+        )
+        audit_service.log_event(
+            action="CASE_UPLOAD",
+            user=current_user,
+            resource=f"case:{record.case_id}",
+            status="SUCCESS",
+            details={
+                "filename": file.filename,
+                "policy_id": policy_id,
+                "procedure": record.procedure_requested,
+                "organization_id": current_user.organization_id
+            }
         )
         return record
     except Exception as e:
@@ -475,19 +623,27 @@ async def upload_clinical_note(
         )
 
 @app.get("/api/notes/{case_id}", response_model=ClinicalNoteRecord)
-def get_clinical_note(case_id: str):
+def get_clinical_note(
+    case_id: str,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_VIEW))
+):
     """Retrieves full case record with extracted facts and quality report."""
     record = note_extractor_service.get_note_record(case_id)
     if not record:
         raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    check_case_tenant(record, current_user)
     return record
 
 @app.get("/api/notes/{case_id}/document")
-def get_note_document(case_id: str):
+def get_note_document(
+    case_id: str,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_VIEW))
+):
     """Streams original uploaded doctor's note PDF inline for browser viewing."""
     record = note_extractor_service.get_note_record(case_id)
     if not record:
         raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    check_case_tenant(record, current_user)
     if not record.storage_path or not Path(record.storage_path).exists():
         raise HTTPException(status_code=404, detail="Physical note PDF not found in storage.")
 
@@ -501,14 +657,27 @@ def get_note_document(case_id: str):
     )
 
 @app.patch("/api/notes/{case_id}/facts/{fact_key}", response_model=ClinicalNoteRecord)
-def correct_extracted_fact(case_id: str, fact_key: str, payload: FactCorrectionRequest):
+def correct_extracted_fact(
+    case_id: str,
+    fact_key: str,
+    payload: FactCorrectionRequest,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.FACT_OVERRIDE)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """
     Auditable Fact Correction Workflow (Phase 5):
     Allows clinical reviewers to correct or override an extracted fact.
     Records reviewer name, reason, timestamp, and audit trail entry.
     Automatically reevaluates the policy ruleset with the updated facts.
     """
+    record = note_extractor_service.get_note_record(case_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    check_case_tenant(record, current_user)
+
     payload.fact_key = fact_key
+    if not payload.reviewer_name:
+        payload.reviewer_name = current_user.full_name
     try:
         updated = note_extractor_service.apply_fact_override(case_id, payload)
         # Re-evaluate automatically to update outcome
@@ -521,6 +690,19 @@ def correct_extracted_fact(case_id: str, fact_key: str, payload: FactCorrectionR
                 note_extractor_service.save_note_record(updated)
             except Exception as eval_err:
                 logger.warning(f"Auto-reevaluation notice: {eval_err}")
+
+        audit_service.log_event(
+            action="FACT_OVERRIDE",
+            user=current_user,
+            resource=f"case:{case_id}",
+            status="SUCCESS",
+            details={
+                "fact_key": fact_key,
+                "corrected_value": str(payload.corrected_value),
+                "corrected_status": payload.corrected_status.value if hasattr(payload.corrected_status, "value") else str(payload.corrected_status),
+                "reason": payload.reason
+            }
+        )
         return updated
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -528,10 +710,32 @@ def correct_extracted_fact(case_id: str, fact_key: str, payload: FactCorrectionR
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/notes/{case_id}/flag", response_model=ClinicalNoteRecord)
-def flag_extracted_fact(case_id: str, payload: FactFlagRequest):
+def flag_extracted_fact(
+    case_id: str,
+    payload: FactFlagRequest,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.FACT_FLAG)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """Flags an extracted fact for secondary clinical review."""
+    record = note_extractor_service.get_note_record(case_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    check_case_tenant(record, current_user)
+
+    if not payload.reviewer_name:
+        payload.reviewer_name = current_user.full_name
     try:
         updated = note_extractor_service.flag_fact_for_review(case_id, payload)
+        audit_service.log_event(
+            action="FACT_FLAG",
+            user=current_user,
+            resource=f"case:{case_id}",
+            status="SUCCESS",
+            details={
+                "fact_key": payload.fact_key,
+                "reason": payload.reason
+            }
+        )
         return updated
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -539,12 +743,16 @@ def flag_extracted_fact(case_id: str, payload: FactFlagRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/api/dashboard/stats")
-def get_dashboard_stats():
+def get_dashboard_stats(
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Phase 5: Real-time dashboard statistics derived dynamically from saved case records.
     Computes total reviews, approved, not approved, pending, and recent review summaries.
+    Enforces tenant isolation: users only see metrics for their authorized organization.
     """
-    cases = note_extractor_service.list_note_records()
+    all_cases = note_extractor_service.list_note_records()
+    cases = [c for c in all_cases if current_user.can_access_tenant(getattr(c, "organization_id", "org_riverside"))]
     total_reviews = len(cases)
     approved_count = 0
     not_approved_count = 0
@@ -584,22 +792,31 @@ def get_dashboard_stats():
     }
 
 @app.get("/api/cases", response_model=List[ClinicalNoteRecord])
-def list_cases():
-    """Lists all saved cases with clinical note records."""
-    return note_extractor_service.list_note_records()
+def list_cases(
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_VIEW))
+):
+    """Lists all saved cases with clinical note records filtered by tenant isolation."""
+    all_cases = note_extractor_service.list_note_records()
+    return [c for c in all_cases if current_user.can_access_tenant(getattr(c, "organization_id", "org_riverside"))]
 
 @app.get("/api/cases/{case_id}", response_model=ClinicalNoteRecord)
-def get_case(case_id: str):
+def get_case(
+    case_id: str,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_VIEW))
+):
     """Retrieves an individual case record by case_id."""
     record = note_extractor_service.get_note_record(case_id)
     if not record:
         raise HTTPException(status_code=404, detail=f"Case record '{case_id}' not found.")
+    check_case_tenant(record, current_user)
     return record
 
 @app.post("/api/cases/{case_id}/evaluate", response_model=EvaluationReport)
 def evaluate_case(
     case_id: str,
-    policy_id: Optional[str] = Query(None, description="Optional override policy ID")
+    policy_id: Optional[str] = Query(None, description="Optional override policy ID"),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.EVALUATION_RUN)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
 ):
     """
     Phase 4 & 5 Deterministic Case Evaluation:
@@ -609,6 +826,7 @@ def evaluate_case(
     note_record = note_extractor_service.get_note_record(case_id)
     if not note_record:
         raise HTTPException(status_code=404, detail=f"Case record '{case_id}' not found.")
+    check_case_tenant(note_record, current_user)
 
     target_policy_id = policy_id or note_record.policy_id
     policy = registry_service.get_by_id(target_policy_id)
@@ -620,6 +838,13 @@ def evaluate_case(
         note_record.latest_outcome = report.decision_outcome.value if hasattr(report.decision_outcome, "value") else str(report.decision_outcome)
         note_record.latest_evaluation = report.model_dump()
         note_extractor_service.save_note_record(note_record)
+        audit_service.log_event(
+            action="EVALUATION_RUN",
+            user=current_user,
+            resource=f"case:{case_id}",
+            status="SUCCESS",
+            details={"policy_id": target_policy_id, "outcome": note_record.latest_outcome}
+        )
         return report
     except PolicyVerificationGateError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -627,7 +852,8 @@ def evaluate_case(
 @app.get("/api/cases/{case_id}/export")
 def export_case_audit_report(
     case_id: str,
-    format: str = Query("txt", description="Export format: 'txt' or 'json'")
+    format: str = Query("txt", description="Export format: 'txt' or 'json'"),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.DECISION_EXPORT))
 ):
     """
     Phase 5 Auditable Decision Report Export:
@@ -638,10 +864,19 @@ def export_case_audit_report(
     note_record = note_extractor_service.get_note_record(case_id)
     if not note_record:
         raise HTTPException(status_code=404, detail=f"Case record '{case_id}' not found.")
+    check_case_tenant(note_record, current_user)
 
     policy = registry_service.get_by_id(note_record.policy_id)
     if not policy:
         raise HTTPException(status_code=404, detail=f"Policy '{note_record.policy_id}' not found.")
+
+    audit_service.log_event(
+        action="DECISION_EXPORT",
+        user=current_user,
+        resource=f"case:{case_id}",
+        status="SUCCESS",
+        details={"format": format, "policy_id": note_record.policy_id}
+    )
 
     evaluation = None
     try:
@@ -787,7 +1022,9 @@ def export_case_audit_report(
 # --- Authoritative Terminology-Only Lookup Endpoints (Phase 6) ---
 
 @app.get("/api/terminology/sources", response_model=List[ApprovedSource])
-def get_terminology_sources():
+def get_terminology_sources(
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Approved Source Registry:
     Returns explicitly registered and verified terminology authorities
@@ -803,7 +1040,11 @@ def get_terminology_sources():
         400: {"description": "Invalid lookup request or term formatting error"}
     }
 )
-def lookup_terminology(payload: TerminologyLookupRequest):
+def lookup_terminology(
+    payload: TerminologyLookupRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
     """
     Authoritative Terminology-Only Lookup:
     1. RULEBOOK-FIRST: Always checks selected policy rulebook definitions first.
@@ -817,7 +1058,10 @@ def lookup_terminology(payload: TerminologyLookupRequest):
 
 
 @app.get("/api/terminology/rulebook-terms/{policy_id}")
-def get_policy_rulebook_terms(policy_id: str):
+def get_policy_rulebook_terms(
+    policy_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
     """
     Rulebook-First Definitions:
     Retrieves all terms natively defined by the specified policy rulebook.
@@ -826,7 +1070,9 @@ def get_policy_rulebook_terms(policy_id: str):
 
 
 @app.get("/api/terminology/audit-log")
-def get_terminology_audit_log():
+def get_terminology_audit_log(
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.AUDIT_VIEW_COMPLIANCE))
+):
     """
     Terminology Provenance Audit Trail:
     Retrieves the immutable audit log of all clinical terminology lookups.

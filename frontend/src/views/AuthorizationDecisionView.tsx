@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, X, AlertCircle, AlertTriangle, Download, RotateCcw, ShieldCheck } from 'lucide-react';
 import { ViewMode, EvaluationReport, ClinicalNoteRecord } from '../types';
 import { mockJohnDoeCase } from '../mockData';
+import { apiFetch } from '../api/client';
 
 interface AuthorizationDecisionViewProps {
   onNavigate: (view: ViewMode) => void;
@@ -87,7 +88,7 @@ export const AuthorizationDecisionView: React.FC<AuthorizationDecisionViewProps>
 
   const handleDownloadTxt = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
+      const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
       if (res.ok) {
         const text = await res.text();
         const blob = new Blob([text], { type: 'text/plain' });
@@ -159,7 +160,7 @@ ${evaluationReport?.governance_notice || 'DEVELOPMENT/DEMO MODE ONLY: Synthetic 
 
   const handleDownloadJson = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/cases/${caseId}/export?format=json`);
+      const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}/export?format=json`);
       if (res.ok) {
         const jsonContent = await res.text();
         const blob = new Blob([jsonContent], { type: 'application/json' });

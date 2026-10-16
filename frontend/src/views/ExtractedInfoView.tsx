@@ -24,6 +24,7 @@ import {
   FactCorrectionPayload,
   FactFlagPayload
 } from '../types';
+import { apiFetch } from '../api/client';
 
 interface ExtractedInfoViewProps {
   onNavigate: (view: ViewMode) => void;
@@ -162,7 +163,7 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
     };
 
     try {
-      const response = await fetch(`http://localhost:8000/api/notes/${caseId}/facts/${editingFact.fact_key}`, {
+      const response = await apiFetch(`http://localhost:8000/api/notes/${caseId}/facts/${editingFact.fact_key}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -200,7 +201,7 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
     };
 
     try {
-      const response = await fetch(`http://localhost:8000/api/notes/${caseId}/flag`, {
+      const response = await apiFetch(`http://localhost:8000/api/notes/${caseId}/flag`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

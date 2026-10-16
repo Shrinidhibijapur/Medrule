@@ -38,9 +38,10 @@ import {
   VerificationStatus,
   ReviewerSignoff
 } from '../types';
+import { apiFetch } from '../api/client';
 
 interface PolicyLibraryViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
 }
 
 export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate }) => {
@@ -85,7 +86,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
 
   const fetchPolicies = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/policies');
+      const res = await apiFetch('http://localhost:8000/api/policies');
       if (res.ok) {
         const data = await res.json();
         setPolicies(data);
@@ -105,7 +106,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
   const fetchRuleset = async (policyId: string) => {
     setLoadingRuleset(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/policies/${policyId}/criteria`);
+      const res = await apiFetch(`http://localhost:8000/api/policies/${policyId}/criteria`);
       if (res.ok) {
         const data = await res.json();
         setPolicyRuleset(data);
@@ -123,7 +124,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
     setGateError(null);
     setGateSuccess(null);
     try {
-      const res = await fetch(`http://localhost:8000/api/policies/${selectedPolicy.id}/criteria/verify-gate`, {
+      const res = await apiFetch(`http://localhost:8000/api/policies/${selectedPolicy.id}/criteria/verify-gate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -153,7 +154,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
 
   const handleStatusTransition = async (policyId: string, newStatus: PolicyLifecycleStatus) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/policies/${policyId}/status`, {
+      const res = await apiFetch(`http://localhost:8000/api/policies/${policyId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -198,7 +199,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
     formData.append('cpt_codes', 'CP.MP.107');
 
     try {
-      const res = await fetch('http://localhost:8000/api/policies/upload', {
+      const res = await apiFetch('http://localhost:8000/api/policies/upload', {
         method: 'POST',
         body: formData
       });

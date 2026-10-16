@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Send, Paperclip, Sparkles, Check, X, ShieldAlert, ArrowRight } from 'lucide-react';
 import { ViewMode } from '../types';
 import { mockJohnDoeCase } from '../mockData';
 
 interface AskMedRuleViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
 }
 
 export const AskMedRuleView: React.FC<AskMedRuleViewProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Array<{
     sender: 'user' | 'agent';
     text?: string;
@@ -200,7 +202,10 @@ export const AskMedRuleView: React.FC<AskMedRuleViewProps> = ({ onNavigate }) =>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                       <button
-                        onClick={() => onNavigate('authorization_decision')}
+                        onClick={() => {
+                          navigate('/cases/CASE-2026-001/decision');
+                          if (onNavigate) onNavigate('authorization_decision');
+                        }}
                         className="btn btn-primary"
                         style={{ padding: '8px 16px', fontSize: '13px' }}
                       >

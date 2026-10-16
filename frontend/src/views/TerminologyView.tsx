@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BookMarked,
   ArrowLeft,
@@ -17,9 +18,10 @@ import {
   Scale
 } from 'lucide-react';
 import { ViewMode } from '../types';
+import { apiFetch } from '../api/client';
 
 interface TerminologyViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
 }
 
 interface ApprovedSource {
@@ -74,6 +76,7 @@ interface AuditLogEntry {
 }
 
 export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('Papilledema');
   const [selectedPolicyId, setSelectedPolicyId] = useState('P-UHC-CT-2026');
   const [isLoading, setIsLoading] = useState(false);
@@ -93,7 +96,7 @@ export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) 
 
   const fetchApprovedSources = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/terminology/sources');
+      const res = await apiFetch('http://localhost:8000/api/terminology/sources');
       if (res.ok) {
         const data = await res.json();
         setSources(data);
@@ -174,7 +177,7 @@ export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) 
 
   const fetchAuditLogs = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/terminology/audit-log');
+      const res = await apiFetch('http://localhost:8000/api/terminology/audit-log');
       if (res.ok) {
         const data = await res.json();
         setAuditLogs(data);
@@ -190,7 +193,7 @@ export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) 
     setErrorMessage(null);
 
     try {
-      const res = await fetch('http://localhost:8000/api/terminology/lookup', {
+      const res = await apiFetch('http://localhost:8000/api/terminology/lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -380,7 +383,10 @@ export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) 
 
         <button
           type="button"
-          onClick={() => onNavigate('dashboard')}
+          onClick={() => {
+            navigate('/dashboard');
+            if (onNavigate) onNavigate('dashboard');
+          }}
           className="btn btn-outline"
         >
           <ArrowLeft size={16} />
@@ -985,14 +991,20 @@ export const TerminologyView: React.FC<TerminologyViewProps> = ({ onNavigate }) 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
         <button
           type="button"
-          onClick={() => onNavigate('policy_library')}
+          onClick={() => {
+            navigate('/policies');
+            if (onNavigate) onNavigate('policy_library');
+          }}
           className="btn btn-outline"
         >
           <span>View Policy Library</span>
         </button>
         <button
           type="button"
-          onClick={() => onNavigate('new_review')}
+          onClick={() => {
+            navigate('/review/new');
+            if (onNavigate) onNavigate('new_review');
+          }}
           className="btn btn-primary"
         >
           <span>Start Authorization Review</span>

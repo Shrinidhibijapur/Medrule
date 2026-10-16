@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, CheckCircle2, XCircle, Clock, FileText, AlertCircle, RefreshCw, ShieldAlert, ArrowRight } from 'lucide-react';
 import { ViewMode, ClinicalNoteRecord } from '../types';
+import { apiFetch } from '../api/client';
 
 interface DashboardStats {
   total_reviews: number;
@@ -20,11 +22,12 @@ interface DashboardStats {
 }
 
 interface DashboardViewProps {
-  onNavigate: (view: ViewMode) => void;
+  onNavigate?: (view: ViewMode) => void;
   onSelectCaseRecord?: (record: ClinicalNoteRecord) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSelectCaseRecord }) => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +36,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSele
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:8000/api/dashboard/stats');
+      const res = await apiFetch('http://localhost:8000/api/dashboard/stats');
       if (!res.ok) {
         throw new Error(`Failed to load dashboard metrics (HTTP ${res.status})`);
       }
@@ -53,18 +56,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSele
 
   const handleSelectCase = async (caseId: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/cases/${caseId}`);
+      const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}`);
       if (res.ok) {
         const record: ClinicalNoteRecord = await res.json();
         if (onSelectCaseRecord) {
           onSelectCaseRecord(record);
         }
-        onNavigate('authorization_decision');
+        navigate(`/cases/${caseId}/decision`);
+        if (onNavigate) onNavigate('authorization_decision');
       } else {
-        onNavigate('new_review');
+        navigate('/review/new');
+        if (onNavigate) onNavigate('new_review');
       }
     } catch {
-      onNavigate('new_review');
+      navigate('/review/new');
+      if (onNavigate) onNavigate('new_review');
     }
   };
 
@@ -139,7 +145,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSele
           </p>
         </div>
         <button
-          onClick={() => onNavigate('new_review')}
+          onClick={() => {
+            navigate('/review/new');
+            if (onNavigate) onNavigate('new_review');
+          }}
           className="btn btn-primary"
           style={{ padding: '10px 18px', fontSize: '14px' }}
         >
@@ -288,7 +297,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSele
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Dynamically retrieved from saved case repository</span>
           </div>
           <button
-            onClick={() => onNavigate('cases_history')}
+            onClick={() => {
+              navigate('/cases');
+              if (onNavigate) onNavigate('cases_history');
+            }}
             className="btn btn-outline"
             style={{ padding: '6px 14px', fontSize: '12px' }}
           >
@@ -321,7 +333,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, onSele
                   <FileText size={24} style={{ margin: '0 auto 8px', display: 'block', color: 'var(--text-muted)' }} />
                   <div>No clinical review cases registered yet.</div>
                   <button
-                    onClick={() => onNavigate('new_review')}
+                    onClick={() => {
+                      navigate('/review/new');
+                      if (onNavigate) onNavigate('new_review');
+                    }}
                     className="btn btn-primary"
                     style={{ marginTop: '12px', fontSize: '13px' }}
                   >

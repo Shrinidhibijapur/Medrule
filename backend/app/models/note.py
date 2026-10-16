@@ -31,15 +31,15 @@ class ExtractedFact(BaseModel):
     reviewer_override: Optional[ReviewerFactOverride] = None
 
 class FactCorrectionRequest(BaseModel):
-    fact_key: str
+    fact_key: Optional[str] = None
     corrected_value: Any
     corrected_status: ClinicalFactStatus
-    reviewer_name: str
+    reviewer_name: Optional[str] = None
     reason: str
 
 class FactFlagRequest(BaseModel):
     fact_key: str
-    reviewer_name: str
+    reviewer_name: Optional[str] = None
     reason: str
 
 class ClinicalNoteRecord(BaseModel):
@@ -53,6 +53,7 @@ class ClinicalNoteRecord(BaseModel):
     procedure_requested: str
     procedure_type: Optional[str] = None
     insurance_plan: str = "United Healthcare"
+    organization_id: str = "org_riverside"
     policy_id: str = "P-UHC-CT-2026"
     policy_version: Optional[str] = "2026.1"
     chief_complaint: Optional[str] = None
