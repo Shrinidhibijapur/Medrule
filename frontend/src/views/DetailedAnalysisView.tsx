@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, Check, X } from 'lucide-react';
-import { ViewMode } from '../types';
+import { ArrowLeft, ArrowRight, BookOpen, Check, X, Minus, AlertCircle, AlertTriangle } from 'lucide-react';
+import { ViewMode, EvaluationReport, ClinicalNoteRecord } from '../types';
 import { mockJohnDoeCase } from '../mockData';
 
 interface DetailedAnalysisViewProps {
   onNavigate: (view: ViewMode) => void;
+  evaluationReport?: EvaluationReport | null;
+  caseRecord?: ClinicalNoteRecord | null;
 }
 
-export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ onNavigate }) => {
+export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ 
+  onNavigate,
+  evaluationReport,
+  caseRecord
+}) => {
   const [showRulebookModal, setShowRulebookModal] = useState(false);
+
+  const criteriaRows = evaluationReport 
+    ? evaluationReport.criteria_results 
+    : mockJohnDoeCase.criteria_results;
+
+  const patientName = evaluationReport?.patient_name || caseRecord?.patient_name || mockJohnDoeCase.patient_name;
+  const procedure = evaluationReport?.procedure || caseRecord?.procedure_requested || mockJohnDoeCase.procedure;
 
   return (
     <div style={{ maxWidth: '1100px' }}>
@@ -17,14 +30,14 @@ export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ onNa
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '24px'
+        marginBottom: '20px'
       }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '700', letterSpacing: '-0.5px', marginBottom: '4px' }}>
-            Detailed Analysis
+            Detailed Criteria & Evidence Analysis
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-            Complete evaluation with rulebook references and evidence
+            {patientName} &bull; {procedure} &bull; Line-by-line evidence mapping to canonical policy ruleset
           </p>
         </div>
 
@@ -40,39 +53,116 @@ export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ onNa
 
       {/* Analysis Table Card */}
       <div className="card" style={{ padding: '0', overflow: 'hidden', marginBottom: '32px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13.5px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
           <thead>
             <tr style={{ backgroundColor: '#FAF9F6', borderBottom: '1px solid var(--border-subtle)' }}>
-              <th style={{ padding: '14px 18px', width: '40px', fontWeight: '600', color: 'var(--text-secondary)' }}>#</th>
+              <th style={{ padding: '14px 18px', width: '50px', fontWeight: '600', color: 'var(--text-secondary)' }}>#</th>
               <th style={{ padding: '14px 18px', width: '180px', fontWeight: '600', color: 'var(--text-secondary)' }}>Criterion</th>
-              <th style={{ padding: '14px 18px', width: '140px', fontWeight: '600', color: 'var(--text-secondary)' }}>Policy Reference</th>
-              <th style={{ padding: '14px 18px', width: '220px', fontWeight: '600', color: 'var(--text-secondary)' }}>Evidence from Note</th>
-              <th style={{ padding: '14px 18px', width: '80px', fontWeight: '600', color: 'var(--text-secondary)', textAlign: 'center' }}>Status</th>
-              <th style={{ padding: '14px 18px', fontWeight: '600', color: 'var(--text-secondary)' }}>Comments</th>
+              <th style={{ padding: '14px 18px', width: '160px', fontWeight: '600', color: 'var(--text-secondary)' }}>Policy Reference</th>
+              <th style={{ padding: '14px 18px', width: '240px', fontWeight: '600', color: 'var(--text-secondary)' }}>Evidence from Note</th>
+              <th style={{ padding: '14px 18px', width: '100px', fontWeight: '600', color: 'var(--text-secondary)', textAlign: 'center' }}>Status</th>
+              <th style={{ padding: '14px 18px', fontWeight: '600', color: 'var(--text-secondary)' }}>Evaluation Explanation</th>
             </tr>
           </thead>
           <tbody>
-            {mockJohnDoeCase.criteria_results.map((row) => (
+            {criteriaRows.map((row: any) => (
               <tr key={row.rule_id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '16px 18px', color: 'var(--text-secondary)' }}>{row.rule_id}</td>
+                <td style={{ padding: '16px 18px', color: 'var(--text-secondary)', fontWeight: '600' }}>{row.rule_id}</td>
                 <td style={{ padding: '16px 18px', fontWeight: '600' }}>{row.criterion_name}</td>
-                <td style={{ padding: '16px 18px', color: 'var(--primary)', fontWeight: '600' }}>{row.section}</td>
-                <td style={{ padding: '16px 18px', color: 'var(--text-primary)' }}>{row.evidence_excerpt}</td>
-                <td style={{ padding: '16px 18px', textAlign: 'center' }}>
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--success-bg)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--success)'
-                  }}>
-                    <Check size={15} />
-                  </div>
+                <td style={{ padding: '16px 18px' }}>
+                  <div style={{ color: 'var(--primary)', fontWeight: '600' }}>{row.section}</div>
+                  {row.source_page && (
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Page {row.source_page}</div>
+                  )}
                 </td>
-                <td style={{ padding: '16px 18px', color: 'var(--text-secondary)' }}>{row.comment}</td>
+                <td style={{ padding: '16px 18px', color: 'var(--text-primary)', fontStyle: 'italic' }}>
+                  "{row.evidence_excerpt}"
+                </td>
+                <td style={{ padding: '16px 18px', textAlign: 'center' }}>
+                  {row.status === 'MET' && (
+                    <div style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--success-bg)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--success)',
+                      margin: '0 auto'
+                    }} title="Satisfied">
+                      <Check size={16} />
+                    </div>
+                  )}
+                  {row.status === 'NOT_MET' && (
+                    <div style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--danger-bg)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--danger)',
+                      margin: '0 auto'
+                    }} title="Not Met">
+                      <X size={16} />
+                    </div>
+                  )}
+                  {row.status === 'NOT_DOCUMENTED' && (
+                    <div style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FEF3C7',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#92400E',
+                      margin: '0 auto'
+                    }} title="Not Documented">
+                      <AlertTriangle size={15} />
+                    </div>
+                  )}
+                  {row.status === 'UNCLEAR_CONFLICTING' && (
+                    <div style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: '#FEF3C7',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#92400E',
+                      margin: '0 auto'
+                    }} title="Unclear / Review">
+                      <AlertCircle size={15} />
+                    </div>
+                  )}
+                  {row.status === 'NOT_APPLICABLE' && (
+                    <div style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: '#F3F4F6',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#4B5563',
+                      margin: '0 auto'
+                    }} title="Not Applicable">
+                      <Minus size={15} />
+                    </div>
+                  )}
+                </td>
+                <td style={{ padding: '16px 18px', color: 'var(--text-secondary)' }}>
+                  {row.comment}
+                  {row.reviewer_overridden && (
+                    <div style={{ marginTop: '4px', fontSize: '11px', color: '#92400E', fontWeight: '600' }}>
+                      [Overridden by {row.reviewer_override_by}: {row.reviewer_override_reason}]
+                    </div>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -86,7 +176,7 @@ export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ onNa
           className="btn btn-outline"
         >
           <ArrowLeft size={16} />
-          <span>Back</span>
+          <span>Back to Evaluation</span>
         </button>
 
         <button
@@ -94,7 +184,7 @@ export const DetailedAnalysisView: React.FC<DetailedAnalysisViewProps> = ({ onNa
           className="btn btn-primary"
           style={{ padding: '10px 24px' }}
         >
-          <span>Continue</span>
+          <span>Continue to Decision</span>
           <ArrowRight size={16} />
         </button>
       </div>

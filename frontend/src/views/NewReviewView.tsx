@@ -326,7 +326,7 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
               style={{ display: 'none' }}
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
-                  handleFileUpload(e.target.files[0]);
+                  void handleFileUpload(e.target.files[0]);
                 }
               }}
             />
@@ -378,11 +378,12 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
         marginBottom: '32px'
       }}>
         <div>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+          <label htmlFor="new-review-policy-select" style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
             Applicable Policy Rulebook
           </label>
           <div style={{ position: 'relative' }}>
             <select
+              id="new-review-policy-select"
               value={selectedPolicyId}
               onChange={(e) => setSelectedPolicyId(e.target.value)}
               style={{
@@ -406,11 +407,12 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+          <label htmlFor="new-review-procedure-select" style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
             Procedure Requested
           </label>
           <div style={{ position: 'relative' }}>
             <select
+              id="new-review-procedure-select"
               value={selectedProcedure}
               onChange={(e) => setSelectedProcedure(e.target.value)}
               style={{

@@ -34,7 +34,7 @@ def sample_approved_uhc_policy():
         procedure_full_name="CT Scan of Head with Contrast",
         cpt_codes=["70450", "70460"],
         effective_date="2026-01-01",
-        sha256_checksum="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        sha256_checksum="681f8ececb53bcacf5e0950b6a8058284dfc468d63c517ea2355a781cedc00a7",
         total_pages=4,
         lifecycle_status=PolicyLifecycleStatus.APPROVED_FOR_USE,
         criteria=[]

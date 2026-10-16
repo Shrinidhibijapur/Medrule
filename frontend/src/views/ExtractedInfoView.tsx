@@ -151,7 +151,7 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
     let parsedVal = correctedValue;
     if (correctedValue === 'true' || correctedValue === true) parsedVal = true;
     else if (correctedValue === 'false' || correctedValue === false) parsedVal = false;
-    else if (!isNaN(Number(correctedValue)) && correctedValue !== '') parsedVal = Number(correctedValue);
+    else if (!Number.isNaN(Number(correctedValue)) && correctedValue !== '') parsedVal = Number(correctedValue);
 
     const payload: FactCorrectionPayload = {
       fact_key: editingFact.fact_key,
@@ -697,10 +697,11 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
 
             <div style={{ padding: '20px' }}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
+                <label htmlFor="edit-corrected-value-input" style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
                   Corrected Clinical Value
                 </label>
                 <input
+                  id="edit-corrected-value-input"
                   type="text"
                   value={String(correctedValue)}
                   onChange={(e) => setCorrectedValue(e.target.value)}
@@ -716,10 +717,11 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
+                <label htmlFor="edit-corrected-status-select" style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
                   Status Classification
                 </label>
                 <select
+                  id="edit-corrected-status-select"
                   value={correctedStatus}
                   onChange={(e) => setCorrectedStatus(e.target.value as ClinicalFactStatus)}
                   style={{
@@ -739,10 +741,11 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
+                <label htmlFor="edit-reviewer-name-input" style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
                   Reviewing Clinician Name (Required for Governance Audit)
                 </label>
                 <input
+                  id="edit-reviewer-name-input"
                   type="text"
                   value={reviewerName}
                   onChange={(e) => setReviewerName(e.target.value)}
@@ -758,10 +761,11 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
+                <label htmlFor="edit-correction-reason-textarea" style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
                   Clinical Justification / Audit Reason (Required)
                 </label>
                 <textarea
+                  id="edit-correction-reason-textarea"
                   rows={3}
                   value={correctionReason}
                   onChange={(e) => setCorrectionReason(e.target.value)}
@@ -865,10 +869,11 @@ export const ExtractedInfoView: React.FC<ExtractedInfoViewProps> = ({
               </p>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
+                <label htmlFor="flag-reason-notes-textarea" style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>
                   Flag Reason & Notes
                 </label>
                 <textarea
+                  id="flag-reason-notes-textarea"
                   rows={3}
                   value={correctionReason}
                   onChange={(e) => setCorrectionReason(e.target.value)}

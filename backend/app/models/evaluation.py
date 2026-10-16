@@ -36,6 +36,11 @@ class CriterionEvaluationResult(BaseModel):
     logic_group: Optional[str] = None
     plain_english_rationale: Optional[str] = None
     is_exclusion: bool = False
+    fact_key: Optional[str] = None
+    fact_confidence: Optional[float] = None
+    reviewer_overridden: bool = False
+    reviewer_override_by: Optional[str] = None
+    reviewer_override_reason: Optional[str] = None
 
 class EvaluationReport(BaseModel):
     case_id: str
@@ -54,3 +59,5 @@ class EvaluationReport(BaseModel):
     decision_outcome: Optional[DecisionOutcome] = None
     policy_checksum: Optional[str] = None
     verification_gate_verified: bool = True
+    is_synthetic_demo: bool = True
+    governance_notice: str = "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."

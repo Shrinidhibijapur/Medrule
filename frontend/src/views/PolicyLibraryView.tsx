@@ -80,7 +80,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
-    fetchPolicies();
+    void fetchPolicies();
   }, []);
 
   const fetchPolicies = async () => {
@@ -98,7 +98,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
 
   useEffect(() => {
     if (selectedPolicy) {
-      fetchRuleset(selectedPolicy.id);
+      void fetchRuleset(selectedPolicy.id);
     }
   }, [selectedPolicy?.id]);
 
@@ -621,10 +621,11 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
+                      <label htmlFor="gate-primary-reviewer-input" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
                         Primary Reviewer Name & Title *
                       </label>
                       <input
+                        id="gate-primary-reviewer-input"
                         type="text"
                         value={gatePrimaryReviewer}
                         onChange={e => setGatePrimaryReviewer(e.target.value)}
@@ -634,10 +635,11 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
+                      <label htmlFor="gate-secondary-reviewer-input" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
                         Independent Secondary Reviewer Name & Title *
                       </label>
                       <input
+                        id="gate-secondary-reviewer-input"
                         type="text"
                         value={gateSecondaryReviewer}
                         onChange={e => setGateSecondaryReviewer(e.target.value)}
@@ -670,10 +672,11 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
+                      <label htmlFor="gate-reviewer-audit-notes" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>
                         Reviewer Audit Notes
                       </label>
                       <textarea
+                        id="gate-reviewer-audit-notes"
                         value={gateNotes}
                         onChange={e => setGateNotes(e.target.value)}
                         rows={3}
@@ -762,7 +765,15 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                     {displayedSections.map(sec => (
                       <div
                         key={sec.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setInspectorPage(sec.page_number)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setInspectorPage(sec.page_number);
+                          }
+                        }}
                         style={{
                           padding: '14px 16px',
                           borderRadius: 'var(--radius-sm)',
@@ -1097,7 +1108,7 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                   {selectedFile ? selectedFile.name : 'Choose policy PDF (Max 25MB)'}
                 </div>
                 <label className="btn btn-primary" style={{ padding: '6px 14px', fontSize: '12px', cursor: 'pointer' }}>
-                  Browse File
+                  <span>Browse File</span>
                   <input
                     type="file"
                     accept=".pdf"
@@ -1113,8 +1124,9 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Insurer</label>
+                  <label htmlFor="upload-modal-insurer" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Insurer</label>
                   <input
+                    id="upload-modal-insurer"
                     type="text"
                     value={uploadInsurer}
                     onChange={(e) => setUploadInsurer(e.target.value)}
@@ -1123,8 +1135,9 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Version</label>
+                  <label htmlFor="upload-modal-version" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Version</label>
                   <input
+                    id="upload-modal-version"
                     type="text"
                     value={uploadVersion}
                     onChange={(e) => setUploadVersion(e.target.value)}
@@ -1136,8 +1149,9 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Policy Title</label>
+                <label htmlFor="upload-modal-policy-title" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Policy Title</label>
                 <input
+                  id="upload-modal-policy-title"
                   type="text"
                   value={uploadPolicyName}
                   onChange={(e) => setUploadPolicyName(e.target.value)}
@@ -1148,8 +1162,9 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '18px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Procedure Scope</label>
+                  <label htmlFor="upload-modal-proc-scope" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Procedure Scope</label>
                   <input
+                    id="upload-modal-proc-scope"
                     type="text"
                     value={uploadProcType}
                     onChange={(e) => setUploadProcType(e.target.value)}
@@ -1158,8 +1173,9 @@ export const PolicyLibraryView: React.FC<PolicyLibraryViewProps> = ({ onNavigate
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Effective Date</label>
+                  <label htmlFor="upload-modal-effective-date" style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Effective Date</label>
                   <input
+                    id="upload-modal-effective-date"
                     type="date"
                     value={uploadEffectiveDate}
                     onChange={(e) => setUploadEffectiveDate(e.target.value)}

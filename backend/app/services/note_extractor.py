@@ -3,7 +3,7 @@ import re
 import io
 import json
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
@@ -182,7 +182,7 @@ class ClinicalNoteExtractorService:
         audit_trail: List[Dict[str, Any]] = []
         if has_injection:
             audit_trail.append({
-                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "action": "SECURITY_WARNING",
                 "details": f"Untrusted document contains potential prompt injection: {'; '.join(injection_warnings)}. Content isolated from execution instructions."
             })
@@ -215,7 +215,7 @@ class ClinicalNoteExtractorService:
         date_of_visit = self._extract_regex(
             combined_full_text,
             r'(?:Date of Visit|Encounter Date|Date of Service|Visit Date)\s*[:\-]\s*([0-9]{1,2}[/\-][0-9]{1,2}[/\-][0-9]{2,4})',
-            default=datetime.utcnow().strftime("%m/%d/%Y")
+            default=datetime.now(timezone.utc).strftime("%m/%d/%Y")
         )
         procedure = procedure_requested_override or self._extract_regex(
             combined_full_text,
@@ -237,7 +237,7 @@ class ClinicalNoteExtractorService:
         # 5. Extract Clinical Facts matching Policy Evidence Schema
         facts = self._extract_clinical_facts(all_text_blocks, policy_id, policy_rules)
 
-        case_id = f"CASE-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        case_id = f"CASE-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
 
         record = ClinicalNoteRecord(
             case_id=case_id,
@@ -271,8 +271,8 @@ class ClinicalNoteExtractorService:
             is_synthetic=True,
             governance_warning="DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
             audit_trail=audit_trail,
-            created_at=datetime.utcnow().isoformat() + "Z",
-            updated_at=datetime.utcnow().isoformat() + "Z",
+            created_at=datetime.now(timezone.utc).isoformat(),
+            updated_at=datetime.now(timezone.utc).isoformat(),
         )
 
         self.save_note_record(record)
@@ -780,10 +780,10 @@ class ClinicalNoteExtractorService:
         return m.group(1).strip() if m else default
 
     def _extract_age(self, text: str) -> Optional[int]:
-        m = re.search(r'(?:Age|Patient Age)\s*[:\-]?\s*(\d+)', text, re.IGNORECASE)
+        m = re.search(r'\b(?:Age|Patient Age)\s*(?:[:\-]\s*)?(\d{1,3})\b', text, re.IGNORECASE)
         if m:
             return int(m.group(1))
-        m2 = re.search(r'(\d+)\s*(?:year\s+old|yo|y/o)', text, re.IGNORECASE)
+        m2 = re.search(r'\b(\d{1,3})\s*(?:years?\s+old|y[ /]?o)\b', text, re.IGNORECASE)
         if m2:
             return int(m2.group(1))
         return 42
@@ -795,13 +795,26 @@ class ClinicalNoteExtractorService:
             f.write(record.model_dump_json(indent=2))
 
     def get_note_record(self, case_id: str) -> Optional[ClinicalNoteRecord]:
-        """Loads note record from data/notes/{case_id}.json."""
+        """Loads note record from data/notes/{case_id}.json or matches by case_id within JSON."""
         path = self.notes_data_dir / f"{case_id}.json"
-        if not path.exists():
-            return None
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return ClinicalNoteRecord.model_validate(data)
+        if path.exists():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    return ClinicalNoteRecord.model_validate(data)
+            except Exception:
+                pass
+
+        # Fallback: scan files in notes_data_dir to find matching record by case_id
+        for file in self.notes_data_dir.glob("*.json"):
+            try:
+                with open(file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if data.get("case_id") == case_id or file.stem.lower() == case_id.lower():
+                        return ClinicalNoteRecord.model_validate(data)
+            except Exception:
+                continue
+        return None
 
     def list_note_records(self) -> List[ClinicalNoteRecord]:
         """Returns all note records stored in data/notes/."""
@@ -844,7 +857,7 @@ class ClinicalNoteExtractorService:
         fact.reviewer_override = ReviewerFactOverride(
             is_overridden=True,
             overridden_by=request.reviewer_name,
-            overridden_at=datetime.utcnow().isoformat() + "Z",
+            overridden_at=datetime.now(timezone.utc).isoformat(),
             original_value=original_val,
             corrected_value=request.corrected_value,
             original_status=original_stat,
@@ -857,7 +870,7 @@ class ClinicalNoteExtractorService:
         fact.confidence = 1.0
 
         record.audit_trail.append({
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "action": "FACT_OVERRIDE",
             "fact_key": request.fact_key,
             "reviewer": request.reviewer_name,
@@ -867,7 +880,7 @@ class ClinicalNoteExtractorService:
             "corrected_status": request.corrected_status.value if hasattr(request.corrected_status, "value") else str(request.corrected_status),
             "reason": request.reason
         })
-        record.updated_at = datetime.utcnow().isoformat() + "Z"
+        record.updated_at = datetime.now(timezone.utc).isoformat()
 
         self.save_note_record(record)
         return record
@@ -886,13 +899,13 @@ class ClinicalNoteExtractorService:
         fact.flag_reason = request.reason
 
         record.audit_trail.append({
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "action": "FACT_FLAGGED",
             "fact_key": request.fact_key,
             "reviewer": request.reviewer_name,
             "reason": request.reason
         })
-        record.updated_at = datetime.utcnow().isoformat() + "Z"
+        record.updated_at = datetime.now(timezone.utc).isoformat()
 
         self.save_note_record(record)
         return record

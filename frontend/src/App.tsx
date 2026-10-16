@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ViewMode, ClinicalNoteRecord } from './types';
+import { ViewMode, ClinicalNoteRecord, EvaluationReport } from './types';
 import { Sidebar } from './components/Sidebar';
 import { LoginView } from './views/LoginView';
 import { DashboardView } from './views/DashboardView';
@@ -12,11 +12,14 @@ import { AuthorizationDecisionView } from './views/AuthorizationDecisionView';
 import { CasesHistoryView } from './views/CasesHistoryView';
 import { AskMedRuleView } from './views/AskMedRuleView';
 import { PolicyLibraryView } from './views/PolicyLibraryView';
+import { TerminologyView } from './views/TerminologyView';
+import { SettingsView } from './views/SettingsView';
 
 export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
   const [activeCaseRecord, setActiveCaseRecord] = useState<ClinicalNoteRecord | null>(null);
+  const [activeEvaluationReport, setActiveEvaluationReport] = useState<EvaluationReport | null>(null);
 
   useEffect(() => {
     // Attempt initial load of canonical demo case CASE-2026-001 from backend
@@ -35,12 +38,23 @@ export const App: React.FC = () => {
   const renderCurrentView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <DashboardView onNavigate={setCurrentView} />;
+        return (
+          <DashboardView
+            onNavigate={setCurrentView}
+            onSelectCaseRecord={(rec) => {
+              setActiveCaseRecord(rec);
+              setActiveEvaluationReport(null);
+            }}
+          />
+        );
       case 'new_review':
         return (
           <NewReviewView
             onNavigate={setCurrentView}
-            onSelectCaseRecord={setActiveCaseRecord}
+            onSelectCaseRecord={(rec) => {
+              setActiveCaseRecord(rec);
+              setActiveEvaluationReport(null);
+            }}
             activeCaseRecord={activeCaseRecord}
           />
         );
@@ -56,26 +70,65 @@ export const App: React.FC = () => {
           <ExtractedInfoView
             onNavigate={setCurrentView}
             caseRecord={activeCaseRecord}
-            onCaseRecordUpdated={setActiveCaseRecord}
+            onCaseRecordUpdated={(rec) => {
+              setActiveCaseRecord(rec);
+              setActiveEvaluationReport(null);
+            }}
           />
         );
       case 'criteria_evaluation':
-        return <CriteriaEvaluationView onNavigate={setCurrentView} />;
+        return (
+          <CriteriaEvaluationView 
+            onNavigate={setCurrentView} 
+            caseRecord={activeCaseRecord}
+            evaluationReport={activeEvaluationReport}
+            onEvaluationReportChange={setActiveEvaluationReport}
+          />
+        );
       case 'detailed_analysis':
-        return <DetailedAnalysisView onNavigate={setCurrentView} />;
+        return (
+          <DetailedAnalysisView 
+            onNavigate={setCurrentView} 
+            evaluationReport={activeEvaluationReport}
+            caseRecord={activeCaseRecord}
+          />
+        );
       case 'authorization_decision':
-        return <AuthorizationDecisionView onNavigate={setCurrentView} />;
+        return (
+          <AuthorizationDecisionView 
+            onNavigate={setCurrentView} 
+            evaluationReport={activeEvaluationReport}
+            caseRecord={activeCaseRecord}
+          />
+        );
       case 'cases_history':
-        return <CasesHistoryView onNavigate={setCurrentView} />;
+        return (
+          <CasesHistoryView
+            onNavigate={setCurrentView}
+            onSelectCaseRecord={(rec) => {
+              setActiveCaseRecord(rec);
+              setActiveEvaluationReport(null);
+            }}
+          />
+        );
       case 'ask_medrule':
         return <AskMedRuleView onNavigate={setCurrentView} />;
       case 'policy_library':
         return <PolicyLibraryView onNavigate={setCurrentView} />;
       case 'terminology':
+        return <TerminologyView onNavigate={setCurrentView} />;
       case 'settings':
-        return <CasesHistoryView onNavigate={setCurrentView} />;
+        return <SettingsView onNavigate={setCurrentView} />;
       default:
-        return <DashboardView onNavigate={setCurrentView} />;
+        return (
+          <DashboardView
+            onNavigate={setCurrentView}
+            onSelectCaseRecord={(rec) => {
+              setActiveCaseRecord(rec);
+              setActiveEvaluationReport(null);
+            }}
+          />
+        );
     }
   };
 

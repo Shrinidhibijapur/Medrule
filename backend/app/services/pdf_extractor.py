@@ -103,7 +103,7 @@ class PDFExtractorService:
 
         # Pattern for explicit section numbers: e.g. "Section 4.2.1", "Section 1.0", "Article 2"
         section_prefix_pattern = re.compile(
-            r'^(?:Section|Article|Clause)\s+(\d+(?:\.\d+)*)\s*[:.\-–]?\s*(.*)$',
+            r'^(?:Section|Article|Clause)\s+([\d.]+)\s*(?:[:.\-–]\s*)?(.*)$',
             re.IGNORECASE
         )
 

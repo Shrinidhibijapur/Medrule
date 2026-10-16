@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 from app.models.policy import Policy, Criterion
 from app.models.evaluation import (
     CriterionStatus,
@@ -132,6 +132,95 @@ class DeterministicRulesEngine:
             )
 
     @classmethod
+    def _categorize_criteria(
+        cls,
+        policy: Policy,
+        facts: Dict[str, Any]
+    ) -> Tuple[List[CriterionEvaluationResult], List[str], List[str], List[str], List[str]]:
+        criteria_results: List[CriterionEvaluationResult] = []
+        satisfied_ids: List[str] = []
+        failed_ids: List[str] = []
+        missing_ids: List[str] = []
+        review_reasons: List[str] = []
+
+        for crit in policy.criteria:
+            res = cls.evaluate_criterion(crit, facts)
+            criteria_results.append(res)
+
+            if res.status == CriterionStatus.MET:
+                satisfied_ids.append(res.rule_id)
+            elif res.status == CriterionStatus.NOT_DOCUMENTED:
+                missing_ids.append(res.rule_id)
+                failed_ids.append(res.rule_id)
+            elif res.status in (CriterionStatus.UNCLEAR_CONFLICTING, CriterionStatus.POLICY_AMBIGUITY):
+                failed_ids.append(res.rule_id)
+                review_reasons.append(f"Ambiguity/Conflict in {res.rule_id}: {res.comment}")
+            elif res.status != CriterionStatus.NOT_APPLICABLE:
+                failed_ids.append(res.rule_id)
+
+        return criteria_results, satisfied_ids, failed_ids, missing_ids, review_reasons
+
+    @staticmethod
+    def _build_key_reasoning(
+        criteria_results: List[CriterionEvaluationResult],
+        satisfied_ids: List[str],
+        failed_ids: List[str],
+        missing_ids: List[str]
+    ) -> List[str]:
+        if not failed_ids:
+            bullets = ["All required clinical criteria are satisfied"]
+            for cr in criteria_results:
+                if cr.status == CriterionStatus.MET:
+                    bullets.append(f"{cr.criterion_name}: {cr.evidence_excerpt}")
+            return bullets
+
+        bullets = []
+        if satisfied_ids:
+            bullets.append(f"Satisfied conditions: {', '.join(satisfied_ids)}")
+        if missing_ids:
+            bullets.append(f"Missing documentation for: {', '.join(missing_ids)}")
+        unmet_only = [i for i in failed_ids if i not in missing_ids]
+        if unmet_only:
+            bullets.append(f"Unmet clinical criteria: {', '.join(unmet_only)}")
+        return bullets
+
+    @staticmethod
+    def _determine_verdict(
+        procedure_type: str,
+        satisfied_ids: List[str],
+        failed_ids: List[str],
+        missing_ids: List[str],
+        review_reasons: List[str]
+    ) -> Tuple[Verdict, str, bool, List[str]]:
+        reasons = list(review_reasons)
+        if not failed_ids:
+            verdict = Verdict.APPROVED
+            verdict_sentence = (
+                f"Approval of a {procedure_type} requires all minimum clinical criteria to be met. "
+                f"Conditions {', '.join(satisfied_ids)} are satisfied and meet that minimum. "
+                f"Therefore the {procedure_type} request can be approved."
+            )
+            return verdict, verdict_sentence, False, reasons
+
+        verdict = Verdict.NOT_APPROVED
+        unmet_only = [i for i in failed_ids if i not in missing_ids]
+        if missing_ids and not unmet_only:
+            verdict_sentence = (
+                f"Not all conditions required as the minimum for approval of a {procedure_type} have been satisfied. "
+                f"The note does not contain the evidence required for {', '.join(missing_ids)}; "
+                f"the request may be re-assessed if that documentation is provided. "
+                f"Therefore the {procedure_type} request is not approved at this time."
+            )
+            reasons.append("Missing documentation requires human review or supplemental record intake.")
+        else:
+            verdict_sentence = (
+                f"Not all conditions required as the minimum for approval of a {procedure_type} have been satisfied. "
+                f"Not satisfied: {', '.join(failed_ids)}. "
+                f"Therefore the {procedure_type} request is not approved."
+            )
+        return verdict, verdict_sentence, True, reasons
+
+    @classmethod
     def evaluate_case(
         cls,
         case_id: str,
@@ -140,72 +229,13 @@ class DeterministicRulesEngine:
         facts: Dict[str, Any],
         evaluation_date: str = "2026-10-12"
     ) -> EvaluationReport:
-        criteria_results: List[CriterionEvaluationResult] = []
-        satisfied_ids = []
-        failed_ids = []
-        missing_ids = []
-        review_reasons = []
-
-        for crit in policy.criteria:
-            res = cls.evaluate_criterion(crit, facts)
-            criteria_results.append(res)
-
-            if res.status == CriterionStatus.MET:
-                satisfied_ids.append(res.rule_id)
-            elif res.status == CriterionStatus.NOT_APPLICABLE:
-                pass
-            elif res.status == CriterionStatus.NOT_DOCUMENTED:
-                missing_ids.append(res.rule_id)
-                failed_ids.append(res.rule_id)
-            elif res.status in (CriterionStatus.UNCLEAR_CONFLICTING, CriterionStatus.POLICY_AMBIGUITY):
-                failed_ids.append(res.rule_id)
-                review_reasons.append(f"Ambiguity/Conflict in {res.rule_id}: {res.comment}")
-            else:
-                failed_ids.append(res.rule_id)
-
-        # Construct Key Reasoning bullets BEFORE verdict
-        key_reasoning = []
-        if len(failed_ids) == 0:
-            key_reasoning.append("All required clinical criteria are satisfied")
-            for cr in criteria_results:
-                if cr.status == CriterionStatus.MET:
-                    key_reasoning.append(f"{cr.criterion_name}: {cr.evidence_excerpt}")
-        else:
-            if satisfied_ids:
-                key_reasoning.append(f"Satisfied conditions: {', '.join(satisfied_ids)}")
-            if missing_ids:
-                key_reasoning.append(f"Missing documentation for: {', '.join(missing_ids)}")
-            unmet_only = [i for i in failed_ids if i not in missing_ids]
-            if unmet_only:
-                key_reasoning.append(f"Unmet clinical criteria: {', '.join(unmet_only)}")
-
-        # Determine Verdict & Verdict Sentence
-        if len(failed_ids) == 0:
-            verdict = Verdict.APPROVED
-            verdict_sentence = (
-                f"Approval of a {policy.procedure_type} requires all minimum clinical criteria to be met. "
-                f"Conditions {', '.join(satisfied_ids)} are satisfied and meet that minimum. "
-                f"Therefore the {policy.procedure_type} request can be approved."
-            )
-            requires_review = False
-        else:
-            verdict = Verdict.NOT_APPROVED
-            if missing_ids and not [i for i in failed_ids if i not in missing_ids]:
-                verdict_sentence = (
-                    f"Not all conditions required as the minimum for approval of a {policy.procedure_type} have been satisfied. "
-                    f"The note does not contain the evidence required for {', '.join(missing_ids)}; "
-                    f"the request may be re-assessed if that documentation is provided. "
-                    f"Therefore the {policy.procedure_type} request is not approved at this time."
-                )
-                requires_review = True
-                review_reasons.append("Missing documentation requires human review or supplemental record intake.")
-            else:
-                verdict_sentence = (
-                    f"Not all conditions required as the minimum for approval of a {policy.procedure_type} have been satisfied. "
-                    f"Not satisfied: {', '.join(failed_ids)}. "
-                    f"Therefore the {policy.procedure_type} request is not approved."
-                )
-                requires_review = True
+        criteria_results, satisfied_ids, failed_ids, missing_ids, review_reasons = (
+            cls._categorize_criteria(policy, facts)
+        )
+        key_reasoning = cls._build_key_reasoning(criteria_results, satisfied_ids, failed_ids, missing_ids)
+        verdict, verdict_sentence, requires_review, final_review_reasons = (
+            cls._determine_verdict(policy.procedure_type, satisfied_ids, failed_ids, missing_ids, review_reasons)
+        )
 
         return EvaluationReport(
             case_id=case_id,
@@ -220,5 +250,5 @@ class DeterministicRulesEngine:
             verdict=verdict,
             verdict_sentence=verdict_sentence,
             requires_human_review=requires_review,
-            review_reasons=review_reasons
+            review_reasons=final_review_reasons
         )

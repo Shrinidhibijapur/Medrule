@@ -42,6 +42,15 @@ export interface CriterionResult {
   ui_symbol: string;
   ui_label: string;
   comment: string;
+  policy_citation?: string;
+  logic_group?: string;
+  plain_english_rationale?: string;
+  is_exclusion?: boolean;
+  fact_key?: string;
+  fact_confidence?: number;
+  reviewer_overridden?: boolean;
+  reviewer_override_by?: string;
+  reviewer_override_reason?: string;
 }
 
 export interface ReviewCase {
@@ -242,6 +251,8 @@ export interface ClinicalNoteRecord {
   is_synthetic: boolean;
   governance_warning: string;
   audit_trail: Array<Record<string, any>>;
+  latest_outcome?: string;
+  latest_evaluation?: any;
   created_at: string;
   updated_at: string;
 }
@@ -258,6 +269,57 @@ export interface FactFlagPayload {
   fact_key: string;
   reviewer_name: string;
   reason: string;
+}
+
+export type Verdict = 'APPROVED' | 'NOT_APPROVED' | 'CANNOT_BE_DETERMINED';
+
+export type DecisionOutcome = 
+  | 'APPROVED' 
+  | 'DENIED' 
+  | 'ADDITIONAL_DOCUMENTATION_REQUIRED' 
+  | 'CANNOT_BE_DETERMINED';
+
+export interface CriterionEvaluationResult {
+  rule_id: string;
+  criterion_name: string;
+  section: string;
+  requirement: string;
+  evidence_excerpt: string;
+  source_page?: number;
+  status: CriterionStatus;
+  ui_symbol: string;
+  ui_label: string;
+  comment: string;
+  policy_citation?: string;
+  logic_group?: string;
+  plain_english_rationale?: string;
+  is_exclusion: boolean;
+  fact_key?: string;
+  fact_confidence?: number;
+  reviewer_overridden?: boolean;
+  reviewer_override_by?: string;
+  reviewer_override_reason?: string;
+}
+
+export interface EvaluationReport {
+  case_id: string;
+  patient_name: string;
+  procedure: string;
+  insurer: string;
+  policy_id: string;
+  policy_version: string;
+  evaluation_date: string;
+  criteria_results: CriterionEvaluationResult[];
+  key_reasoning: string[];
+  verdict: Verdict;
+  verdict_sentence: string;
+  requires_human_review: boolean;
+  review_reasons: string[];
+  decision_outcome?: DecisionOutcome;
+  policy_checksum?: string;
+  verification_gate_verified: boolean;
+  is_synthetic_demo: boolean;
+  governance_notice: string;
 }
 
 

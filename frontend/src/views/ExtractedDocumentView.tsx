@@ -152,12 +152,17 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
           </span>
 
           {pagesArray.map((pageNum) => (
-            <div
+            <button
+              type="button"
               key={pageNum}
               onClick={() => setActivePage(pageNum)}
               style={{
                 cursor: 'pointer',
-                textAlign: 'center'
+                textAlign: 'center',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                width: '100%'
               }}
             >
               <div style={{
@@ -187,7 +192,7 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
               }}>
                 Page {pageNum}
               </span>
-            </div>
+            </button>
           ))}
         </div>
 

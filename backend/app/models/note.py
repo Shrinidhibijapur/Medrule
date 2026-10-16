@@ -73,6 +73,8 @@ class ClinicalNoteRecord(BaseModel):
     is_synthetic: bool = True
     governance_warning: str = "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active"
     audit_trail: List[Dict[str, Any]] = Field(default_factory=list)
+    latest_outcome: Optional[str] = None
+    latest_evaluation: Optional[Dict[str, Any]] = None
     created_at: str = ""
     updated_at: str = ""
 

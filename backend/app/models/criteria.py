@@ -98,4 +98,5 @@ class CriteriaEvaluationRequest(BaseModel):
     version: Optional[str] = None
     case_id: str = "CASE-TEMP"
     patient_name: str = "Patient"
-    patient_facts: Dict[str, Any]
+    patient_facts: Optional[Dict[str, Any]] = None
+

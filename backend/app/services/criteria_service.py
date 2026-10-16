@@ -1,4 +1,5 @@
 import json
+import hashlib
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,8 @@ from app.models.evaluation import (
 from app.models.policy import Policy, PolicyLifecycleStatus
 
 logger = logging.getLogger(__name__)
+
+EMPTY_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 class PolicyVerificationGateError(Exception):
     """Raised when policy criteria or lifecycle status fails verification gate."""
@@ -102,14 +105,42 @@ class CriteriaService:
         if not ruleset:
             raise PolicyVerificationGateError(f"No criteria ruleset found for policy {policy.id}. Must encode criteria before gate verification.")
 
-        # 1. Checksum verification
-        if policy.sha256_checksum and ruleset.policy_checksum:
-            if policy.sha256_checksum != ruleset.policy_checksum:
-                raise PolicyVerificationGateError(
-                    f"Policy verification gate failed: PDF checksum mismatch. "
-                    f"Expected {policy.sha256_checksum[:16]}..., ruleset recorded {ruleset.policy_checksum[:16]}... "
-                    "Ruleset must be tied to the exact source policy version."
-                )
+        # 1. Checksum verification & physical document validation
+        if not policy.sha256_checksum or policy.sha256_checksum == EMPTY_SHA256:
+            raise PolicyVerificationGateError(
+                "Policy verification gate failed: Empty or placeholder policy SHA-256 checksum is not permitted."
+            )
+        if not ruleset.policy_checksum or ruleset.policy_checksum == EMPTY_SHA256:
+            raise PolicyVerificationGateError(
+                "Policy verification gate failed: Ruleset contains an empty or placeholder SHA-256 checksum."
+            )
+        if policy.sha256_checksum != ruleset.policy_checksum:
+            raise PolicyVerificationGateError(
+                f"Policy verification gate failed: PDF checksum mismatch. "
+                f"Expected {policy.sha256_checksum[:16]}..., ruleset recorded {ruleset.policy_checksum[:16]}... "
+                "Ruleset must be tied to the exact source policy version."
+            )
+
+        if policy.storage_path:
+            p_path = Path(policy.storage_path)
+            if not p_path.is_absolute():
+                candidates = [
+                    Path(__file__).resolve().parent.parent.parent / policy.storage_path,
+                    Path(__file__).resolve().parent.parent.parent.parent / policy.storage_path,
+                    Path(__file__).resolve().parent.parent.parent / "storage" / "policies" / p_path.name,
+                    Path(__file__).resolve().parent.parent.parent.parent / "backend" / "storage" / "policies" / p_path.name
+                ]
+                for cand in candidates:
+                    if cand.exists():
+                        p_path = cand
+                        break
+            if p_path.exists():
+                computed_hash = hashlib.sha256(p_path.read_bytes()).hexdigest()
+                if computed_hash != policy.sha256_checksum:
+                    raise PolicyVerificationGateError(
+                        f"Policy verification gate failed: Physical PDF on disk does not match registered checksum. "
+                        f"Computed {computed_hash[:16]}..., expected {policy.sha256_checksum[:16]}..."
+                    )
 
         # 2. Reviewer requirements (Mandatory secondary independent reviewer)
         if not request.primary_reviewer or not request.primary_reviewer.strip():
@@ -156,6 +187,79 @@ class CriteriaService:
 
         return self.save_ruleset(ruleset)
 
+    @staticmethod
+    def unpack_fact(fact_item: Any) -> Dict[str, Any]:
+        """
+        Extracts standardized fact representation from ExtractedFact, dictionary, or scalar.
+        Extracts value, status, excerpt, page, confidence, and reviewer override history.
+        """
+        if fact_item is None:
+            return {
+                "value": None,
+                "status": "ABSENT",
+                "excerpt": None,
+                "source_page": None,
+                "confidence": 1.0,
+                "is_unclear": False,
+                "is_flagged": False,
+                "flag_reason": None,
+                "reviewer_override": None
+            }
+
+        if hasattr(fact_item, "model_dump"):
+            d = fact_item.model_dump()
+        elif hasattr(fact_item, "dict"):
+            d = fact_item.dict()
+        elif isinstance(fact_item, dict):
+            d = fact_item
+        else:
+            # Primitive scalar value (e.g. True, 12, False)
+            return {
+                "value": fact_item,
+                "status": "EXPLICIT" if fact_item is not None else "ABSENT",
+                "excerpt": str(fact_item) if fact_item is not None else None,
+                "source_page": None,
+                "confidence": 1.0,
+                "is_unclear": False,
+                "is_flagged": False,
+                "flag_reason": None,
+                "reviewer_override": None
+            }
+
+        val = d.get("value")
+        raw_status = d.get("status")
+        status_str = raw_status.value if hasattr(raw_status, "value") else (str(raw_status) if raw_status else None)
+
+        # Check for reviewer override
+        rev_override = d.get("reviewer_override")
+        if rev_override and hasattr(rev_override, "model_dump"):
+            rev_override = rev_override.model_dump()
+        elif rev_override and hasattr(rev_override, "dict"):
+            rev_override = rev_override.dict()
+
+        is_flagged = bool(d.get("is_flagged_for_review"))
+        is_unclear_explicit = bool(d.get("is_unclear"))
+
+        if status_str in ("UNCLEAR", "CONFLICTING") or is_unclear_explicit or (is_flagged and not rev_override):
+            status_val = "UNCLEAR_CONFLICTING"
+        elif status_str == "ABSENT" or (val is None and status_str is None):
+            status_val = "ABSENT"
+        else:
+            status_val = "EXPLICIT"
+
+        return {
+            "value": val,
+            "status": status_val,
+            "raw_status": status_str,
+            "excerpt": d.get("excerpt"),
+            "source_page": d.get("source_page"),
+            "confidence": d.get("confidence", 1.0),
+            "is_unclear": (status_val == "UNCLEAR_CONFLICTING"),
+            "is_flagged": is_flagged,
+            "flag_reason": d.get("flag_reason"),
+            "reviewer_override": rev_override
+        }
+
     # --- Deterministic Evaluation Logic ---
 
     def evaluate_rule(
@@ -186,15 +290,17 @@ class CriteriaService:
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group="EXPLANATORY_NOTES",
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=False
+                is_exclusion=False,
+                fact_key=rule.fact_key
             )
             return res, child_results
 
         # 2. Check Conditional Prerequisite
         if rule.conditional_prerequisite:
-            cond_fact = facts.get(rule.conditional_prerequisite)
+            raw_cond = facts.get(rule.conditional_prerequisite)
+            unpacked_cond = self.unpack_fact(raw_cond)
             # If prerequisite is not met or not requested, criterion is NOT_APPLICABLE
-            if not cond_fact or not cond_fact.get("value", False):
+            if not unpacked_cond or unpacked_cond.get("value") is not True:
                 res = CriterionEvaluationResult(
                     rule_id=rule.id,
                     criterion_name=rule.section_name,
@@ -209,7 +315,8 @@ class CriteriaService:
                     policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                     logic_group=rule.operator.value if rule.operator else None,
                     plain_english_rationale=rule.plain_english_description,
-                    is_exclusion=False
+                    is_exclusion=False,
+                    fact_key=rule.fact_key
                 )
                 return res, child_results
 
@@ -313,55 +420,75 @@ class CriteriaService:
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group=rule.operator.value if rule.operator else None,
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=False
+                is_exclusion=False,
+                fact_key=rule.fact_key
             )
             return group_res, child_results
 
         # 4. Atomic Criterion / Threshold / Duration / Exclusion
-        fact = facts.get(rule.fact_key) if rule.fact_key else None
+        raw_fact = facts.get(rule.fact_key) if rule.fact_key else None
+        unpacked = self.unpack_fact(raw_fact)
 
-        # A. Not documented check
-        if fact is None:
+        value = unpacked["value"]
+        excerpt = unpacked["excerpt"]
+        page = unpacked["source_page"] or rule.source_page
+        conf = unpacked["confidence"]
+
+        # Track reviewer override
+        rev_override = unpacked.get("reviewer_override")
+        is_overridden = bool(rev_override)
+        override_by = rev_override.get("overridden_by") if rev_override else None
+        override_reason = rev_override.get("reason") if rev_override else None
+        override_suffix = f" [Clinician override by {override_by}: '{override_reason}']" if is_overridden else ""
+
+        # A. Not documented check (Preserves distinct NOT_DOCUMENTED status)
+        if unpacked["status"] == "ABSENT" or (value is None and not unpacked["is_unclear"]):
             res = CriterionEvaluationResult(
                 rule_id=rule.id,
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt="No matching clinical documentation found in submitted records",
-                source_page=rule.source_page,
+                evidence_excerpt=excerpt or "No matching clinical documentation found in submitted records",
+                source_page=page,
                 status=CriterionStatus.NOT_DOCUMENTED,
                 ui_symbol="❌",
                 ui_label="Not documented",
-                comment="Required clinical evidence not documented in medical record",
+                comment=f"Required clinical evidence not documented in medical record{override_suffix}",
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group="MANDATORY_CRITERIA" if rule.is_mandatory else "OPTIONAL",
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=rule.is_exclusion
+                is_exclusion=rule.is_exclusion,
+                fact_key=rule.fact_key,
+                fact_confidence=conf,
+                reviewer_overridden=is_overridden,
+                reviewer_override_by=override_by,
+                reviewer_override_reason=override_reason
             )
             return res, child_results
 
-        value = fact.get("value")
-        excerpt = fact.get("excerpt", "")
-        page = fact.get("source_page", rule.source_page)
-        is_unclear = fact.get("is_unclear", False)
-
-        # B. Unclear / Conflicting check
-        if is_unclear:
+        # B. Unclear / Conflicting check (Preserves distinct UNCLEAR_CONFLICTING status)
+        if unpacked["is_unclear"] or unpacked["status"] == "UNCLEAR_CONFLICTING":
+            flag_note = f" (Flagged for review: {unpacked['flag_reason']})" if unpacked.get("is_flagged") else ""
             res = CriterionEvaluationResult(
                 rule_id=rule.id,
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt,
+                evidence_excerpt=excerpt or "Ambiguous or conflicting clinical notes",
                 source_page=page,
                 status=CriterionStatus.UNCLEAR_CONFLICTING,
                 ui_symbol="❌",
                 ui_label="Unclear",
-                comment="Ambiguous or conflicting clinical notes require manual clinician review",
+                comment=f"Ambiguous or conflicting clinical notes require manual clinician review{flag_note}{override_suffix}",
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group="UNCLEAR_EVIDENCE",
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=rule.is_exclusion
+                is_exclusion=rule.is_exclusion,
+                fact_key=rule.fact_key,
+                fact_confidence=conf,
+                reviewer_overridden=is_overridden,
+                reviewer_override_by=override_by,
+                reviewer_override_reason=override_reason
             )
             return res, child_results
 
@@ -374,16 +501,21 @@ class CriteriaService:
                     criterion_name=rule.section_name,
                     section=rule.section_number,
                     requirement=rule.source_text,
-                    evidence_excerpt=excerpt,
+                    evidence_excerpt=excerpt or "Documented contraindication/exclusion present",
                     source_page=page,
                     status=CriterionStatus.NOT_MET,
                     ui_symbol="❌",
                     ui_label="Exclusion Present",
-                    comment="Clinical contraindication/exclusion condition is present; request cannot be approved",
+                    comment=f"Clinical contraindication/exclusion condition is present; request cannot be approved{override_suffix}",
                     policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                     logic_group="CONTRAINDICATION",
                     plain_english_rationale=rule.plain_english_description,
-                    is_exclusion=True
+                    is_exclusion=True,
+                    fact_key=rule.fact_key,
+                    fact_confidence=conf,
+                    reviewer_overridden=is_overridden,
+                    reviewer_override_by=override_by,
+                    reviewer_override_reason=override_reason
                 )
             else:
                 res = CriterionEvaluationResult(
@@ -396,11 +528,16 @@ class CriteriaService:
                     status=CriterionStatus.MET,
                     ui_symbol="✅",
                     ui_label="Satisfied",
-                    comment="Exclusion condition ruled out",
+                    comment=f"Exclusion condition ruled out{override_suffix}",
                     policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                     logic_group="CONTRAINDICATION",
                     plain_english_rationale=rule.plain_english_description,
-                    is_exclusion=True
+                    is_exclusion=True,
+                    fact_key=rule.fact_key,
+                    fact_confidence=conf,
+                    reviewer_overridden=is_overridden,
+                    reviewer_override_by=override_by,
+                    reviewer_override_reason=override_reason
                 )
             return res, child_results
 
@@ -432,16 +569,21 @@ class CriteriaService:
                     criterion_name=rule.section_name,
                     section=rule.section_number,
                     requirement=rule.source_text,
-                    evidence_excerpt=excerpt,
+                    evidence_excerpt=excerpt or f"Value {value} {unit}",
                     source_page=page,
                     status=CriterionStatus.MET,
                     ui_symbol="✅",
                     ui_label="Satisfied",
-                    comment=f"Value {value} {unit} satisfies requirement ({op} {thresh} {unit})",
+                    comment=f"Value {value} {unit} satisfies requirement ({op} {thresh} {unit}){override_suffix}",
                     policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                     logic_group="DURATION_AND_THRESHOLDS",
                     plain_english_rationale=rule.plain_english_description,
-                    is_exclusion=False
+                    is_exclusion=False,
+                    fact_key=rule.fact_key,
+                    fact_confidence=conf,
+                    reviewer_overridden=is_overridden,
+                    reviewer_override_by=override_by,
+                    reviewer_override_reason=override_reason
                 )
             else:
                 res = CriterionEvaluationResult(
@@ -449,16 +591,21 @@ class CriteriaService:
                     criterion_name=rule.section_name,
                     section=rule.section_number,
                     requirement=rule.source_text,
-                    evidence_excerpt=excerpt,
+                    evidence_excerpt=excerpt or f"Value {value} {unit}",
                     source_page=page,
                     status=CriterionStatus.NOT_MET,
                     ui_symbol="❌",
                     ui_label="Not met",
-                    comment=f"Value {value} {unit} fails required threshold ({op} {thresh} {unit})",
+                    comment=f"Value {value} {unit} fails required threshold ({op} {thresh} {unit}){override_suffix}",
                     policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                     logic_group="DURATION_AND_THRESHOLDS",
                     plain_english_rationale=rule.plain_english_description,
-                    is_exclusion=False
+                    is_exclusion=False,
+                    fact_key=rule.fact_key,
+                    fact_confidence=conf,
+                    reviewer_overridden=is_overridden,
+                    reviewer_override_by=override_by,
+                    reviewer_override_reason=override_reason
                 )
             return res, child_results
 
@@ -469,33 +616,66 @@ class CriteriaService:
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt,
+                evidence_excerpt=excerpt or "Documented finding confirmed",
                 source_page=page,
                 status=CriterionStatus.MET,
                 ui_symbol="✅",
                 ui_label="Satisfied",
-                comment="Clinical requirement documented and confirmed",
+                comment=f"Clinical requirement documented and confirmed{override_suffix}",
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group="CLINICAL_CRITERIA",
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=False
+                is_exclusion=False,
+                fact_key=rule.fact_key,
+                fact_confidence=conf,
+                reviewer_overridden=is_overridden,
+                reviewer_override_by=override_by,
+                reviewer_override_reason=override_reason
             )
-        else:
+        elif value is False:
             res = CriterionEvaluationResult(
                 rule_id=rule.id,
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt,
+                evidence_excerpt=excerpt or "Documented clinical negation",
                 source_page=page,
                 status=CriterionStatus.NOT_MET,
                 ui_symbol="❌",
                 ui_label="Not met",
-                comment="Clinical documentation explicitly contradicts or fails requirement",
+                comment=f"Clinical documentation explicitly contradicts or fails requirement{override_suffix}",
                 policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
                 logic_group="CLINICAL_CRITERIA",
                 plain_english_rationale=rule.plain_english_description,
-                is_exclusion=False
+                is_exclusion=False,
+                fact_key=rule.fact_key,
+                fact_confidence=conf,
+                reviewer_overridden=is_overridden,
+                reviewer_override_by=override_by,
+                reviewer_override_reason=override_reason
+            )
+        else:
+            # Value is None / not boolean -> Never convert missing to NOT_MET
+            res = CriterionEvaluationResult(
+                rule_id=rule.id,
+                criterion_name=rule.section_name,
+                section=rule.section_number,
+                requirement=rule.source_text,
+                evidence_excerpt=excerpt or "No clinical documentation found",
+                source_page=page,
+                status=CriterionStatus.NOT_DOCUMENTED,
+                ui_symbol="❌",
+                ui_label="Not documented",
+                comment=f"Required clinical evidence not documented in medical record{override_suffix}",
+                policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
+                logic_group="CLINICAL_CRITERIA",
+                plain_english_rationale=rule.plain_english_description,
+                is_exclusion=False,
+                fact_key=rule.fact_key,
+                fact_confidence=conf,
+                reviewer_overridden=is_overridden,
+                reviewer_override_by=override_by,
+                reviewer_override_reason=override_reason
             )
         return res, child_results
 
@@ -525,12 +705,44 @@ class CriteriaService:
                 "Policies must be 'APPROVED_FOR_USE' before clinical evaluation."
             )
 
+        if not policy.sha256_checksum or policy.sha256_checksum == EMPTY_SHA256:
+            raise PolicyVerificationGateError(
+                "Policy Gate Blocked: Policy contains an empty or placeholder checksum."
+            )
+
         ruleset = self.get_ruleset(policy.id)
         if not ruleset or ruleset.verification_status != VerificationStatus.APPROVED_VERIFIED:
             raise PolicyVerificationGateError(
                 f"Policy Verification Gate Blocked: Criteria ruleset for '{policy.id}' is not 'APPROVED_VERIFIED'. "
                 "Two-reviewer verification gate sign-off is mandatory before authorization assessment."
             )
+
+        if policy.sha256_checksum != ruleset.policy_checksum:
+            raise PolicyVerificationGateError(
+                f"Policy Verification Gate Blocked: Policy checksum ({policy.sha256_checksum[:16]}...) does not match "
+                f"verified ruleset checksum ({ruleset.policy_checksum[:16]}...)."
+            )
+
+        if policy.storage_path:
+            p_path = Path(policy.storage_path)
+            if not p_path.is_absolute():
+                candidates = [
+                    Path(__file__).resolve().parent.parent.parent / policy.storage_path,
+                    Path(__file__).resolve().parent.parent.parent.parent / policy.storage_path,
+                    Path(__file__).resolve().parent.parent.parent / "storage" / "policies" / p_path.name,
+                    Path(__file__).resolve().parent.parent.parent.parent / "backend" / "storage" / "policies" / p_path.name
+                ]
+                for cand in candidates:
+                    if cand.exists():
+                        p_path = cand
+                        break
+            if p_path.exists():
+                computed_hash = hashlib.sha256(p_path.read_bytes()).hexdigest()
+                if computed_hash != policy.sha256_checksum:
+                    raise PolicyVerificationGateError(
+                        f"Policy Verification Gate Blocked: Physical PDF on disk does not match registered checksum. "
+                        f"Computed {computed_hash[:16]}..., expected {policy.sha256_checksum[:16]}..."
+                    )
 
         all_results: List[CriterionEvaluationResult] = []
         for rule in ruleset.rules:
@@ -619,6 +831,10 @@ class CriteriaService:
             )
             requires_human_review = False
 
+        demo_prefix = "[DEMO / SYNTHETIC CASE - NOT A CLINICAL DECISION] "
+        if not verdict_sentence.startswith(demo_prefix):
+            verdict_sentence = f"{demo_prefix}{verdict_sentence}"
+
         return EvaluationReport(
             case_id=case_id,
             patient_name=patient_name,
@@ -635,5 +851,44 @@ class CriteriaService:
             review_reasons=review_reasons,
             decision_outcome=decision_outcome,
             policy_checksum=policy.sha256_checksum,
-            verification_gate_verified=True
+            verification_gate_verified=True,
+            is_synthetic_demo=True,
+            governance_notice="DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."
         )
+
+    def evaluate_note_record(
+        self,
+        policy: Policy,
+        note_record: Any
+    ) -> EvaluationReport:
+        """
+        Phase 4: Bridges extracted clinical facts from Phase 3 note records
+        to the deterministic criteria engine. Reads fact status, values,
+        excerpts, source-page citations, confidences, and reviewer overrides.
+        """
+        # Extract facts dictionary
+        facts_map: Dict[str, Any] = {}
+        if hasattr(note_record, "facts") and note_record.facts:
+            facts_map = note_record.facts
+        elif isinstance(note_record, dict) and "facts" in note_record and note_record["facts"]:
+            facts_map = note_record["facts"]
+        elif hasattr(note_record, "extracted_facts") and note_record.extracted_facts:
+            facts_map = note_record.extracted_facts
+        elif isinstance(note_record, dict) and "extracted_facts" in note_record and note_record["extracted_facts"]:
+            facts_map = note_record["extracted_facts"]
+
+        case_id = getattr(note_record, "case_id", None) or (note_record.get("case_id") if isinstance(note_record, dict) else "CASE-UNKNOWN")
+        patient_name = getattr(note_record, "patient_name", None) or (note_record.get("patient_name") if isinstance(note_record, dict) else "Unknown Patient")
+        eval_date = getattr(note_record, "date_of_visit", None) or (note_record.get("date_of_visit") if isinstance(note_record, dict) else None)
+        is_synthetic = getattr(note_record, "is_synthetic", True) if not isinstance(note_record, dict) else note_record.get("is_synthetic", True)
+
+        report = self.evaluate_policy_case(
+            policy=policy,
+            case_id=case_id,
+            patient_name=patient_name,
+            facts=facts_map,
+            evaluation_date=eval_date
+        )
+        report.is_synthetic_demo = is_synthetic
+        return report
+

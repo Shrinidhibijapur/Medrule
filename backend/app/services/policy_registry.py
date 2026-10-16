@@ -2,7 +2,7 @@ import os
 import json
 import shutil
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 
 from app.models.policy import (
@@ -103,7 +103,7 @@ class PolicyRegistryService:
         with open(storage_path, "wb") as f:
             f.write(file_bytes)
 
-        now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
 
         # 3. Create Policy instance in NEEDS_REVIEW status
         policy = Policy(
@@ -145,7 +145,7 @@ class PolicyRegistryService:
             raise PolicyRegistryError(f"Policy '{policy_id}' not found.")
 
         policy.lifecycle_status = new_status
-        policy.updated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")
+        policy.updated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
 
         # Persist update
         json_file = self.data_dir / f"{policy.id.lower()}.json"
