@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ViewMode } from './types';
+import React, { useState, useEffect } from 'react';
+import { ViewMode, ClinicalNoteRecord } from './types';
 import { Sidebar } from './components/Sidebar';
 import { LoginView } from './views/LoginView';
 import { DashboardView } from './views/DashboardView';
@@ -16,6 +16,17 @@ import { PolicyLibraryView } from './views/PolicyLibraryView';
 export const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
+  const [activeCaseRecord, setActiveCaseRecord] = useState<ClinicalNoteRecord | null>(null);
+
+  useEffect(() => {
+    // Attempt initial load of canonical demo case CASE-2026-001 from backend
+    fetch('http://localhost:8000/api/notes/CASE-2026-001')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setActiveCaseRecord(data);
+      })
+      .catch(() => {});
+  }, []);
 
   if (!isLoggedIn) {
     return <LoginView onLoginSuccess={() => setIsLoggedIn(true)} />;
@@ -26,11 +37,28 @@ export const App: React.FC = () => {
       case 'dashboard':
         return <DashboardView onNavigate={setCurrentView} />;
       case 'new_review':
-        return <NewReviewView onNavigate={setCurrentView} />;
+        return (
+          <NewReviewView
+            onNavigate={setCurrentView}
+            onSelectCaseRecord={setActiveCaseRecord}
+            activeCaseRecord={activeCaseRecord}
+          />
+        );
       case 'extracted_doc':
-        return <ExtractedDocumentView onNavigate={setCurrentView} />;
+        return (
+          <ExtractedDocumentView
+            onNavigate={setCurrentView}
+            caseRecord={activeCaseRecord}
+          />
+        );
       case 'extracted_info':
-        return <ExtractedInfoView onNavigate={setCurrentView} />;
+        return (
+          <ExtractedInfoView
+            onNavigate={setCurrentView}
+            caseRecord={activeCaseRecord}
+            onCaseRecordUpdated={setActiveCaseRecord}
+          />
+        );
       case 'criteria_evaluation':
         return <CriteriaEvaluationView onNavigate={setCurrentView} />;
       case 'detailed_analysis':

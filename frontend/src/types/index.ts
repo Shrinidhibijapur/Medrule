@@ -181,3 +181,83 @@ export interface PolicyRuleset {
   last_updated?: string;
 }
 
+export type ClinicalFactStatus = 'EXPLICIT' | 'UNCLEAR' | 'CONFLICTING' | 'ABSENT';
+
+export interface ReviewerFactOverride {
+  is_overridden: boolean;
+  overridden_by: string;
+  overridden_at: string;
+  original_value?: any;
+  corrected_value: any;
+  original_status: ClinicalFactStatus;
+  corrected_status: ClinicalFactStatus;
+  reason: string;
+}
+
+export interface ExtractedFact {
+  fact_key: string;
+  label: string;
+  value?: any;
+  status: ClinicalFactStatus;
+  excerpt?: string;
+  source_page?: number;
+  confidence: number;
+  is_flagged_for_review?: boolean;
+  flag_reason?: string;
+  reviewer_override?: ReviewerFactOverride;
+}
+
+export interface ClinicalNoteRecord {
+  case_id: string;
+  patient_name: string;
+  patient_age?: number;
+  gender?: string;
+  dob?: string;
+  facility?: string;
+  date_of_visit?: string;
+  procedure_requested: string;
+  procedure_type?: string;
+  insurance_plan: string;
+  policy_id: string;
+  policy_version?: string;
+  chief_complaint?: string;
+  history_of_present_illness?: string;
+  clinical_findings?: string[];
+  impression?: string;
+  physician_recommendation?: string;
+  original_filename: string;
+  storage_path?: string;
+  sha256_checksum: string;
+  total_pages: number;
+  scanned_pages_count: number;
+  overall_quality: string;
+  ocr_engine_status: string;
+  facts: Record<string, ExtractedFact>;
+  raw_pages_text?: Array<{
+    page_number: number;
+    text: string;
+    char_count: number;
+    is_scanned: boolean;
+  }>;
+  is_synthetic: boolean;
+  governance_warning: string;
+  audit_trail: Array<Record<string, any>>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FactCorrectionPayload {
+  fact_key: string;
+  corrected_value: any;
+  corrected_status: ClinicalFactStatus;
+  reviewer_name: string;
+  reason: string;
+}
+
+export interface FactFlagPayload {
+  fact_key: string;
+  reviewer_name: string;
+  reason: string;
+}
+
+

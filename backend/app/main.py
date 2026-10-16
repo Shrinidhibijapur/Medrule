@@ -31,6 +31,14 @@ from app.models.criteria import (
     CriteriaEvaluationRequest,
 )
 from app.services.criteria_service import CriteriaService, PolicyVerificationGateError
+from app.models.note import (
+    ClinicalNoteRecord,
+    ExtractedFact,
+    ClinicalFactStatus,
+    FactCorrectionRequest,
+    FactFlagRequest,
+)
+from app.services.note_extractor import ClinicalNoteExtractorService, OCRService
 
 app = FastAPI(
     title="MedRule Decision-Support API",
@@ -49,6 +57,7 @@ app.add_middleware(
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 registry_service = PolicyRegistryService()
 criteria_service = CriteriaService(DATA_DIR)
+note_extractor_service = ClinicalNoteExtractorService(data_dir=DATA_DIR)
 
 class EvaluateRequest(BaseModel):
     case_id: str
@@ -352,12 +361,137 @@ def evaluate_request(req: EvaluateRequest):
     )
     return report
 
-@app.get("/api/cases")
+# --- Phase 3: Doctor's Note Ingestion, Fact Extraction & Evidence Review ---
+
+@app.get("/api/notes/ocr-status")
+def get_ocr_status():
+    """
+    Reports the status of the OCR subsystem and any unconfigured components.
+    Gracefully flags when OCR binary is unavailable and reports fallback mode.
+    """
+    is_available, details = OCRService.get_ocr_status()
+    return {
+        "ocr_available": is_available,
+        "status": "OCR_AVAILABLE" if is_available else "OCR_UNAVAILABLE_FALLBACK_TO_MANUAL_REVIEW",
+        "details": details,
+        "supported_formats": ["PDF", "PNG", "JPEG"],
+        "fallback_mode": "Manual clinician review and side-by-side verification interface"
+    }
+
+@app.post("/api/notes/upload", response_model=ClinicalNoteRecord, status_code=status.HTTP_201_CREATED)
+async def upload_clinical_note(
+    file: UploadFile = File(...),
+    policy_id: str = Form("P-UHC-CT-2026"),
+    patient_name: Optional[str] = Form(None),
+    facility: Optional[str] = Form(None),
+    procedure_requested: Optional[str] = Form(None),
+    insurance_plan: Optional[str] = Form("United Healthcare"),
+):
+    """
+    Secure Doctor's Note Upload & Fact Extraction:
+    - Validates file format (.pdf only) and file size (< 15MB)
+    - Computes SHA-256 and stores original file
+    - Page-by-page text extraction with precise page citations
+    - Detects scanned pages and low character density
+    - Treats document content as untrusted data (mitigating prompt injections)
+    - Extracts only facts required by the policy's approved evidence schema
+    - Detects contradictions, ambiguities, and abbreviations
+    - Saves record with DEVELOPMENT/DEMO synthetic governance watermark
+    """
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file format. MedRule accepts only valid clinical PDF documents."
+        )
+
+    file_bytes = await file.read()
+    max_size = 15 * 1024 * 1024  # 15MB
+    if len(file_bytes) > max_size:
+        raise HTTPException(
+            status_code=413,
+            detail="File too large. Maximum clinical note PDF size is 15MB."
+        )
+    if len(file_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    policy_rules = None
+    ruleset = criteria_service.get_ruleset(policy_id)
+    if ruleset:
+        policy_rules = ruleset.rules
+
+    try:
+        record = note_extractor_service.extract_note(
+            file_bytes=file_bytes,
+            filename=file.filename,
+            policy_id=policy_id,
+            policy_rules=policy_rules,
+            patient_name_override=patient_name,
+            facility_override=facility,
+            procedure_requested_override=procedure_requested,
+            insurance_plan=insurance_plan,
+        )
+        return record
+    except Exception as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Clinical note processing failed: {str(e)}"
+        )
+
+@app.get("/api/notes/{case_id}", response_model=ClinicalNoteRecord)
+def get_clinical_note(case_id: str):
+    """Retrieves full case record with extracted facts and quality report."""
+    record = note_extractor_service.get_note_record(case_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    return record
+
+@app.get("/api/notes/{case_id}/document")
+def get_note_document(case_id: str):
+    """Streams original uploaded doctor's note PDF inline for browser viewing."""
+    record = note_extractor_service.get_note_record(case_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Case note '{case_id}' not found.")
+    if not record.storage_path or not Path(record.storage_path).exists():
+        raise HTTPException(status_code=404, detail="Physical note PDF not found in storage.")
+
+    safe_filename = record.original_filename or f"{case_id}.pdf"
+    return FileResponse(
+        path=record.storage_path,
+        media_type="application/pdf",
+        content_disposition_type="inline",
+        filename=safe_filename,
+        headers={"Content-Disposition": f'inline; filename="{safe_filename}"'}
+    )
+
+@app.patch("/api/notes/{case_id}/facts/{fact_key}", response_model=ClinicalNoteRecord)
+def correct_extracted_fact(case_id: str, fact_key: str, payload: FactCorrectionRequest):
+    """
+    Auditable Fact Correction Workflow:
+    Allows clinical reviewers to correct or override an extracted fact.
+    Records reviewer name, reason, timestamp, and audit trail entry.
+    """
+    payload.fact_key = fact_key
+    try:
+        updated = note_extractor_service.apply_fact_override(case_id, payload)
+        return updated
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/notes/{case_id}/flag", response_model=ClinicalNoteRecord)
+def flag_extracted_fact(case_id: str, payload: FactFlagRequest):
+    """Flags an extracted fact for secondary clinical review."""
+    try:
+        updated = note_extractor_service.flag_fact_for_review(case_id, payload)
+        return updated
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/cases", response_model=List[ClinicalNoteRecord])
 def list_cases():
-    notes_dir = DATA_DIR / "notes"
-    cases = []
-    if notes_dir.exists():
-        for file in notes_dir.glob("*.json"):
-            with open(file, "r", encoding="utf-8") as f:
-                cases.append(json.load(f))
-    return cases
+    """Lists all saved cases with clinical note records."""
+    return note_extractor_service.list_note_records()
+
