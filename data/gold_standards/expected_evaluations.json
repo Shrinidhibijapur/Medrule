@@ -1,0 +1,34 @@
+{
+  "test_suite_version": "1.0.0",
+  "generated_date": "2026-10-16",
+  "benchmarks": [
+    {
+      "case_id": "CASE-2026-001",
+      "patient_name": "John Doe",
+      "procedure": "CT Scan of Head with Contrast",
+      "policy_id": "P-UHC-CT-2026",
+      "expected_verdict": "APPROVED",
+      "expected_criteria": {
+        "R1": {"status": "MET", "comment": "Meets criteria for neurological symptoms"},
+        "R2": {"status": "MET", "comment": "Exceeds 6 weeks requirement"},
+        "R3": {"status": "MET", "comment": "Documented trial of treatment"},
+        "R4": {"status": "MET", "comment": "Meets requirement"},
+        "R5": {"status": "MET", "comment": "Valid indication"},
+        "R6": {"status": "MET", "comment": "Clinically indicated"}
+      }
+    },
+    {
+      "case_id": "CASE-2026-002",
+      "patient_name": "Jane Smith",
+      "procedure": "MRI Lumbar Spine",
+      "policy_id": "P-AET-MRI-2026",
+      "expected_verdict": "NOT_APPROVED",
+      "expected_criteria": {
+        "M1": {"status": "MET", "comment": "Radicular pain noted"},
+        "M2": {"status": "NOT_DOCUMENTED", "comment": "Conservative therapy < 6 weeks, not completed"},
+        "M3": {"status": "NOT_MET", "comment": "No cauda equina or progressive deficit"},
+        "M4": {"status": "NOT_DOCUMENTED", "comment": "Plain radiographs not documented"}
+      }
+    }
+  ]
+}

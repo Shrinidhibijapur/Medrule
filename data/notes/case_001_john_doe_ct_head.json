@@ -1,0 +1,73 @@
+{
+  "case_id": "CASE-2026-001",
+  "patient_name": "John Doe",
+  "patient_age": 42,
+  "gender": "M",
+  "dob": "01/15/1980",
+  "facility": "Riverside Medical Center",
+  "date_of_visit": "10/05/2026",
+  "procedure_requested": "CT Scan of Head with Contrast",
+  "procedure_type": "CT Scan",
+  "insurance_plan": "United Healthcare",
+  "policy_id": "P-UHC-CT-2026",
+  "policy_version": "2026",
+  "chief_complaint": "Persistent headaches and dizziness",
+  "history_of_present_illness": "42 year old male presents with recurrent severe headaches and dizziness persisting for 3 months with associated visual disturbances.",
+  "clinical_findings": [
+    "Neurological examination abnormal: focal asymmetry and mild ataxia.",
+    "No improvement with conservative treatment over past 8 weeks.",
+    "Patient has history of hypertension."
+  ],
+  "impression": "Rule out intracranial pathology or space-occupying lesion.",
+  "physician_recommendation": "CT scan of head with contrast clinically indicated for further diagnostic evaluation.",
+  "extracted_facts": {
+    "neurological_symptoms": {
+      "value": true,
+      "excerpt": "Headaches, dizziness, visual disturbances",
+      "source_page": 1,
+      "confidence": 0.98
+    },
+    "symptom_duration_weeks": {
+      "value": 12,
+      "excerpt": "Present for 3 months",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "conservative_treatment_attempted": {
+      "value": true,
+      "excerpt": "Conservative treatment (no improvement)",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "neurological_exam_abnormal": {
+      "value": true,
+      "excerpt": "Neurological examination abnormal",
+      "source_page": 2,
+      "confidence": 0.97
+    },
+    "rule_out_pathology": {
+      "value": true,
+      "excerpt": "Rule out intracranial pathology",
+      "source_page": 2,
+      "confidence": 0.99
+    },
+    "contrast_requested": {
+      "value": true,
+      "excerpt": "CT scan of head with contrast",
+      "source_page": 2,
+      "confidence": 0.99
+    },
+    "contrast_justified": {
+      "value": true,
+      "excerpt": "Further evaluation needed",
+      "source_page": 2,
+      "confidence": 0.94
+    }
+  },
+  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\case_001_john_doe_riverside.pdf",
+  "original_filename": "John_Doe_Clinical_Note_Riverside.pdf",
+  "sha256_checksum": "f75b49c3e57ee53f167f15e28d1f8b41be3e72329b24f43d477eccaa8a0add60",
+  "total_pages": 3,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH"
+}

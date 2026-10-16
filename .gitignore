@@ -17,7 +17,14 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Storage and assets
+# Dynamic test note uploads and runtime audit logs
+data/audit/*.jsonl
+backend/storage/notes/*
+!backend/storage/notes/.gitkeep
+backend/storage/policies/*
+!backend/storage/policies/uhc_ct_head_2026.pdf
+!backend/storage/policies/.gitkeep
+
+
+
 medauth_ui_slides_separate_images/
-data/
-backend/storage/

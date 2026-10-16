@@ -1,0 +1,11 @@
+{
+  "policy_id": "POL-CIGN-CTS-2026-1",
+  "policy_name": "Pending CT Policy",
+  "policy_version": "2026.1",
+  "policy_checksum": "095380da9c274c6471c7d1bfa2e899644c3a21402333a2e4f4bb35a7f0f9dad7",
+  "procedure_type": "CT Scan",
+  "rules": [],
+  "verification_status": "DRAFT",
+  "signoff": null,
+  "last_updated": "2026-10-16T17:59:08.700106+00:00"
+}

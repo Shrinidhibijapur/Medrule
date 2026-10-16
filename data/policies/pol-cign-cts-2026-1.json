@@ -1,0 +1,89 @@
+{
+  "id": "POL-CIGN-CTS-2026-1",
+  "policy_id": "POL-CIGN-CTS",
+  "insurer": "Cigna",
+  "policy_name": "Pending CT Policy",
+  "plan": "Commercial & Medicare Advantage Plans",
+  "version": "2026.1",
+  "procedure_type": "CT Scan",
+  "procedure_full_name": "CT Scan",
+  "cpt_codes": [
+    "70450"
+  ],
+  "effective_date": "2026-01-01",
+  "expiry_date": null,
+  "upload_date": "2026-10-16",
+  "sha256_checksum": "095380da9c274c6471c7d1bfa2e899644c3a21402333a2e4f4bb35a7f0f9dad7",
+  "original_filename": "Cigna_CT.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\policies\\095380da9c27_Cigna_CT.pdf",
+  "total_pages": 3,
+  "lifecycle_status": "NEEDS_REVIEW",
+  "criteria": [],
+  "sections": [
+    {
+      "id": "SEC-001",
+      "section_number": "1.0",
+      "heading": "Page 1 Overview",
+      "page_number": 1,
+      "content": "Cigna - Clinical Coverage Guideline\nPending CT Policy (Version 2026.1)",
+      "character_count": 70,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-002",
+      "section_number": "Section 1.0",
+      "heading": "Coverage Scope",
+      "page_number": 1,
+      "content": "This medical policy sets forth diagnostic criteria for outpatient computed tomography. Applicable CPT codes include",
+      "character_count": 115,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-003",
+      "section_number": "Section 4.2.1",
+      "heading": "Clinical Indication",
+      "page_number": 1,
+      "content": "Patient must have documented neurological signs or symptoms, such as severe persistent headaches with atypical\nfeatures, dizziness, or visual disturbance.",
+      "character_count": 154,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-004",
+      "section_number": "Section 4.2.2",
+      "heading": "Duration of Symptoms",
+      "page_number": 2,
+      "content": "Symptoms must persist for at least 6 weeks of active outpatient care prior to imaging.",
+      "character_count": 86,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-005",
+      "section_number": "Section 4.2.3",
+      "heading": "Previous Conservative Treatment",
+      "page_number": 2,
+      "content": "A documented course of conservative therapy must be attempted without improvement.",
+      "character_count": 82,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-006",
+      "section_number": "Section 4.2.6",
+      "heading": "Contrast Justification",
+      "page_number": 3,
+      "content": "If intravenous contrast is requested, clinical rationale must establish suspicion of mass or neoplasm.",
+      "character_count": 102,
+      "table_detected": false
+    }
+  ],
+  "extraction_report": {
+    "total_pages": 3,
+    "scanned_pages_count": 0,
+    "low_confidence_pages": [],
+    "overall_quality": "HIGH",
+    "notes": [
+      "High confidence digital text extracted across all pages."
+    ]
+  },
+  "created_at": "2026-10-16 16:47:50Z",
+  "updated_at": "2026-10-16 16:47:50Z"
+}

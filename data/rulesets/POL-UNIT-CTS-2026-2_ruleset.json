@@ -1,0 +1,11 @@
+{
+  "policy_id": "POL-UNIT-CTS-2026-2",
+  "policy_name": "Computed Tomography Clinical Guideline",
+  "policy_version": "2026.2",
+  "policy_checksum": "8d7474f37dfac4424697ad5a2eda50591bb46b73278d88e39e0586e2b3fca9d0",
+  "procedure_type": "CT Scan",
+  "rules": [],
+  "verification_status": "DRAFT",
+  "signoff": null,
+  "last_updated": "2026-10-16T17:58:55.425673+00:00"
+}

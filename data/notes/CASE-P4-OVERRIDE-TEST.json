@@ -1,0 +1,114 @@
+{
+  "case_id": "CASE-P4-OVERRIDE-TEST",
+  "patient_name": "Grace Hopper",
+  "patient_age": null,
+  "gender": null,
+  "dob": null,
+  "facility": null,
+  "date_of_visit": null,
+  "procedure_requested": "CT Head",
+  "procedure_type": null,
+  "insurance_plan": "United Healthcare",
+  "organization_id": "org_riverside",
+  "policy_id": "P-TEST-CT-PHASE4",
+  "policy_version": "2026.1",
+  "chief_complaint": null,
+  "history_of_present_illness": null,
+  "clinical_findings": [],
+  "impression": null,
+  "physician_recommendation": null,
+  "original_filename": "clinical_note.pdf",
+  "storage_path": null,
+  "sha256_checksum": "",
+  "total_pages": 1,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR_UNAVAILABLE_FALLBACK_TO_MANUAL_REVIEW",
+  "facts": {
+    "focal_neuro_deficit": {
+      "fact_key": "focal_neuro_deficit",
+      "label": "Focal Neuro Deficit",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": {
+        "is_overridden": true,
+        "overridden_by": "Dr. Eleanor Vance, MD",
+        "overridden_at": "2026-10-16T22:32:27.920882+00:00",
+        "original_value": null,
+        "corrected_value": true,
+        "original_status": "ABSENT",
+        "corrected_status": "EXPLICIT",
+        "reason": "Found explicit left-sided hemiparesis documented on page 2 progress note."
+      }
+    },
+    "symptom_duration_weeks": {
+      "fact_key": "symptom_duration_weeks",
+      "label": "Duration",
+      "value": 8.0,
+      "status": "EXPLICIT",
+      "excerpt": "8 weeks of headache",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "recent_normal_ct_within_30_days": {
+      "fact_key": "recent_normal_ct_within_30_days",
+      "label": "Recent CT",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "No prior scans",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    }
+  },
+  "extracted_facts": {
+    "focal_neuro_deficit": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "symptom_duration_weeks": {
+      "value": 8.0,
+      "excerpt": "8 weeks of headache",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "recent_normal_ct_within_30_days": {
+      "value": false,
+      "excerpt": "No prior scans",
+      "source_page": 1,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [
+    {
+      "timestamp": "2026-10-16T22:32:27.920882+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "focal_neuro_deficit",
+      "reviewer": "Dr. Eleanor Vance, MD",
+      "original_value": null,
+      "corrected_value": true,
+      "original_status": "ABSENT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Found explicit left-sided hemiparesis documented on page 2 progress note."
+    }
+  ],
+  "latest_outcome": null,
+  "latest_evaluation": null,
+  "created_at": "2026-10-15T00:00:00Z",
+  "updated_at": "2026-10-16T22:32:27.920882+00:00"
+}

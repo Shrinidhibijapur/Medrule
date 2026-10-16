@@ -1,0 +1,48 @@
+{
+  "policy_id": "P-PHASE5-UHC",
+  "policy_name": "Computed Tomography Head Phase 5 Test",
+  "policy_version": "2026.1",
+  "policy_checksum": "11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff",
+  "procedure_type": "CT Scan",
+  "rules": [
+    {
+      "id": "P5-CRIT-01",
+      "policy_id": "P-PHASE5-UHC",
+      "policy_version": "2026.1",
+      "section_number": "4.1",
+      "section_name": "Acute Symptoms",
+      "source_page": 1,
+      "source_text": "Documented acute neurological symptoms.",
+      "plain_english_description": "Acute symptoms mandatory",
+      "criterion_type": "CRITERION",
+      "is_mandatory": true,
+      "fact_key": "acute_neuro_symptoms",
+      "operator": null,
+      "min_count": null,
+      "comparison_op": null,
+      "threshold_value": null,
+      "threshold_max": null,
+      "threshold_unit": null,
+      "conditional_prerequisite": null,
+      "is_exclusion": false,
+      "children": [],
+      "verification_status": "APPROVED_VERIFIED",
+      "reviewer_signoff": null
+    }
+  ],
+  "verification_status": "APPROVED_VERIFIED",
+  "signoff": {
+    "primary_reviewer": "Dr. Sarah Jenkins, MD",
+    "primary_reviewer_role": "Medical Director",
+    "secondary_reviewer": "Marcus Vance, RN",
+    "secondary_reviewer_role": "Auditor",
+    "signed_off_at": "2026-01-01T00:00:00Z",
+    "policy_checksum": "11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff",
+    "source_criteria_count": 1,
+    "encoded_criteria_count": 1,
+    "side_by_side_verified": true,
+    "plain_english_verified": true,
+    "notes": null
+  },
+  "last_updated": "2026-10-16T22:32:28.348875+00:00"
+}

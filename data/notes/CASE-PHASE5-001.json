@@ -1,0 +1,122 @@
+{
+  "case_id": "CASE-PHASE5-001",
+  "patient_name": "Eleanor Vance",
+  "patient_age": 48,
+  "gender": "F",
+  "dob": null,
+  "facility": "Riverside Regional Medical Center",
+  "date_of_visit": "2026-10-15",
+  "procedure_requested": "CT Scan of Head with Contrast",
+  "procedure_type": null,
+  "insurance_plan": "United Healthcare",
+  "organization_id": "org_riverside",
+  "policy_id": "P-PHASE5-UHC",
+  "policy_version": "2026.1",
+  "chief_complaint": null,
+  "history_of_present_illness": null,
+  "clinical_findings": [],
+  "impression": null,
+  "physician_recommendation": null,
+  "original_filename": "clinical_note.pdf",
+  "storage_path": null,
+  "sha256_checksum": "",
+  "total_pages": 1,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR_UNAVAILABLE_FALLBACK_TO_MANUAL_REVIEW",
+  "facts": {
+    "acute_neuro_symptoms": {
+      "fact_key": "acute_neuro_symptoms",
+      "label": "Acute Neurological Symptoms",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "Patient denies acute neurological deficits.",
+      "source_page": 1,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": {
+        "is_overridden": true,
+        "overridden_by": "Dr. Marcus Vance, MD",
+        "overridden_at": "2026-10-16T22:32:28.359994+00:00",
+        "original_value": false,
+        "corrected_value": true,
+        "original_status": "EXPLICIT",
+        "corrected_status": "EXPLICIT",
+        "reason": "Verified clinical examination records confirming acute symptoms."
+      }
+    }
+  },
+  "extracted_facts": {
+    "acute_neuro_symptoms": {
+      "value": false,
+      "excerpt": "Patient denies acute neurological deficits.",
+      "source_page": 1,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [
+    {
+      "timestamp": "2026-10-16T22:32:28.359994+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "acute_neuro_symptoms",
+      "reviewer": "Dr. Marcus Vance, MD",
+      "original_value": false,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Verified clinical examination records confirming acute symptoms."
+    }
+  ],
+  "latest_outcome": "APPROVED",
+  "latest_evaluation": {
+    "case_id": "CASE-PHASE5-001",
+    "patient_name": "Eleanor Vance",
+    "procedure": "CT Head Scan",
+    "insurer": "United Healthcare",
+    "policy_id": "P-PHASE5-UHC",
+    "policy_version": "2026.1",
+    "evaluation_date": "2026-10-15",
+    "criteria_results": [
+      {
+        "rule_id": "P5-CRIT-01",
+        "criterion_name": "Acute Symptoms",
+        "section": "4.1",
+        "requirement": "Documented acute neurological symptoms.",
+        "evidence_excerpt": "Patient denies acute neurological deficits.",
+        "source_page": 1,
+        "status": "MET",
+        "ui_symbol": "✅",
+        "ui_label": "Satisfied",
+        "comment": "Clinical requirement documented and confirmed [Clinician override by Dr. Marcus Vance, MD: 'Verified clinical examination records confirming acute symptoms.']",
+        "policy_citation": "Computed Tomography Head Phase 5 Test v2026.1, 4.1, Page 1",
+        "logic_group": "CLINICAL_CRITERIA",
+        "plain_english_rationale": "Acute symptoms mandatory",
+        "is_exclusion": false,
+        "fact_key": "acute_neuro_symptoms",
+        "fact_confidence": 1.0,
+        "reviewer_overridden": true,
+        "reviewer_override_by": "Dr. Marcus Vance, MD",
+        "reviewer_override_reason": "Verified clinical examination records confirming acute symptoms."
+      }
+    ],
+    "key_reasoning": [
+      "All required clinical criteria, thresholds, and duration mandates are fully satisfied.",
+      "Acute Symptoms [4.1]: Patient denies acute neurological deficits."
+    ],
+    "verdict": "APPROVED",
+    "verdict_sentence": "[DEMO / SYNTHETIC CASE - NOT A CLINICAL DECISION] Approval of CT Head Scan requires all mandatory criteria to be met. Conditions (P5-CRIT-01) are documented and satisfied. Therefore the request is APPROVED.",
+    "requires_human_review": false,
+    "review_reasons": [],
+    "decision_outcome": "APPROVED",
+    "policy_checksum": "11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff",
+    "verification_gate_verified": true,
+    "is_synthetic_demo": true,
+    "governance_notice": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."
+  },
+  "created_at": "2026-10-17T12:00:00Z",
+  "updated_at": "2026-10-16T22:32:28.359994+00:00"
+}

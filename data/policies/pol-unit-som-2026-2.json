@@ -1,0 +1,963 @@
+{
+  "id": "POL-UNIT-SOM-2026-2",
+  "policy_id": "POL-UNIT-SOM",
+  "insurer": "United Healthcare",
+  "policy_name": "CP MP",
+  "plan": "Commercial Advantage Plan",
+  "version": "2026.2",
+  "procedure_type": "some",
+  "procedure_full_name": "CT Scan of Head with Contrast",
+  "cpt_codes": [
+    "70450",
+    "70460"
+  ],
+  "effective_date": "2026-06-01",
+  "expiry_date": null,
+  "upload_date": "2026-10-16",
+  "sha256_checksum": "9ef5e7dbf19af436c7aa42bf19013cdde77ad067fb17a10173f2bd68adc03d29",
+  "original_filename": "CP.MP.107.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\policies\\9ef5e7dbf19a_CP.MP.107.pdf",
+  "total_pages": 21,
+  "lifecycle_status": "NEEDS_REVIEW",
+  "criteria": [],
+  "sections": [
+    {
+      "id": "SEC-001",
+      "section_number": "1.0",
+      "heading": "Page 1 Overview",
+      "page_number": 1,
+      "content": "Page 1 of 21\nClinical Policy: Durable Medical Equipment and Orthotics and Prosthetics Guidelines\nReference Number: CP.MP.107\nDate of Last Revision: 11/24\nCoding Implications\nR\nevision Log\nSee Important Reminder at the end of this policy for important regulatory and legal\nin\nformation.\nDescription\nDME is defined as equipment that can withstand repeated use, is primarily and customarily used\nto serve a medical purpose, is appropriate for use in the home, and is generally not useful to a\nperson in the absence of an illness or injury.1 Orthotic devices are rigid and semi-rigid devices\nuse\nd for the purpose of supporting a weak or deformed body part or restricting or eliminating\nmotion in a disease or injured body part.2 Prosthetic devices are custom-made artificial limbs or\nother\nassistive devices that replace a body part or function as a result of traumatic injuries,\nva\nscular disease, diabetes, cancer or congenital disorders.\nPolicy/Criteria\nI. It is the policy of health plans affiliated with Centene Corporation\u00ae that durable medical\nequipment, orthotics, and prosthetics are medically necessary when the general and\na\npplicable equipment-specific criteria in A and B are met:\nA. General criteria: Both of the following have been provided to the member/enrollee\nand/or caregiver, as applicable:3",
+      "character_count": 1309,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-002",
+      "section_number": "Section 2",
+      "heading": "A trial of the requested device, with demonstrated ability to use it safely and",
+      "page_number": 1,
+      "content": "e\nffectively.\nNote: If a medically necessary, lesser cost item exists and will suit the member/enrollee's\nmedical needs, a higher cost item will be denied.4\nB. EQUIPMENT-SPECIFIC CRITERIA\nBURN GARMENTS ........................................................................................................ 2\nCARDIAC EQUIPMENT ................................................................................................. 2\nCOMPRESSION THERAPY EQUIPMENT ........................................................................ 2\nDIABETES CARE EQUIPMENT ...................................................................................... 2\nHEAT, COLD & LIGHT THERAPY EQUIPMENT ........................................................... 2\nNEWBORN CARE EQUIPMENT ..................................................................................... 3\nOTHER EQUIPMENT ..................................................................................................... 3\nPROSTHETICS AND ORTHOTICS EQUIPMENT............................................................ 5\nPUMPS ................................ .......................................................................................... 8\nRESPIRATORY EQUIPMENT ......................................................................................... 9\nSURGICAL SUPPLIES.................................................................................................. 10\nWALKERS .................................................................................................................. 10\nWHEELCHAIRS .......................................................................................................... 11\nWOUND CARE ............................................................................................................ 12",
+      "character_count": 1808,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-003",
+      "section_number": "2.0",
+      "heading": "Page 2 Overview",
+      "page_number": 2,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 2 of 21\nBURN GARMENTS CRITERIA HCPCS\nBurn garments 5\nMedically necessary with associated physical and/or occupational\ntherapy when all of the following criteria are met:\nA. At risk of a post-burn contracture;\nB. The garment and physical and/or occupational therapies are being\nused with the intent of preventing the need for skin grafting or\ncontractures as a result of hypertrophic scarring;\nC. Garment is requested by the PCP and/or the treating specialist.\nA6501\nA6502\nA6503\nA6504\nA6505\nA6506\nA6507\nA6508\nA6509\nA6510\nA6511\nA6512\nA6513\nCARDIAC\nEQUIPMENT\nCRITERIA HCPCS\nNon-wearable\nexternal defibrillator\nwith integrated ECG\nanalysis 6\nConsidered not medically necessary as it is primarily considered a safety\ndevice.\nE0617\nCOMPRESSION\nTHERAPY\nEQUIPMENT\nCRITERIA HCPCS\nNon-pneumatic\ncompression devices\n7,8\nThere is insufficient clinical evidence to support the safety and\neffectiveness of non-pneumatic compression devices over the use of\nstandard pneumatic compression devices.\nE0678\nE0679\nDIABETES CARE\nEQUIPMENT\nCRITERIA HCPCS\nBlood glucose monitor\nwith integrated voice\nsynthesizer 9,10\nMedically necessary for member/enrollees with diabetes who are\nlegally blind (best corrected visual acuity less than 20/200).\nE2100\nHEAT, COLD &\nLIGHT THERAPY\nEQUIPMENT\nCRITERIA HCPCS\nUltraviolet panel\nlights 11,12\nMedically necessary when meeting both of the following:\nA. Refractory psoriasis;\nB. MD justifies treatment at home versus alternate sites (e.g. outpatient\ndepartment at hospital). Panel lights should be considered, if several\ndiscrete body areas can be treated individually.\nNote: Cabinet style lights should be reserved for extensive involvement\nof body surface area.\nE0691\nE0692\nE0693\nE0694",
+      "character_count": 1743,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-004",
+      "section_number": "3.0",
+      "heading": "Page 3 Overview",
+      "page_number": 3,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 3 of 21\nHEAT, COLD &\nLIGHT THERAPY\nEQUIPMENT\nCRITERIA HCPCS\nCold pad pump 13 Considered not medically necessary for post-operative management as\nresearch does not indicate improved outcomes in pain or edema\nmanagement with the use of cold compression therapy over the use of\nother treatments to include conservative treatment, cold therapy alone,\ncompression therapy alone, etc.\nE0236\nNEWBORN CARE\nEQUIPMENT\nCRITERIA HCPCS\nBreast pumps Medically necessary for the following:\nA. Breast/chest feeding member if it is a covered benefit in the State\nB. Less than $250.00 as a purchase\nC. If  >$250 approve as rental up to purchase price then convert to\npurchase\nD. Limit one per member/enrollee.\nE0604\nOTHER EQUIPMENT CRITERIA HCPCS\nEnclosed Beds 14, 15, 16,\n17\nRequests w ill be reviewed by a medical director and/or therapy advisorto determine medical necessity, based on all of the following:\nA. Standard bed or standard hospital bed must be unable to meet the\npositioning needs due to disability;\nB. Less intensive alternatives to improve the member\u2019s/enrollee\u2019s\nsafety have been tried and ruled out (to include documentation of\nwhy they could not meet medical needs). Considerations include,\nbut are not limited to:",
+      "character_count": 1258,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-005",
+      "section_number": "Section 6",
+      "heading": "Child protection devices such as locks on doors, windows,",
+      "page_number": 3,
+      "content": "cabinets, furniture anchors, gates at steps and doors;",
+      "character_count": 54,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-006",
+      "section_number": "Section 7",
+      "heading": "Physician-directed medication to address seizures, behaviors",
+      "page_number": 3,
+      "content": "and sleep;",
+      "character_count": 10,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-007",
+      "section_number": "Section 8",
+      "heading": "Environmental modification to encourage calming behaviors",
+      "page_number": 3,
+      "content": "and sleep;",
+      "character_count": 10,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-008",
+      "section_number": "Section 9",
+      "heading": "Established routines addressing sensory needs and/or behavior",
+      "page_number": 3,
+      "content": "modification to assist with improved naptime or night time\nbehaviors and sleep;\nC. Medical diagnosis to include, but not limited to:",
+      "character_count": 132,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-009",
+      "section_number": "Section 2",
+      "heading": "Developm",
+      "page_number": 3,
+      "content": "ental delay;",
+      "character_count": 12,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-010",
+      "section_number": "Section 3",
+      "heading": "Genetic or neurological disorder that would cause vertigo,",
+      "page_number": 3,
+      "content": "disorientation, or uncontrolled movement of the body or\nextremities;",
+      "character_count": 68,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-011",
+      "section_number": "Section 4",
+      "heading": "Uncontrolled seizure disorder;",
+      "page_number": 3,
+      "content": "E0316\nE1399\nE0328 or\nE0329\n(when\ncombined\nwith\nE0316 or\nE1399)",
+      "character_count": 62,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-012",
+      "section_number": "4.0",
+      "heading": "Page 4 Overview",
+      "page_number": 4,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 4 of 21\nOTHER EQUIPMENT CRITERIA HCPCS",
+      "character_count": 80,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-013",
+      "section_number": "Section 5",
+      "heading": "Severe behavior disorder;",
+      "page_number": 4,
+      "content": "D. Healthcare provider evaluation (typically from an occupational or\nphysical therapist) to include:",
+      "character_count": 100,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-014",
+      "section_number": "Section 3",
+      "heading": "Documentation of education provided to caregivers on proper",
+      "page_number": 4,
+      "content": "use of a bed enclosure, noting: they are to be used for medical\nsupport, improved safety transitioning in and out of the bed,\nand improved safety while sleeping;\nE. Name of and invoice for the bed or enclosure being requested.\nNote:\n\u2022 Enclosed beds should not be used as a discipline measure or as a\nrestraint during times of high agitation or aggression. To limit\nsensory deprivation, enclosed beds should be used at night for\nsleeping and only for short rests or naps during the day.\n\u2022 When the above criteria is met, only basic beds will be considered\nmedically necessary. Upgrades for aesthetic purposes or upgrades\nthat do not meet the rules for durable medical equipment (DME)\nwould not be covered as part of an enclosed bed purchase. This\nincludes but is not limited to any of the following:\n\u2022 Special lights, sounds, fans, cameras, two way talk monitors,\nvibration pads weighted blankets;\n\u2022 Custom wood types, finishes or engravings, special coverings\non the outside of the bed;\n\u2022 Custom upgrades where lower cost alternatives are readily\navailable.\nPositioning seat Requests should have a physician or therapy advisor review to\ndetermine medical necessity.\nMedically necessary with therapist evaluation and ongoing treatment\nand all of the following criteria are met:\nA. Commercial device must be unable to meet the positioning needs\ndue to height, weight, or disability;\nB. Other positioning devices in the home must be reviewed to ensure\na duplication of devices is not already in place.\nT5001\nE1399\nSpecialized supply or\nequipment\nRequests for not otherwise specified supplies or miscellaneous\nequipment codes will have a physician or therapy advisor review to\ndetermine medical necessity.\nE0240\nT2028\nT2029\nK0108\nK0739\nE1399\n(For\nwheelchair\nseating\nrefer to\nCP.MP.99)\nROMTech\u00ae\nPortableConnect\u00ae\nDevice 18\nNot medically necessary, as there is insufficient evidence in published\npeer-reviewed literature to support the use of this technology over\ncurrently available alternatives.\nE1399\nA9900",
+      "character_count": 2002,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-015",
+      "section_number": "5.0",
+      "heading": "Page 5 Overview",
+      "page_number": 5,
+      "content": "Page 5 of 21\nPROSTHETICS\nAND\nORTHOTICS\nEQ\nUIPMENT\nCRITERIA HCPCS\nCervical traction\nequipment 19\nMedically necessary when all of the following are met:\nA. The appropriate use of the selected home cervical traction\ndevice has been demonstrated and was tolerated;\nB. One of the following:",
+      "character_count": 285,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-016",
+      "section_number": "Section 1",
+      "heading": "Diagnosis of temporomandibular joint (TMJ) dysfunction",
+      "page_number": 5,
+      "content": "and has received treatment for TMJ condition;",
+      "character_count": 45,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-017",
+      "section_number": "Section 2",
+      "heading": "Distortion of the lower jaw and neck anatomy (e.g. radical",
+      "page_number": 5,
+      "content": "neck dissection) such that a chin halter is unable to be\nutilized;",
+      "character_count": 66,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-018",
+      "section_number": "Section 3",
+      "heading": "The treating physician orders and/or documents the medical",
+      "page_number": 5,
+      "content": "necessity for greater than 20 pounds of cervical traction in\nthe home setting.\nE0849\nCervical collar,\ncustom molded\nRequests for custom molded cervical collar will be reviewed by a\nlicensed physical or occupational therapist. Documentation\naccompanying the request must state reason why pre-fabricated\ncollar not adequate.\nL0170\nL0190\nL0200\nSpinal Orthotics Requests for spinal orthotics will be reviewed using relevant\nnationally recognized decision support tool criteria for similar\ncodes.\nL0700, L0710,\nL0999, L1000\nL1001, L1005\nHip orthotics 20 Medically necessary when ordered by an orthopedist for treatment\nof, or postoperatively for any of the following:\nA. Total hip arthroplasty;\nB. Hip labral tear;\nC. Hip disorders in children when used to stabilize the hip\nand/or to correct and maintain hip abduction.\nLateral replacements due to growth are considered medically\nnecessary in pediatrics for diagnoses such as hip dysplasia with\nCharcot-Marie-Tooth disease.\nRequests for hip orthotics for  hip osteoarthritis in patients who are\nnot surgical candidates will be reviewed on a case by case basis by\na medical director and/or therapy advisor.\nL1640\nL1680\nL1685\nL1686\nL1690\nLegg Perthes\northotics\nMedically necessary when ordered by an orthopedist for use in the\ntreatment for Legg-Calv\u00e9-Perthes disease in children.\nL1700\nL1710\nL1720\nL1730\nL1755\nMicroprocessor-\ncontrolled knee-\nankle-foot orthoses\n(KAFO)21\nThere is insufficient clinical evidence to support the effectiveness\nof electronic KAFOs over the use of standard KAFOs.\nL2006\nHip-knee-ankle-\nfoot orthotics\n(HKAFO)\nRequests for HKAFO orthotics will be reviewed on a case by case\nbasis.\nL2050\nL2060\nL2090\nCLINICAL POLICY\nDME and O&P Criteria",
+      "character_count": 1708,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-019",
+      "section_number": "6.0",
+      "heading": "Page 6 Overview",
+      "page_number": 6,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 6 of 21\nPROSTHETICS\nAND\nORTHOTICS\nEQUIPMENT\nCRITERIA HCPCS\nOrthotic\ncomponents\nRequests for orthotic components listed will be reviewed using\nrelevant nationally recognized decision support tool criteria for\nsimilar codes.\nL2570\nL2580\nL2627\nL2628\nFoot orthotics,\ncustom\nMedically necessary for arch, heel, or other foot pain when\nindicated by both of the following:\nA. Presence of at least one of the following conditions:",
+      "character_count": 464,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-020",
+      "section_number": "Section 5",
+      "heading": "Plantar fasciitis when symptoms have been present for 3",
+      "page_number": 6,
+      "content": "months or more;",
+      "character_count": 15,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-021",
+      "section_number": "Section 6",
+      "heading": "Posterior tibial tendon dysfunction in adult, as indicated by",
+      "page_number": 6,
+      "content": "one or more of the following:\na. Stage I disease (tenosynovitis without deformity);\nb. Stage II disease (flexible and passively correctable\ndeformity);\nB. Documentation that adjustment of activities, anti-inflammatory\nmedications, prefabricated orthotics, physical therapy intervention\nand stretching of calf muscles and plantar surface have failed to\nimprove symptoms.\nL3000\nL3001\nL3002\nL3003\nL3010\nL3020\nL3030\nL3031\nL3070\nL3080\nOrthopedic\nfootwear, custom\nRequests for custom orthotic components will be reviewed using\nrelevant nationally recognized decision support tool criteria for\nsimilar codes.\nIn addition to supporting the medical necessity of foot orthotics,\ninformation must be provided to indicate why prefabricated devices\ncannot meet the need/why custom devices are necessary.\nL3230\nShoulder, elbow,\nwrist, hand, finger\northotics\nMedicall\ny necessary when ordered immediately post-operative for\northopedic surgeries such as rotator cuff repair, tendon repair, or\nORIF.\nReplacement due to normal wear and tear is considered medically\nnecessary when the item is a lateral purchase and the orthotic is\nstill needed; Coverage is based on contract guidelines for\nreplacement DME.\nL3904\nL4000\nL4010\nL4020\nL4030\nL4205\nProsthetics and\nadditions: Upper\nExtremity and\nMyoelectric\nRequests for upper extremity and myoelectric prosthetics will be\nreviewed by a medical director and/or therapy advisor when the\nrequest specific criteria in A. or B. is met:\nA. Initial request meets all of the following:",
+      "character_count": 1504,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-022",
+      "section_number": "Section 1",
+      "heading": "Medical record documentation supports all of the following:",
+      "page_number": 6,
+      "content": "a. Functional needs cannot be met with activity\nmodification and compensatory techniques;\nL6000, L6010,\nL6020, L6026,\nL6050, L6055,\nL6100, L6110,\nL6120, L6130,\nL6200, L6205,\nL6250, L6300,\nL6310, L6320,",
+      "character_count": 201,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-023",
+      "section_number": "7.0",
+      "heading": "Page 7 Overview",
+      "page_number": 7,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 7 of 21\nPROSTHETICS\nAND\nORTHOTICS\nEQUIPMENT\nCRITERIA HCPCS\nb. Requested prosthesis is anticipated to meet functional needs;",
+      "character_count": 165,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-024",
+      "section_number": "Section 2",
+      "heading": "Clinical examination findings include all of the following:",
+      "page_number": 7,
+      "content": "a. Appropriate residual limb length;\nb. Limb volume stable;\nc. Ability to tolerate weight of prosthetic device;\nd. Environmental exposures appropriate for requested\nprosthesis;\ne. Ability to access specialized service and care as\nnecessary;\nf. Stable condition of extremity to include skin integrity,\nstrength, and ROM sufficient to use requested device;\ng. Cognitive function necessary to master prosthetic use;",
+      "character_count": 412,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-025",
+      "section_number": "Section 3",
+      "heading": "Comprehensive prosthetic rehabilitation plan includes all of",
+      "page_number": 7,
+      "content": "the following:\na. Successful participation in pre-prosthetic training and\ntherapy;\nb. Method of prosthetic control discussed;\nc. Functional task training with occupational or physical\ntherapy;\nd. Concurrent home exercise program;\ne. Follow-up care schedule planned.\nB. Replacement request, all of the following:",
+      "character_count": 311,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-026",
+      "section_number": "Section 1",
+      "heading": "Replacement is requested due to one of the following:",
+      "page_number": 7,
+      "content": "a. Current prosthesis no longer functions properly or\nphysiological or surgical changes to residual limb no\nlonger accommodate current prosthesis;\nb. Irreparable wear to prosthesis or prosthetic components;\nc. Significant change in member/enrollee condition\nresulting in poor fit or function of prosthesis or prosthetic\ncomponents;",
+      "character_count": 331,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-027",
+      "section_number": "Section 2",
+      "heading": "Irreparable damage to prosthesis or prosthetic components",
+      "page_number": 7,
+      "content": "or repair cost > 60% of replacement cost;",
+      "character_count": 41,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-028",
+      "section_number": "Section 3",
+      "heading": "Prosthesis has been properly cared for following",
+      "page_number": 7,
+      "content": "manufacturer's recommendations;",
+      "character_count": 31,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-029",
+      "section_number": "Section 4",
+      "heading": "Medical documentation includes all of the following:",
+      "page_number": 7,
+      "content": "a. Supports continued use and medical need;\nb. Continued motivation to use the device for functional\nbenefit;\nc. Functional level continues to be appropriate for\nprosthesis and components in use;\nd. Replacement with same or similar prosthesis and/or\ncomponents;\ne. Updated practitioner's order on file or order not required\n(for loss or irreparable damage).\nL6350, L6360,\nL6370, L6380,\nL6382, L6384,\nL6386, L6388,\nL6400, L6450,\nL6500,  L6550,\nL6570, L6580,\nL6582, L6584,\nL6586, L6588,\nL6590, L6623,\nL6624, L6625,\nL6628, L6638,\nL6646, L6647,\nL6648, L6689,\nL6690, L6692,\nL6693, L6704,\nL6707, L6708,\nL6709, L6711,\nL6712, L6713,\nL6714, L6715,\nL6721, L6722,\nL6885, L6895,\nL6900, L6905,\nL6910, L6915,\nL6920, L6930,\nL6940, L6950,\nL6960, L6965,\nL6970, L6975,\nL7040, L7170,\nL7185, L7186,\nL7405, L7499",
+      "character_count": 791,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-030",
+      "section_number": "8.0",
+      "heading": "Page 8 Overview",
+      "page_number": 8,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 8 of 21\nPROSTHETICS\nAND\nORTHOTICS\nEQUIPMENT\nCRITERIA HCPCS\nProsthetics and\nadditions: Lower\nExtremity\nRequests for these prosthetics and additions will be reviewed by a\nlicensed physical or occupational therapist.\nL5990\nBreast\nProsthetics22, 23, 24\nMedically necessary post-masectomy or for treatment of gender\ndysphoria and documentat\nion supports that prefabricated\nprosthetics will not suffice.\nL8030\nL8035\nMyoPro\u00ae\nOrthosis25\nNot medically necessary, as there is insufficient evidence in\npublished peer-reviewed literature to support the use of this\ntechnology over other technologies and currently available\nalternatives.\nL8701\nL8702\nPUMPS CRITERIA HCPCS\nAmbulatory infusion\npump 26,27\nMedically necessary when used for one of the following indications:\nA. Iron Poisoning: administration of deferoxamine for the treatment\nof acute iron poisoning and iron overload;\nB. Chemotherapy for liver cancer: treatment of primary\nhepatocellular carcinoma or colorectal cancer where this disease\nis unresectable; OR, where the patient refuses surgical excision of\nthe tumor;\nC. With opioid drugs when used for intractable pain caused by\ncancer.\nD. To administer a drug considered reasonable and necessary by\neither:",
+      "character_count": 1250,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-031",
+      "section_number": "Section 1",
+      "heading": "Prolonged infusion of at least 8 hours because of proven",
+      "page_number": 8,
+      "content": "improved cli\nnical efficacy (i.e., proven or generally accepted\nto have significant advantages over intermittent bolus\nadministration regimens or infusions lasting less than 8 hours)\nor",
+      "character_count": 185,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-032",
+      "section_number": "Section 8",
+      "heading": "hours, and both of the following criteria:",
+      "page_number": 8,
+      "content": "a. Does not require the return to the physician's office prior\nto the beginning of each infusion.\nb. Strictly controlled rate of infusion is necessary because\nsystemic toxi\ncity or adverse effects of the drug are\nunavoidable without infusing it at a controlled rate as\nindicated in the Physician\u2019s Desk Reference, or the U.S.\nPharmacopeia Drug Information\nE0780\nE0781\nGastric suction pump,\nhome model 28\nMedically necessa ry for home use for gastric suction due to inability to empty gastri c secretions through normal gastrointestinal functions.  E2000\nImplantable infusion\npumps 26\nMedically necessary when meeting both of the following:\nA. One of the following indications:",
+      "character_count": 676,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-033",
+      "section_number": "Section 1",
+      "heading": "Chemotherapy for liver cancer: primary hepatocellular",
+      "page_number": 8,
+      "content": "carcinoma or Duke\u2019s Class D colorectal cancer, in which the\nmetastases are limited to the liver and where either the\nE0782\nE0783\nE0785\nE0786",
+      "character_count": 140,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-034",
+      "section_number": "9.0",
+      "heading": "Page 9 Overview",
+      "page_number": 9,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 9 of 21\nPUMPS CRITERIA HCPCS\ndisease is unresectable, or the patient refuses excision of the\ntumor;",
+      "character_count": 141,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-035",
+      "section_number": "Section 2",
+      "heading": "Anti-spasmodic drugs for severe spasticity: administered",
+      "page_number": 9,
+      "content": "intrathecal to treat chronic intractable spasticity in patients\nunresponsive to less invasive medical therapy including both\nof the following:\na. A 6-week trial of noninvasive methods, such as oral anti-\nspasmodic drugs, that failed to adequately control the\nspasticity or produced intolerable side effects;\nb. Prior to pump implantation, there has been a favorable\nresponse to a trial of  intrathecal dose of the anti-\nspasmodic drug;",
+      "character_count": 435,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-036",
+      "section_number": "Section 3",
+      "heading": "Opioid drugs for treatment of chronic intractable pain- see",
+      "page_number": 9,
+      "content": "CP.MP.173 Implantable Intrathecal Pain Pumps;",
+      "character_count": 45,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-037",
+      "section_number": "Section 4",
+      "heading": "Other uses when all of the following are met:",
+      "page_number": 9,
+      "content": "a. The drug is reasonable and necessary for the treatment of\nthe  individual;\nb. It is medically necessary that the drug be administered by\nan implanted infusion pump. The infusion pump has been\nFDA-approved for the drug being administered and the\npurpose for which it is being administered;\nB. None of the following contraindications to implantation of an\ninfusion pump:",
+      "character_count": 371,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-038",
+      "section_number": "Section 1",
+      "heading": "Known allergy or hypersensitivity to the drug being used",
+      "page_number": 9,
+      "content": "(e.g., oral baclofen, morphine, etc.);",
+      "character_count": 38,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-039",
+      "section_number": "Section 3",
+      "heading": "Body size insufficient to support the weight and bulk of the",
+      "page_number": 9,
+      "content": "device;",
+      "character_count": 7,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-040",
+      "section_number": "Section 5",
+      "heading": "Heparin or insulin is the drug intended for administration.",
+      "page_number": 9,
+      "content": "Parenteral pump for\nmedication\nadministration 28\nMedically necessary for uninterrupted parenteral administration of\nmedication via pump.\nK0455\nVacuum erection\ndevice 29,30\nA vacuum erection device (VED) and tension ring are medically\nnecessary for the t\nreatment of erectile dysfunction when prescribed by\na physician.\nL7900\nL7902\nRESPIRATORY\nEQUIPMENT\nCRITERIA HCPCS\nNebulizer,\nultrasonic 31\nNot medically necessary, as it provides no clinical advantage over use of a\nsmall-volume nebulizer (E0574) and compressor.\nE0575\nIPPB &\nsupplies\nMedically necessary for member/enrollee with respiratory disease when an\nincentive spirometer is ineffective.\nE0500\nE0550\nOximeter 32 Medically necessary when used as a monitoring and alarm device for any of\nthe following:\nA. To monitor individuals on a home ventilator or with a tracheostomy\nB. To determine appropriate home oxygen requirements\nC. To wean an individual from home oxygen\nE0445",
+      "character_count": 931,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-041",
+      "section_number": "10.0",
+      "heading": "Page 10 Overview",
+      "page_number": 10,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 10 of 21\nRESPIRATORY\nEQUIPMENT\nCRITERIA HCPCS\nD. To monitor an unstable respiratory condition\nNot medically necessary when used for any of the following:\nA. Oximetry when used as a diagnostic procedure\nB. Monitoring of a stable respiratory condition\nC. Asthma management\nD. Other conditions not listed above\nOxygen tent 32 Medically necessary when the ability to breathe is impaired and for whom\nsupplemental oxygen is required.\nE0455\nIntrapulmonary\npercussive\nventilation\ndevices\n(Volara\u2122,\nPercussionaire-\nTRUE-\nIPV\u00ae)33,34,35,36\nCurrent evidence does not support the effectiveness of intrapulmonary\npercussive ventilation (IPV).\nE1399\nSURGICAL\nSUPPLIES\nCRITERIA HCPCS\nOther\nsurgical\nsupplies\nThese items are used as part of a surgical procedure and will be\nreviewed according to the relevant surgical procedure or level of\ncare.\nL8040, L8041, L8042,\nL8043, L8044, L8045,\nL8046, L8047, L8499,\nL8600, L8609, L8610,\nL8612, L8615, L8631,\nL8659\nWALKERS CRITERIA HCPCS\nWalker,\nstandard 37  Requests for standard walkers are considered medically necessary when meeting all of the following:\nA. Mobility-related activities of daily living (MRADLs) in the home cannot\nbe met due to mobility limitation;\nB. Walker is able to be safely used by member/enrollee;\nC. Functional mobility deficit will be sufficiently resolved with the use of a\nwalker.\nE0130\nE0135\nE0141\nE0143\nWalker, heavy\nduty 37\nRequests for heavy duty walkers (E0148, E0149) are considered medically\nnecessary when meeting the above standard walker criteria and the\nmember/enrollee weighs more than 300 pounds.\nRequests for heavy duty, multiple braking system, variable wheel resistance\nwalkers (E0147) are considered medically necessary when meeting the\nabove standard walker criteria and the member/enrollee is unable to use a\nstandard walker due to a severe neurologic disorder or other condition\ncausing the restricted use of one hand.\nE0148\nE0149\nE0147",
+      "character_count": 1955,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-042",
+      "section_number": "11.0",
+      "heading": "Page 11 Overview",
+      "page_number": 11,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 11 of 21\nWHEELCHAIRS CRITERIA HCPCS\nManual\nwheelchair 38\nInitial request is medically necessary when meeting all of the\nfollowing:\nA. Mobility limitation interferes with ability to participate in\nmobility-related activities of daily living, all of the following:",
+      "character_count": 304,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-043",
+      "section_number": "Section 2",
+      "heading": "Manual wheelchair will significantly improve",
+      "page_number": 11,
+      "content": "member/enrollee\u2019s ability to participate in mobility-related\nactivities of daily living;",
+      "character_count": 88,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-044",
+      "section_number": "Section 3",
+      "heading": "Home provides adequate access and maneuvering space for",
+      "page_number": 11,
+      "content": "requested manual wheelchair;",
+      "character_count": 28,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-045",
+      "section_number": "Section 4",
+      "heading": "Willingness by member/enrollee or caregiver to use a",
+      "page_number": 11,
+      "content": "manual wheelchair in the home;\nB. One of the following:",
+      "character_count": 55,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-046",
+      "section_number": "Section 2",
+      "heading": "Member/enrollee is able to safely and efficiently self-propel",
+      "page_number": 11,
+      "content": "manual wheelchair.\nReplacement is medically necessary when documentation supports\none of the following:\nA. Replacement necessary due to loss, theft, or irreparable damage\nand both of the following:",
+      "character_count": 197,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-047",
+      "section_number": "Section 2",
+      "heading": "Replacement is with the same or similar equipment;",
+      "page_number": 11,
+      "content": "B. All of the following:",
+      "character_count": 24,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-048",
+      "section_number": "Section 1",
+      "heading": "Replacement is due to one of the following reasons:",
+      "page_number": 11,
+      "content": "a. Replacement necessary after reasonable useful liftetime\nof five years or more;\nb. Change in member/enrollee status requiring different\nequipment than currently in use and growth features of\ncurrent equipment have been maximized;",
+      "character_count": 231,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-049",
+      "section_number": "Section 2",
+      "heading": "Mobility limitation interferes with ability to participate in",
+      "page_number": 11,
+      "content": "mobility-related activities of daily living, all of the\nfollowing :\na. Mobility limitation cannot be met with a cane or\nwalker;\nb. Manual wheelchair will significantly improve the\nmember/enrollee\u2019s ability to participate in mobility-\nrelated activities of daily living;\nc. Home provides adequate access and maneuvering space\nfor requested manual wheelchair;\nd. Willingness by member/enrollee or caregiver to use a\nmanual wheelchair in the home;",
+      "character_count": 444,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-050",
+      "section_number": "Section 3",
+      "heading": "One of the following:",
+      "page_number": 11,
+      "content": "a. Caregiver is able to assist with wheelchair use;\nb. Member/enrollee is able to safely and efficiently self-\npropel manual wheelchair.\nE1050, E1060,\nE1070, E1083,\nE1084, E1085,\nE1086, E1087,\nE1088, E1089,\nE1090, E1092,\nE1093, E1100,\nE1110, E1130,\nE1140, E1150,\nE1160, E1170,\nE1171, E1172,\nE1180, E1190,\nE1195, E1200,\nE1221, E1222,\nE1223, E1224,\nE1240, E1250,\nE1260, E1270,\nE1280, E1285,\nE1290, E1295\nPower seat\nelevator on\nMedically necessary as a component on a power wheelchair when\nall of the following are met:\nE2298",
+      "character_count": 522,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-051",
+      "section_number": "12.0",
+      "heading": "Page 12 Overview",
+      "page_number": 12,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 12 of 21\nWHEELCHAIRS CRITERIA HCPCS\npower\nwheelchair 39\nA. A licensed, certified medical professional (i.e. physical or\noccupational therapist) is involved with the assessment,\nprescription, trials and training of equipment;\nB. Adequate cognitive function to safely use the seat elevating\nfeature;\nC. A clear functional need for the feature is indicated;\nD. Provision of the feature will improve functional independence\nwith an activity, such as but not limited to: facilitating reach for\nthe completion of ADLs or IADLs or improving transfer\nbiomechanics\nand safety.\nRobotic Arm,\nWheelchair-\nmounted\n(JACO)40\nThere is insufficient clinical evidence to support safety and\nimproved health outcomes of the JACO Assistive Robotic Arm\n(Kinova, Inc.) over other technologies.\nE1399\nRollabout chair Medically necessary when used in lieu of a wheelchair for those\nwho would qualify for a wheelchair (except for the ability to self-\npropel a manual wheelchair).\nE1031\nWheelchair and\nother DME\nrepairs\nRequests for wheelchair or other DME repairs specifically using\ncodes K0108, K0739, or E1399, are medically necessary when\nreviewed by a physician or therapy advisor and when meeting the\nfollowing criteria:\nA. Less than 5 years old (as evident by the age/date of purchase\ninformation provided);\nB. Cost of repairs is less than the cost of replacement;\nC. Information is provided to support the need for repairs due to\nnormal wear and tear, as opposed to abuse/misuse or\noverutilization (as based on review of previous repair history,\nage and overall condition).\nOne month\u2019s rental for a standard manual wheelchair is considered\nmedically necessary if a member/enrollee owned wheelchair is\nbeing repaired.32\nK0108\nK0739\nE1399\nWOUND CARE CRITERIA HCPCS\nWhirlpool tub Considered not medically necessary. E1310\nCoding Implications\nCodes referenced in this clinical policy are for informational purposes only. Inclusion or\ne\nxclusion of any codes does not guarantee coverage. Providers should reference the most up-to-\ndate sources of professional coding guidance prior to the submission of claims for\nreimbursement of covered services.\nBackground\nDME items have the following characteristics:\n\u2022 The equipment is prescribed by a physician;\n\u2022 The equipment meets the definition of DME;\n\u2022 The equipment is necessary and reasonable for the treatment of an illness or injury;",
+      "character_count": 2401,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-052",
+      "section_number": "13.0",
+      "heading": "Page 13 Overview",
+      "page_number": 13,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 13 of 21\n\u2022 The equipment is manufactured primarily for use in the home environment, but is not\nlimited to use in the home.\nMember/Enrollee\u2019s Home\nFor purposes of rental and purchase of DME, a member/enrollee\u2019s home may be their own\ndwelling, an apartment, a relative\u2019s home, a home for the aged or some other type of institution.\nHowever, an institution may not be considered a member/enrollee\u2019s home if the following are\nmet:\n\u2022 Meets at least the basic requirement in the definition of a hospital, i.e., it is primarily\nengaged in providing by or under the supervision of physicians, inpatient, diagnostic and\ntherapeutic services for medical diagnosis, treatment, and care of injured, disabled, and\nsick persons, or rehabilitation services for the rehabilitation of injured, disabled, or sick\npersons; or\n\u2022 Meets at least the basic requirement in the definition of a skilled nursing facility, i.e., it is\nprimarily engaged in providing to inpatients skilled nursing care and related services for\nmembers/enrollees who require medical or nursing care, or rehabilitation services for the\nrehabilitation of injured, disabled, or sick persons.\nMembers/enrollees who have been permanently admitted to an inpatient skilled nursing facility\nor inpa\ntient hospice and who have changed their home address to that of the SNF or ho spice will\nhave the SNF or hospice defined as their home.\nProducts\nProducts is defined as a listing of the most common items, or group of items, that are or may be\nperceived as home medical equipment. This listing, while reasonably complete, is not intended to\nquantify the entire spectrum of products that may be considered DME either now or in the future.\nDurability\nAn item is considered durable if it can withstand repeated use, i.e., the type of item that could\nnormally be rented. Medical supplies of an expendable nature, such as incontinence pads, lamb\u2019s\nwool pads, catheters, ace bandages, elastic stockings, surgical facemasks, sheets and bags are not\nconsidered \u201cdurable\u201d within the meaning of the definition. There are other items that although\ndurable in nature, may fall into other coverage categories such as supplies and orthotics and\nprosthetics. Orthotics and Prosthetics items include, but are not limited to, braces, artificial limbs\nand eyes.\nMedical Equipment\nMedical equipment is defined as equipment primarily and customarily used for medical purposes\nand is not generally useful in the absence of illness or injury. In most instances, no\ndocumentation will be needed to support whether a specific item of equipment is medical in\nnature. However, some cases will require documentation to determine whether the item\nconstitutes medical equipment. This documentation would include the advice of local medical\norganizations and facilities and specialists in the field of physical medicine and rehabilitation. If\nthe equipment is new on the market, it may be necessary, prior to seeking professional advice, to\nobtain information from the supplier or manufacturer explaining the design, purpose,\neffectiveness and method of using the equipment in the home as well as the results of any tests or\nclinical studies that have been conducted.",
+      "character_count": 3222,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-053",
+      "section_number": "14.0",
+      "heading": "Page 14 Overview",
+      "page_number": 14,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 14 of 21\nPersonal computers or mobile technology such as iPads, smart phones, iPods, personal digital\nassistants, etc., may be considered as medical equipment when used for the purpose of speech\ngenerating equipment when other non-medical functions are limited or disabled and that device\nis used as the primary source of communication for those qualifying for a speech generating\ndevice.\nReviews, Revisions, and Approvals Revision\nDate\nApproval\nDate\nPolicy created  06/09 06/09\nGait trainers: Removed code E1399 and replaced it with a note stating\nE1399 is not necessary.Under Ambulatory Assist Products: Added criteria\nfor standing frames for  codes E1399 and E0642; Under Heat, Cold &\nLight\nTherapy Equipment: Changed coverage recommendation for Cold\nPad Pump to \u201cNot medically necessary; Under Orthopedic Care\nEquipment: Added criteria for traction equipment for E0849 that targets\nTemporomandibular Joint Dysfunction; Moved Fracture Frames with\nc\nodes E0947 and E0948 to the section with Halo Procedure Equipment as\ncriteria and indicati\nons are the same; Changed male vacuum erection\ndevices from not medically necessary to medically necessary; Added hip\nlabral tears as an indication for a Hip Orthotic; Added clarification to\nprosthetics and additions section to avoid inappropriate application; For\npositioning seat, added a requirement for review by therapist or MD;\nUnder Other Equipment: Added criteria for E1399, K0108 and K0739\nwhen they are used for wheelchair repairs; Added criteria for E2300 Seat\nElevators; Under Stimulator Equipment: Added E0770 when the diagnosis\nis spinal cord injury to the coverage criteria detailed under Neuromuscular\nstimulator.\n11/19\n12/19\nClarified that E0617 is a non-wearable external defibrillator. 03/20\nRemoved criteria for flexion/extension devices, and associated codes\nE1802, E1810, and E1812 as they are now in CP.MP.144 Mechanical\nS\ntretch Devices. Removed criteria for E0466, non-invasive ventilators, and\nse\ncond non-invasive ventilators, as this is now included in CP.MP.184\nNon-invasive home ventilators. Clarified that back up ventilator is\nnecessary in the case of a wheelchair mounted ventilator if the ventilator\nc\nould not reach from the wheelchair to the bed. Restructured\nse\ncond/backup ventilator criteria, and removed \u201cmay be considered\u201d from\nthe remote geographic access indication.\n05/20\nCode E0780 added to criteria for ambulatory infusion pump. Moved\nambulatory and implantable infusion pump criteria into pumps section.\nUpdated table of contents.\n07/20\nUnder Wound Care, removed HCPCS code Q4111, GammaGraft, as code\nis included in CP.MP.185 Skin Substitutes for Chronic Wounds. Removed\n\u201c\nmember\u201d from criteria and reworded, without impact on criteria. When\nnot possible to remove, replaced \u201cmember\u201d with \u201cmember/enrollee.\u201d\n09/20 09/20",
+      "character_count": 2851,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-054",
+      "section_number": "15.0",
+      "heading": "Page 15 Overview",
+      "page_number": 15,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 15 of 21\nReviews, Revisions, and Approvals Revision\nDate\nApproval\nDate\nReplaced \u201cmembers\u201d with \u201cmembers/enrollees\u201d in the disclaimer of the\npolicy.\nAdded note to the description stating that if a lower cost, medically\nnecessary item exists and will meet the member\u2019s needs, the lower cost\nitem will be approved. Updated policy to remove diaphragmatic nerve\nstimulation criteria, which was transferred to CP.MP.203 Diaphragmatic\nP\nhrenic Nerve Stimulation. Nebulizer, ultrasonic: changed to not medically\nnecessary with supporting statement. Blood glucose monitor with\nintegrated voice synthesizer:  revised language from diabetics to\nmember/enrollee with diabetes.  Implantable infusion pumps: Added\ncontraindications. Gastric suction pump: added requirement of inability to\nempty gastric secretions through normal gastrointestinal functions. Wheelchair\nc\nriteria added to its own table. Criteria for manual added and coding\nupdated. Direction added to use nationally recognized criteria for upper\ne\nxtremities and myoelectric prosthetics. Split lower extremity prosthetics\ninto its own row. Removed codes from Shoulder, elbow, wrist, hand, finger\northotics that were duplicated in IQ, L3720, L3730, L3740, L3760, L3900,\nL3901, L3960, L3962 and L3999. Updated ta\nble of contents. References\nreviewed and updated.\n11/20 12/20\nAdded criteria for enclosed beds to \u201cOther Equipment\u201d section of policy.\nAdded references and codes E0316, E1399 and E0328 or E0329 (when\nc\nombined with E0316 or E1399) for enclosed beds. Replaced\n\u201cinvestigational\u201d with \u201cnot proven safe and effective\u201d in the following\nse\nctions: Pnuematic compression devices, neuromuscular stimulator, and\npe\nroneal nerve stimulators.\n04/21 04/21\nUpdated policy to remove neuromuscular stimulator, fuctional\nneuromuscular stimulator, and peroneal nerve stimulator, which was\ntra\nnsferred to CP.MP.48 Neuromuscular Electrical Stimulation (NMES).\nReplaced existing Standing Frames criteria with new initial request and\nreplacement request criteria. Revised section on pneumatic compression\ndevices to state that they are not proven safe and effective for lymphedema\nof the abdomen, trunk, chest, genitals, or neck; and for arterial\ninsufficiency. Added criteria for Wheelchair-mounted Assistive Robotic\nArm (JACO). Changed \u201creview date\u201d in the header to \u201cdate of last\nrevision\u201d and \u201cdate\u201d in the revision log header to \u201crevision date.\u201d Updated\nre\nferences.\n07/21 07/21\nReorganized Standing Frame criteria and required that replacement\nrequests also meet existing criteria for the initial request. For initial request\nunder 18, added \"and one of the following: Developmental delay in\na\nmbulation and \u2265 18 months of age; Documented neurological or\nne\nuromuscular impairments and \u2265 1 year of age.\u201d Required that\ndoc\numentation supports meeting height and weight requirements, alert and\nresponsive to stimuli, no contraindications to standing program, and\n08/21 08/21",
+      "character_count": 2963,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-055",
+      "section_number": "16.0",
+      "heading": "Page 16 Overview",
+      "page_number": 16,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 16 of 21\nReviews, Revisions, and Approvals Revision\nDate\nApproval\nDate\ncaregiver trained, available, and able to safely assist. Removed requirement\nfor \u201cable to tolerate upright position.\u201d Added informational note.\nRemoved requirement for replacement requests not due to physiological\nchanges to meet existing criteria and reformatted criteria. Contents table\nrenumbered.\n9/21\nAnnual review. References reviewed and updated. Added burn garment\nHCPCS codes A6502, A6503, A6504, A6505, A6506, A6508, A6509,\nA6510, A6512 and A6513 to policy. Made note for HCPCS code K0108 to\nrefer to CP.MP.99 for wheelchair seating in Specialized supply or\nEquipm\nent section.\n12/21 12/21\nRemoved cardiac event monitor (E0616) criteria from cardiac equipment\nsection of policy and moved to CP.MP.243 Implantable Loop Recorders.\nR\nemoved invasive home ventilator criteria (E0465) and moved to\nCP.MP.184 Home Ventilators. Added statement that current evidence does\nnot su\npport the effectiveness of intrapulmonary percussive ventilation\n(E\n1399).\n06/22 06/22\nAnnual review. Updated policy statement in I. and added general criteria\nI.A.1. and I.A.2. Removed ambulatory assist products and updated I.B.\npolicy table. Retired gait trainers and standing frame criteria, defer to\nstandard IQ criteria. Updated pneumatic compression device criteria and\na\ndded non-pneumatic compression device criteria. Added \"one month\u2019s\nre\nntal for a standa\nrd manual wheelchair is considered medically necessary\nif a member/enrollee owned wheelchair is being repaired\" to wheelchair\nrepair. Added foot orthotics, custom criteria and codes. Removed \"male\"\nfrom male vacuum erection device. Added criteria section for walkers.\nMinor verbiage and formating updates with no impact on criteria.\nReferences reviewed, updated, and reformatted. Internal specialist review.\n12/22 12/22\nAnnual review. Updated description with no impact on criteria. Changed\nOrthopedic Care Equipment to Prosthetics and Orthotics Equipment. Table\nof c\nontents updated. Retired pneumatic compression device criteria\n(E\n0675) for IQ. Updated \"Cabinet style...\" note under Ultraviolet panel\nli\nghts. Under \u201cOther Equipment\u201d added code E0240 to \u201cSpecialized supply\nor e\nquipment\u201d section and added section, criteria, and coding (E1399,\nA9900) for \u201cROMTech device\u201d. Reformatted Foot orthotics, custom\ncriteria in \u201cProsthetics and Orthotics Equipment\u201d section. Added criteria\nfor Prosthetics and  additions: Upper Extremity and Myoelectric in \u201c Prosthetics\nand Orthotics Equipment\u201d section. Added section, criteria, and coding\n(L\n8701, L8702) for \u201cMyoPro Orthosis\u201d under \u201cProsthetics and Orthotics\nEquipment\u201d. Removed code L8035 from \"other surgical supplies\" and\nadded section and criteria for \"Breast Prosthetics\" (L8030, L8035).\nRemoved pediatric wheelchair codes (E1229, E1231, E1232, E1233,\nE1234, E1235, E1236, E1237, E1238, E1037) from manual wheelchair\nsection. References reviewed, updated, and reformatted. Internal specialist\nreview.\n10/23 10/23",
+      "character_count": 3026,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-056",
+      "section_number": "17.0",
+      "heading": "Page 17 Overview",
+      "page_number": 17,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 17 of 21\nReviews, Revisions, and Approvals Revision\nDate\nApproval\nDate\nUpdated verbiage in Newborn Care Equipment, Breast Pumps for\ninclusivity. Added new criteria section titled Lumbar-Sacral Orthotics\n(L\nSO) and included codes L0450, L0452, L0454, L0455, L0456, L0457,\nL0458, L0460, L0462, L0464, L0466, L0467, L0468, L0469, L0470,\nL0472, L0480, L0482, L0484, L0486, L0488,  L0490, L0491, L0492,\nL0621, L0622, L0623, L0624, L0625, L0626, L0627, L0628, L0629,\nL0630, L0631, L0632, L0633, L0634, L0635, L0636, L0637, L0638,\nL0639, L0640, L0643, L0648, L0649, L0650, L0651, L0700, L0710,\nL0999, L1000, L1001, L1005. Renamed original \u201cSpinal Orthotics\u201d criteria\n\u201c\nOther Spinal Orthotics\u201d. Updated manual wheelchair initial request criteria\nA., A\n.2. and 4., B.1. and 2., and removed C. Reformatted and updated\nmanua\nl wheelchair r\neplacement request criteria. Deleted codes E1091 and\nK0009. Reviewed by inte\nrnal specialist.\n05/24 05/24\nAnnual review. Minor rewording to description with no clinical\nsignificance. Replaced codes K1032 and K1033 with E0678 and E0679\nunde\nr non-pneumatic compression devices. Added additional note to\nenclosed bed section. Removed halo procedure and equipment criteria due\nto no prior auth. Removed lumbar sacral orthotics criteria, defer to IQ.\nUpdated verbiage and coding in spinal orthotics section. Updated criteria\nunder hip orthotics. Added section and code L2006 for microprocessor-\ncontrolled knee-ankle-foot orthoses (KAFO). Removed code L4130 under\nsho\nulder, elbow, wrist, hand, finger orthotics. Updated code E2300 to\nE2298 under power seat elevator on power wheelchair. Updated wheelchair\nrepairs section to include wheelchair and other DME repairs. References\nreviewed and updated.\n11/24 11/24\nReferences",
+      "character_count": 1790,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-057",
+      "section_number": "Section 1",
+      "heading": "National coverage determination: Durable medical equipment (DME) reference list (280.1).",
+      "page_number": 17,
+      "content": "Centers for Medicare and Medicaid Services website. https://www.cms.gov/medicare-\ncoverage-database/search.aspx. Published May 16, 2023. Accessed September 4, 2024.",
+      "character_count": 164,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-058",
+      "section_number": "Section 2",
+      "heading": "Local coverage article. Knee orthoses \u2013 policy article (A52465). Centers for Medicare &",
+      "page_number": 17,
+      "content": "Me\ndicaid Services website. http://www.cms.hhs.gov/mcd/search.asp. P ublished October 1,",
+      "character_count": 88,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-059",
+      "section_number": "Section 3",
+      "heading": "DMEPOS quality standards. Centers for Medicare & Medicaid Services website.",
+      "page_number": 17,
+      "content": "htt\nps://www.cms.gov/Outreach-and-Education/Medicare-Learning-Network-\nMLN/MLNProduc\nts/DMEPOSQuality/DMEPOSQualBooklet-905709.html. Published\nDecember 2022. Accessed September 23, 2024.",
+      "character_count": 186,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-060",
+      "section_number": "Section 4",
+      "heading": "Medicare Claims Processing Manual. Chapter 20 \u2013 Durable Medical Equipment, Prosthetics,",
+      "page_number": 17,
+      "content": "Or\nthotics, and Supplies (DMEPOS). Centers for Medicare & Medicaid Services website.\nhttps://www.cms.gov/regulations-and-\nguidance/guidance/manuals/downloads/clm104c20.pdf#:~:text=)%20Usually%20this%20is\n%20the%20least%20costly,a%20more%20expensive%20item%20may%20be%20medically.\nPublished March 28, 2024. Accessed October 29, 2024.",
+      "character_count": 332,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-061",
+      "section_number": "18.0",
+      "heading": "Page 18 Overview",
+      "page_number": 18,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 18 of 21",
+      "character_count": 50,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-062",
+      "section_number": "Section 5",
+      "heading": "Local coverage article. Surgical dressings (A54563). Centers for Medicare & Medicaid",
+      "page_number": 18,
+      "content": "Services we\nbsite\n. http://www.cms.hhs.gov/mcd/search.asp. Published October 1, 2015\n(revised January 1, 2024). Accessed September 4, 2024.",
+      "character_count": 139,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-063",
+      "section_number": "Section 6",
+      "heading": "Rea TD, Eisenberg MS. Automated external defibrillators. UpToDate. http://www.utdol.com.",
+      "page_number": 18,
+      "content": "Published March 5, 2024. Accessed September 6, 2024.",
+      "character_count": 52,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-064",
+      "section_number": "Section 7",
+      "heading": "National coverage determination. Pneumatic compression devices (280.6). Centers for",
+      "page_number": 18,
+      "content": "Medicare & Medicaid Services website. http://www.cms.hhs.gov/mcd/search.asp. Published\nJa\nnuary 14, 2002. Accessed September 6, 2024.",
+      "character_count": 133,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-065",
+      "section_number": "Section 8",
+      "heading": "Evidence analysis research brief: Dayspring (Koya Medical Inc.) for treatment of",
+      "page_number": 18,
+      "content": "lymphedema. Hayes. www.hayesinc.com. Published March 27, 2023. Accessed September 6,\n2024.",
+      "character_count": 90,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-066",
+      "section_number": "Section 9",
+      "heading": "National coverage determination. Home blood glucose monitors (40.2). Centers for Medicare",
+      "page_number": 18,
+      "content": "& Medicaid Services website. http://www.cms.hhs.gov/mcd/search.asp. Published June 19,",
+      "character_count": 86,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-067",
+      "section_number": "Section 2006",
+      "heading": "Ac",
+      "page_number": 18,
+      "content": "cessed September 6, 2024.",
+      "character_count": 25,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-068",
+      "section_number": "Section 10",
+      "heading": "Local coverage determination: Glucose Monitors (L33822). Centers for Medicare and",
+      "page_number": 18,
+      "content": "Me\ndicaid Services website. htt ps://www.cms.gov/medicare-coverage-database/search.aspx .\nPublished October 1, 2015 (updated April 1, 2024). Accessed September 10, 2024.",
+      "character_count": 169,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-069",
+      "section_number": "Section 11",
+      "heading": "National coverage determination. Treatment of psoriasis (250.1).",
+      "page_number": 18,
+      "content": "htt\np://www.cms.hhs.gov/mcd/search.asp. Published January 1, 1966. Accessed September 6,\n2024.",
+      "character_count": 94,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-070",
+      "section_number": "Section 12",
+      "heading": "Elmets CA, Lim HW, Stoff B, et al. Joint American Academy of Dermatology-National",
+      "page_number": 18,
+      "content": "Psoriasis Foundation guidelines of care for the management and treatment of psoriasis with\nphototherapy. J Am Acad Dermatol. 2019; 81(3):775-804.",
+      "character_count": 145,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-071",
+      "section_number": "Section 13",
+      "heading": "Loc al coverage determination: Heating pads and heat lamps (L33784). Centers for Medicare",
+      "page_number": 18,
+      "content": "and Medicaid Services website. https://www.cms.gov/medicare-coverage-\ndatabase/search.aspx. Published October 1, 2015 (updated January 1, 2020). Accessed\nSeptember 10, 2024.",
+      "character_count": 173,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-072",
+      "section_number": "Section 14",
+      "heading": "Restraint and seclusion - Enclosure beds, side rails and mitts. The Joint Commission website.",
+      "page_number": 18,
+      "content": "https://www.jointcommission.org/standards/standard-faqs/critical-access-hospital/provision-\nof-care-treatment-and-services-pc/000001668/. Published April 11, 2016 (updated July 20,\n2022)\n. Accessed September 23, 2024.",
+      "character_count": 217,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-073",
+      "section_number": "Section 15",
+      "heading": "Enclosure bed: A protective and calming restraint. American Nurse Association website.",
+      "page_number": 18,
+      "content": "https://www.myamericannurse.com/use-enclosure-beds/. Published January 13, 2015.\nAccessed September 23, 2024.",
+      "character_count": 109,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-074",
+      "section_number": "Section 16",
+      "heading": "State Operations Manual Appendix A \u2013 Survey Protocol, Regulations and Interpretive",
+      "page_number": 18,
+      "content": "Guidelines for Hospitals. Centers for Medicare & Medicaid Services.\nhttps://www.cms.gov/R\negulations-and-\nGuida\nnce/Guidance/Manuals/downloads/som107ap_a_hospitals.pdf. Published May 21,",
+      "character_count": 186,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-075",
+      "section_number": "Section 2004",
+      "heading": "(r",
+      "page_number": 18,
+      "content": "evised April 19, 2024). Accessed September 23, 2024.",
+      "character_count": 52,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-076",
+      "section_number": "Section 17",
+      "heading": "National coverage determination: Hospital beds (280.7). Centers for Medicare and Medicaid",
+      "page_number": 18,
+      "content": "Services website. htt p://www.cms.hhs.gov/mcd/search.asp . Published January 1, 1966.\nAc\ncessed September 23, 2024.",
+      "character_count": 115,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-077",
+      "section_number": "Section 18",
+      "heading": "Evolving evidence review: ROMTech/PortableConnect (ROM Technologies Inc.) for",
+      "page_number": 18,
+      "content": "telereha\nbilitation following total knee arthroplasty. Hayes. https://www.hayesinc.com/.\nPublished August 15, 2024. Accessed September 23, 2024.",
+      "character_count": 144,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-078",
+      "section_number": "19.0",
+      "heading": "Page 19 Overview",
+      "page_number": 19,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 19 of 21",
+      "character_count": 50,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-079",
+      "section_number": "Section 19",
+      "heading": "Local coverage determination. Cervical traction devices (L33823). Centers for Medicare &",
+      "page_number": 19,
+      "content": "Medicaid Services website. http://www.cms.hhs.gov/mcd/search.asp. Published October 1,",
+      "character_count": 86,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-080",
+      "section_number": "Section 2015",
+      "heading": "(",
+      "page_number": 19,
+      "content": "revised January 1, 2020). Accessed September 23, 2024.",
+      "character_count": 54,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-081",
+      "section_number": "Section 20",
+      "heading": "Kemker BP 3rd, Kankaria R, Patel N, Golladay G. Hip and Knee Bracing: Categorization,",
+      "page_number": 19,
+      "content": "Treatment Algorithm, and Systematic Review. J Am Acad Orthop Surg Glob Res Rev.\n2021;5(6)\n:e20.00181-12. Published 2021 Jun 7. doi:10.5435/JAAOSGlobal-D-20-00181",
+      "character_count": 161,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-082",
+      "section_number": "Section 21",
+      "heading": "Deems-Dluhy S, Hoppe-Ludwig S, Mummidisetty CK, Semik P, Heinemann AW,",
+      "page_number": 19,
+      "content": "Jayaraman A. Microprocessor Controlled Knee Ankle Foot Orthosis (KAFO) vs Stance\nControl vs Locked KAFO: A Randomized Controlled Trial. Arch Phys Med Rehabil. 2021\nFeb;102(2):233-244. doi: 10.1016/j.apmr.2020.08.013. Epub 2020 Sep 22. PMID: 32976844.\n22.\nWomen\u2019s He\nalth and Cancer Rights Act (WHCRA). Centers for Medicare & Medicaid\nServices website. Women's Health and Cancer Rights Act (WHCRA) | CMS. Published\nS\neptember 10, 2024. Accessed October 8, 2024.",
+      "character_count": 460,
+      "table_detected": true
+    },
+    {
+      "id": "SEC-083",
+      "section_number": "Section 23",
+      "heading": "The World Professional Association for Transgender Health, Inc. (WPATH). Position",
+      "page_number": 19,
+      "content": "statement on medical necessity of treatment, sex reassignment, and insurance coverage in the\nU.S.A. https://www.wpath.org/newsroom/medical-necessity-statement. Published December\n21, 2016. Accessed June 19, 2024.",
+      "character_count": 212,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-084",
+      "section_number": "Section 24",
+      "heading": "Coleman E, Radix AE, Bouman WP, et al. Standards of Care for the Health of Transgender",
+      "page_number": 19,
+      "content": "and Gender Diverse People, Version 8. Int J Transgend Health. 2022;23(Suppl 1):S1 to S259.\nPublished 2022 Sep 6. doi:10.1080/26895269.2022.2100644",
+      "character_count": 146,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-085",
+      "section_number": "Section 25",
+      "heading": "Evolving evidence review: MyoPro Orthosis (Myomo Inc.) for Upper Extremity",
+      "page_number": 19,
+      "content": "Paralysis/Paresis After Stroke. Hayes. www.hayesinc.com. Published March 6, 2023 (annual\nreview March 18, 2024). Acc\nessed October 1, 2024.",
+      "character_count": 139,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-086",
+      "section_number": "Section 26",
+      "heading": "National coverage determination. Infusion pumps (280.14). Centers for Medicare &",
+      "page_number": 19,
+      "content": "Medicaid Services website. http://www.cms.hhs.gov/mcd/search.asp. Published December\n17, 2004. Ac\ncessed October 1, 2024.",
+      "character_count": 121,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-087",
+      "section_number": "Section 27",
+      "heading": "Local coverage article. External infusion pumps (L33794).",
+      "page_number": 19,
+      "content": "http://www.c\nms.hhs.gov/mcd/search.asp. Published October 1, 2015 (revised July 1, 2024).\nAc\ncessed October 1, 2024.",
+      "character_count": 116,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-088",
+      "section_number": "Section 28",
+      "heading": "Local coverage determination. Suction pumps (L33612). Centers for Medicare & Medicaid",
+      "page_number": 19,
+      "content": "Services website. http://www.cms.hhs.gov/mcd/search.asp. Published October 1, 2015\n(r\nevised January 1, 2024). Accessed October 1, 2024.",
+      "character_count": 136,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-089",
+      "section_number": "Section 29",
+      "heading": "Local coverage determination. Vacuum erection devices (L34824). Centers for Medicare &",
+      "page_number": 19,
+      "content": "Medicaid Services website. htt p://www.cms.hhs.gov/mcd/search.asp . Published October 1,",
+      "character_count": 88,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-090",
+      "section_number": "Section 30",
+      "heading": "Khera M. Treatment of male sexual dysfunction. UpToDate. www.uptodate.com. Published",
+      "page_number": 19,
+      "content": "October 24, 2023. Accessed October 1, 2024.",
+      "character_count": 43,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-091",
+      "section_number": "Section 31",
+      "heading": "Local coverage determination: Nebulizers (L33370). Centers or Medicare and Medicaid",
+      "page_number": 19,
+      "content": "Services website. https://www.cms.gov/medicare-coverage-database/search.aspx. Published\nOctober 15, 2015 (revised January 1, 2024). Accessed October 1, 2024.",
+      "character_count": 157,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-092",
+      "section_number": "Section 32",
+      "heading": "Local coverage determination. Oxygen and oxygen equipment (L33797).",
+      "page_number": 19,
+      "content": "http://www.cms.hhs.gov/mcd/search.asp. Published October 1, 2015 (revised April 1, 2023).\nAccessed October 2, 2024.",
+      "character_count": 115,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-093",
+      "section_number": "Section 33",
+      "heading": "Evidence analysis research brief: Volara (Hillrom) for respiratory therapy. Hayes.",
+      "page_number": 19,
+      "content": "www.hayesinc.com. Published March 18, 2024. Accessed October 2, 2024.",
+      "character_count": 69,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-094",
+      "section_number": "20.0",
+      "heading": "Page 20 Overview",
+      "page_number": 20,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 20 of 21",
+      "character_count": 50,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-095",
+      "section_number": "Section 34",
+      "heading": "Lauwers E, Ides K, Van Hoorenbeeck K, Verhulst S. The effect of intrapulmonary percussive",
+      "page_number": 20,
+      "content": "ventilation in pediatric patients: A systematic review. Pediatr Pulmonol. 2018;53(11):1463 to",
+      "character_count": 93,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-096",
+      "section_number": "Section 1474",
+      "heading": "doi:10.1002/ppul.2",
+      "page_number": 20,
+      "content": "4135",
+      "character_count": 4,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-097",
+      "section_number": "Section 35",
+      "heading": "Huynh TT, Liesching TN, Cereda M, et al. Efficacy of Oscillation and Lung Expansion in",
+      "page_number": 20,
+      "content": "Reducing Postoperative Pulmonary Complication. J Am Coll Surg. 2019;229(5):458 to\n466.e1. doi:10.1016/j\n.jamcoll\nsurg.2019.06.004",
+      "character_count": 129,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-098",
+      "section_number": "Section 36",
+      "heading": "Aboussouan LS. Role of mucoactive agents and secretion clearance techniques in COPD.",
+      "page_number": 20,
+      "content": "UpToDate. www.uptodate\n.com. Updated November 16, 2023. Accessed October 2, 2024.",
+      "character_count": 81,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-099",
+      "section_number": "Section 37",
+      "heading": "Local coverage determination: Walkers (L33791). Centers for Medicare and Medicaid",
+      "page_number": 20,
+      "content": "Services website. https://www.cms.gov/medicare-coverage-database/search.aspx. Published\nOctober 1, 2015 (revised January 1, 2020). Accessed November 18, 2022.",
+      "character_count": 158,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-100",
+      "section_number": "Section 38",
+      "heading": "Local coverage determination: Manual wheelchair bases (L33788). Centers for Medicare and",
+      "page_number": 20,
+      "content": "Medicaid Services website. https://www.cms.gov/medicare-coverage-database/search.aspx.\nPublished October 1, 2015 (revised January 1, 2020). Accessed October 2, 2024.",
+      "character_count": 165,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-101",
+      "section_number": "Section 39",
+      "heading": "Schiappa V, Piriano J, Bernhardt L, et al. RESNA Position on the Application of Seat-",
+      "page_number": 20,
+      "content": "Elevation Devices for Power Wheelchair Users Literature Update. Rehabilitation\nEngineering and Assistive Technology Society of North America.\nhttps://www.resna.org/Portals/0/Documents/Position%20Papers/RESNA_App%20of%20Sea\nt%20Elevation%20Devices%202019.pdf. Published September 25, 2019. Accessed October\n2, 2024.",
+      "character_count": 314,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-102",
+      "section_number": "Section 40",
+      "heading": "Beaudoin M, Lettre J, Routhier F, Archambault PS, Lemay M, G\u00e9linas I. Long-term use of",
+      "page_number": 20,
+      "content": "the JACO robotic arm: a case series. Disabil Rehabil Assist Technol. 2019;14(3):267 to 275.\ndoi:10.1080/17483107.2018.1428692\nImportant Reminder\nThis clinical policy has been developed by appropriately experienced and licensed health care\nprofessionals based on a review and consideration of currently available generally accepted\nstandards of medical practice; peer-reviewed medical literature; government agency/program\napproval status; evidence-based guidelines and positions of leading national health professional\norganizations; views of physicians practicing in relevant clinical areas affected by this clinical\npolicy; and other available clinical information. The Health Plan makes no representations and\nacce\npts no liability with respect to the content of any external information used or relied upon in\ndeveloping this clinical policy. This clinical policy is consistent with standards of medical\npractice current at the time that this clinical policy was approved. \u201cHealth Plan\u201d means a health\nplan that has adopted this clinical policy and that is operated or administered, in whole or in part,\nby Centene Management Company, LLC, or any of such health plan\u2019s affiliates, as applicable.\nThe purpose of this clinical policy is to provide a guide to medical necessity, which is a\ncomponent of the guidelines used to assist in making coverage decisions and administering\nbenefits. It does not constitute a contract or guarantee regarding payment or results. Coverage\ndecisions and the administration of benefits are subject to all terms, conditions, exclusions and\nlimitations of the coverage documents (e.g., evidence of coverage, certificate of coverage, policy,\ncontract of insurance, etc.), as well as to state and federal requirements and applicable Health\nPlan-level administrative policies and procedures.",
+      "character_count": 1822,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-103",
+      "section_number": "21.0",
+      "heading": "Page 21 Overview",
+      "page_number": 21,
+      "content": "CLINICAL POLICY\nDME and O&P Criteria\nPage 21 of 21\nThis clinical policy is effective as of the date determined by the Health Plan. The date of posting\nmay not be the effective date of this clinical policy. This clinical policy may be subject to\napplicable legal and regulatory requirements relating to provider notification. If there is a\ndiscrepancy between the effective date of this clinical policy and any applicable legal or\nregulatory requirement, the requirements of law and regulation shall govern. The Health Plan\nretains the right to change, amend or withdraw this clinical policy, and additional clinical\npolicies may be developed and adopted as needed, at any time.\nThis clinical policy does not constitute medical advice, medical treatment or medical care. It is\nnot intended to dictate to providers how to practice medicine. Providers are expected to exercise\nprofessional medical judgment in providing the most appropriate care, and are solely responsible\nfor the medical advice and treatment of members/enrollees. This clinical policy is not intended to\nrecommend treatment for members/enrollees. Members/enrollees should consult with their\ntre\nating physician in connection with diagnosis and treatment decisions.\nProviders referred to in this clinical policy are independent contractors who exercise independent\njudgment and over whom the Health Plan has no control or right of control. Providers are not\nagents or employees of the Health Plan.\nThis clinical policy is the property of the Health Plan. Unauthorized copying, use, and\ndistribution of this clinical policy or any information contained herein are strictly prohibited.\nProviders, members/enrollees and their representatives are bound to the terms and conditions\ne\nxpressed herein through the terms of their contracts. Where no such contract exists, providers,\nmembers/enrollees and their representatives agree to be bound by such terms and conditions by\nproviding services to members/enrollees and/or submitting claims for payment for such services.\nNote: For Medicaid members/enrollees, when state Medicaid coverage provisions conflict\nwith the coverage provisions in this clinical policy, state Medicaid coverage provisions take\nprecedence. Please refer to the state Medicaid manual for any coverage provisions pertaining to\nthis clinical policy.\nNote: For Medicare members/enrollees, to ensure consistency with the Medicare National\nC\noverage Determinations (NCD) and Local Coverage Determinations (LCD), all applicable\nNCDs, LCDs, and Medicare Coverage Articles should be reviewed prior to applying the criteria\nset forth in this c\nlinical policy. Refer to the CMS website at http://www.cms.gov for additional\ninformation.\n\u00a92018 Centene Corporation. All rights reserved. All materials are exclusively owned by Centene\nCorporation a\nnd are protected by United States copyright law and international copyright\nlaw. No part of this publication may be reproduced, copied, modified, distributed, displayed,\nstored in a retrieval system, transmitted in any form or by any means, or otherwise published\nwithout the prior written permission of Centene Corporation. You may not alter or remove any\ntrademark, copyright or other notice contained herein. Centene\u00ae and Centene Corporation\u00ae are\nregistered trademarks exclusively owned by Centene Corporation.",
+      "character_count": 3329,
+      "table_detected": false
+    }
+  ],
+  "extraction_report": {
+    "total_pages": 21,
+    "scanned_pages_count": 0,
+    "low_confidence_pages": [],
+    "overall_quality": "HIGH",
+    "notes": [
+      "High confidence digital text extracted across all pages."
+    ]
+  },
+  "created_at": "2026-10-16 17:08:39Z",
+  "updated_at": "2026-10-16 17:08:39Z"
+}

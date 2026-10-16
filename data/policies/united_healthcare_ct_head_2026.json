@@ -1,0 +1,151 @@
+{
+  "id": "P-UHC-CT-2026",
+  "policy_id": "POL-UHC-CT",
+  "insurer": "United Healthcare",
+  "policy_name": "CT Scan of Head / Brain",
+  "plan": "Commercial & Medicare Advantage Guidelines",
+  "version": "2026.1",
+  "procedure_type": "CT Scan",
+  "procedure_full_name": "CT Scan of Head with Contrast",
+  "cpt_codes": ["70450", "70460", "70470"],
+  "effective_date": "2026-01-01",
+  "expiry_date": "2026-12-31",
+  "upload_date": "2026-01-02",
+  "sha256_checksum": "681f8ececb53bcacf5e0950b6a8058284dfc468d63c517ea2355a781cedc00a7",
+  "original_filename": "UHC_Head_CT_Guidelines_2026.pdf",
+  "storage_path": "backend/storage/policies/uhc_ct_head_2026.pdf",
+  "total_pages": 4,
+  "lifecycle_status": "APPROVED_FOR_USE",
+  "extraction_report": {
+    "total_pages": 4,
+    "scanned_pages_count": 0,
+    "low_confidence_pages": [],
+    "overall_quality": "HIGH",
+    "notes": [
+      "Digital text extracted with 100% selectable character density.",
+      "Preserved 6 numbered indication clauses and procedure table."
+    ]
+  },
+  "sections": [
+    {
+      "id": "SEC-001",
+      "section_number": "Section 1.0",
+      "heading": "Coverage Overview & Clinical Scope",
+      "page_number": 1,
+      "content": "Computed Tomography (CT) of the head or brain is considered medically necessary when specific clinical indications are met. This guideline governs outpatient and elective advanced imaging pre-authorization.",
+      "character_count": 218,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-002",
+      "section_number": "Section 4.2.1",
+      "heading": "Clinical Indication for Head CT",
+      "page_number": 1,
+      "content": "Patient must have documented focal or generalized neurological symptoms or signs, including but not limited to severe persistent headaches with atypical features, dizziness, ataxia, or visual disturbances.",
+      "character_count": 204,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-003",
+      "section_number": "Section 4.2.2",
+      "heading": "Duration of Clinical Symptoms",
+      "page_number": 2,
+      "content": "For chronic or subacute headache presentations, clinical symptoms must persist for at least 6 weeks of active observation or documentation prior to advanced imaging request.",
+      "character_count": 178,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-004",
+      "section_number": "Section 4.2.3",
+      "heading": "Previous Conservative Treatment",
+      "page_number": 2,
+      "content": "A trial of conservative medical management (pharmacological, lifestyle modification, or physical therapy) must have been attempted without symptomatic resolution, unless red flag signs are present.",
+      "character_count": 201,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-005",
+      "section_number": "Section 4.2.4",
+      "heading": "Documented Clinical Findings",
+      "page_number": 3,
+      "content": "An in-person physical and neurological examination documented by a licensed clinician revealing abnormal or asymmetric findings is mandatory prior to authorization.",
+      "character_count": 171,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-006",
+      "section_number": "Section 4.2.5",
+      "heading": "Rule Out Serious Intracranial Pathology",
+      "page_number": 3,
+      "content": "The clinical indication must state the requirement to evaluate or rule out intracranial pathology, mass lesion, neoplasm, structural lesion, or acute hydrocephalus.",
+      "character_count": 171,
+      "table_detected": false
+    },
+    {
+      "id": "SEC-007",
+      "section_number": "Section 4.2.6",
+      "heading": "Intravenous Contrast Justification",
+      "page_number": 4,
+      "content": "When intravenous contrast (CPT 70460) is requested, explicit diagnostic rationale justifying contrast enhancement (e.g., evaluation of suspected mass, neoplasm, infection, or vascular abnormality) must be provided.",
+      "character_count": 218,
+      "table_detected": false
+    }
+  ],
+  "criteria": [
+    {
+      "id": "R1",
+      "section": "Section 4.2.1",
+      "name": "Clinical Indication",
+      "requirement": "Patient must have neurological symptoms or signs",
+      "mandatory": true,
+      "fact_key": "neurological_symptoms",
+      "min_value": null
+    },
+    {
+      "id": "R2",
+      "section": "Section 4.2.2",
+      "name": "Duration of Symptoms",
+      "requirement": "Symptoms must persist for >= 6 weeks",
+      "mandatory": true,
+      "fact_key": "symptom_duration_weeks",
+      "min_value": 6
+    },
+    {
+      "id": "R3",
+      "section": "Section 4.2.3",
+      "name": "Previous Treatment",
+      "requirement": "Conservative treatment attempted",
+      "mandatory": true,
+      "fact_key": "conservative_treatment_attempted",
+      "min_value": null
+    },
+    {
+      "id": "R4",
+      "section": "Section 4.2.4",
+      "name": "Documented Findings",
+      "requirement": "Abnormal neurological examination",
+      "mandatory": true,
+      "fact_key": "neurological_exam_abnormal",
+      "min_value": null
+    },
+    {
+      "id": "R5",
+      "section": "Section 4.2.5",
+      "name": "Rule out Serious Condition",
+      "requirement": "Must be to rule out intracranial pathology or mass",
+      "mandatory": true,
+      "fact_key": "rule_out_pathology",
+      "min_value": null
+    },
+    {
+      "id": "R6",
+      "section": "Section 4.2.6",
+      "name": "Contrast Justification",
+      "requirement": "If contrast requested, must be clinically indicated",
+      "mandatory": false,
+      "conditional_on": "contrast_requested",
+      "fact_key": "contrast_justified",
+      "min_value": null
+    }
+  ]
+}

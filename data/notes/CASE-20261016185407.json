@@ -1,0 +1,195 @@
+{
+  "case_id": "CASE-20261016185407",
+  "patient_name": "John Doe",
+  "patient_age": 1,
+  "gender": "M",
+  "dob": null,
+  "facility": "Riverside Medical Center",
+  "date_of_visit": "10/16/2026",
+  "procedure_requested": "CT Scan of Head with Contrast",
+  "procedure_type": "CT Scan",
+  "insurance_plan": "United Healthcare",
+  "policy_id": "P-UHC-CT-2026",
+  "policy_version": "2026.1",
+  "chief_complaint": null,
+  "history_of_present_illness": null,
+  "clinical_findings": [
+    "Physical and neurological evaluation documented."
+  ],
+  "impression": "Rule out intracranial pathology or space-occupying lesion.",
+  "physician_recommendation": "CT Scan of Head with Contrast",
+  "original_filename": "test.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\998750bae487_test.pdf",
+  "sha256_checksum": "998750bae487d4867e36c2bf62bed10a02122c392cc56ab7eec8b037099a0e41",
+  "total_pages": 2,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR engine (pytesseract) is not installed in the Python environment. Scanned pages routed to manual clinician review.",
+  "facts": {
+    "neurological_symptoms": {
+      "fact_key": "neurological_symptoms",
+      "label": "Neurological Symptoms Documented",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.; On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal",
+      "source_page": 1,
+      "confidence": 0.98,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "symptom_duration_weeks": {
+      "fact_key": "symptom_duration_weeks",
+      "label": "Symptom Duration (Weeks)",
+      "value": 2.0,
+      "status": "EXPLICIT",
+      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
+      "source_page": 1,
+      "confidence": 0.99,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "conservative_treatment_attempted": {
+      "fact_key": "conservative_treatment_attempted",
+      "label": "Conservative Treatment Trial",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "neurological_exam_abnormal": {
+      "fact_key": "neurological_exam_abnormal",
+      "label": "Abnormal Neurological Examination",
+      "value": null,
+      "status": "CONFLICTING",
+      "excerpt": "Contradictory physical exam entries: Page 1: 'Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.' vs Page 2: 'On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal'",
+      "source_page": 2,
+      "confidence": 0.48,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "rule_out_pathology": {
+      "fact_key": "rule_out_pathology",
+      "label": "Rule Out Intracranial Pathology",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_requested": {
+      "fact_key": "contrast_requested",
+      "label": "Intravenous Contrast Requested",
+      "value": false,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 0.9,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_justified": {
+      "fact_key": "contrast_justified",
+      "label": "Contrast Enhancement Justification",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "fact_key": "contrast_anaphylaxis_unmitigated",
+      "label": "Unmitigated Anaphylactic Contrast Allergy",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    }
+  },
+  "extracted_facts": {
+    "neurological_symptoms": {
+      "value": true,
+      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.; On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal",
+      "source_page": 1,
+      "confidence": 0.98
+    },
+    "symptom_duration_weeks": {
+      "value": 2.0,
+      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "conservative_treatment_attempted": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "neurological_exam_abnormal": {
+      "value": null,
+      "excerpt": "Contradictory physical exam entries: Page 1: 'Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.' vs Page 2: 'On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal'",
+      "source_page": 2,
+      "confidence": 0.48
+    },
+    "rule_out_pathology": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_requested": {
+      "value": false,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 0.9
+    },
+    "contrast_justified": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "value": false,
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [
+    {
+      "page_number": 1,
+      "text": "Clinic Triage Note - Page 1\nPatient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
+      "char_count": 137,
+      "is_scanned": false
+    },
+    {
+      "page_number": 2,
+      "text": "Neurology Specialist Assessment - Page 2\nOn detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal\nwith focal asymmetry and ataxia.",
+      "char_count": 189,
+      "is_scanned": false
+    }
+  ],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [],
+  "created_at": "2026-10-16T18:54:07.797835Z",
+  "updated_at": "2026-10-16T18:54:07.797835Z"
+}
