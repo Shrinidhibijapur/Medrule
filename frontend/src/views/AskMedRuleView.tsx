@@ -25,7 +25,7 @@ import {
   FileSearch,
   BookOpen
 } from 'lucide-react';
-import { ViewMode, EvaluationReport, ClinicalNoteRecord } from '../types';
+import { ViewMode, EvaluationReport, ClinicalNoteRecord, VerifiedClaimItem } from '../types';
 import { apiFetch } from '../api/client';
 
 interface AskMedRuleViewProps {
@@ -54,6 +54,7 @@ interface ChatMessage {
   intent?: string;
   documentId?: string;
   citations?: AgentCitationItem[];
+  verifiedClaims?: VerifiedClaimItem[];
   warnings?: string[];
 }
 
@@ -430,6 +431,7 @@ Welcome to the Ask MedRule conversational copilot. MedRule routes clinical reque
         intent: agentData.intent,
         documentId: agentData.document_id,
         citations: agentData.citations,
+        verifiedClaims: agentData.verified_claims,
         warnings: agentData.warnings,
         report: agentData.evaluation
       };
@@ -922,6 +924,95 @@ Welcome to the Ask MedRule conversational copilot. MedRule routes clinical reque
                       </div>
                     )}
 
+                    {/* Claim-Level Evidence Verification Layer */}
+                    {m.verifiedClaims && m.verifiedClaims.length > 0 && (
+                      <div style={{
+                        marginTop: '12px',
+                        padding: '10px 12px',
+                        borderRadius: '6px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                        fontSize: '12px'
+                      }}>
+                        <div style={{
+                          fontWeight: 700,
+                          color: '#334155',
+                          marginBottom: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '6px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <ShieldCheck size={14} color="#059669" />
+                            <span>Claim-Level Evidence Verification ({m.verifiedClaims.length} Claims Evaluated)</span>
+                          </div>
+                          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 500 }}>
+                            Document: {m.documentId ? m.documentId.substring(0, 8) + '...' : 'Active Note'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {m.verifiedClaims.map((claim, cIdx) => {
+                            const isSupported = claim.evidence_status === 'SUPPORTED';
+                            const isPartial = claim.evidence_status === 'PARTIALLY_SUPPORTED';
+                            const isConflicting = claim.evidence_status === 'CONFLICTING';
+
+                            const badgeBg = isSupported ? '#DEF7EC' : (isPartial ? '#FEF3C7' : (isConflicting ? '#FFE4E6' : '#FEE2E2'));
+                            const badgeColor = isSupported ? '#03543F' : (isPartial ? '#92400E' : (isConflicting ? '#9F1239' : '#991B1B'));
+                            const badgeBorder = isSupported ? '#86EFAC' : (isPartial ? '#FCD34D' : (isConflicting ? '#FDA4AF' : '#FCA5A5'));
+
+                            return (
+                              <div
+                                key={cIdx}
+                                style={{
+                                  padding: '7px 10px',
+                                  borderRadius: '5px',
+                                  backgroundColor: '#FFFFFF',
+                                  border: '1px solid #E2E8F0',
+                                  fontSize: '11.5px'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
+                                  <span style={{ fontWeight: 600, color: '#1E293B', flex: 1 }}>
+                                    {claim.claim_text}
+                                  </span>
+                                  <span style={{
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    backgroundColor: badgeBg,
+                                    color: badgeColor,
+                                    border: `1px solid ${badgeBorder}`,
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    {claim.evidence_status}
+                                  </span>
+                                </div>
+                                {claim.evidence_excerpt && (
+                                  <div style={{ color: '#475569', fontStyle: 'italic', marginBottom: '3px' }}>
+                                    "{claim.evidence_excerpt}"
+                                  </div>
+                                )}
+                                <div style={{ display: 'flex', gap: '10px', fontSize: '10.5px', color: '#64748B', flexWrap: 'wrap' }}>
+                                  {claim.source_page && <span>Page: <strong>{claim.source_page}</strong></span>}
+                                  {claim.source_document_sha256 && (
+                                    <span>SHA-256: <code>{claim.source_document_sha256.substring(0, 10)}...</code></span>
+                                  )}
+                                  {claim.verification_notes && (
+                                    <span style={{ color: isConflicting ? '#B91C1C' : '#64748B' }}>
+                                      {claim.verification_notes}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Validation Warnings */}
                     {m.warnings && m.warnings.length > 0 && (
                       <div style={{ 
@@ -1089,7 +1180,7 @@ Welcome to the Ask MedRule conversational copilot. MedRule routes clinical reque
                   backgroundColor: '#EBF3EE',
                   border: '1px solid var(--success-border)',
                   color: 'var(--primary)',
-                  padding: '2px 8px',
+                  padding: '3px 8px',
                   borderRadius: '4px',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -1098,7 +1189,17 @@ Welcome to the Ask MedRule conversational copilot. MedRule routes clinical reque
                   <FileCheck size={12} />
                   <span style={{ fontWeight: 600 }}>{attachedFileName}</span>
                   {activeDocument?.totalPages && (
-                    <span style={{ fontSize: '10.5px', opacity: 0.8 }}>({activeDocument.totalPages}p)</span>
+                    <span style={{ fontSize: '10.5px', opacity: 0.85 }}>({activeDocument.totalPages}p)</span>
+                  )}
+                  {activeDocument?.id && (
+                    <span style={{ fontSize: '10px', fontFamily: 'monospace', opacity: 0.8 }} title={`Document ID: ${activeDocument.id}`}>
+                      ID: {activeDocument.id.substring(0, 8)}
+                    </span>
+                  )}
+                  {activeDocument?.sha256 && (
+                    <span style={{ fontSize: '10px', fontFamily: 'monospace', opacity: 0.75 }} title={`SHA-256: ${activeDocument.sha256}`}>
+                      SHA: {activeDocument.sha256.substring(0, 8)}...
+                    </span>
                   )}
                   <button 
                     onClick={() => {
@@ -1643,6 +1744,44 @@ Welcome to the Ask MedRule conversational copilot. MedRule routes clinical reque
                         </span></div>
                       </div>
                     </div>
+
+                    {/* SECTION 5: CLAIM-LEVEL EVIDENCE VERIFICATION */}
+                    {activeTrace.verified_claims && activeTrace.verified_claims.length > 0 && (
+                      <div style={{ backgroundColor: '#FAF9F6', borderRadius: '8px', border: '1px solid var(--border-subtle)', padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'var(--text-secondary)' }}>
+                            5. Claim-Level Evidence Verification ({activeTrace.verified_claims.length} Claims)
+                          </div>
+                          <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 600 }}>
+                            {activeTrace.verified_claims.filter((c: any) => c.evidence_status === 'SUPPORTED').length} Supported
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {activeTrace.verified_claims.map((claim: any, idx: number) => (
+                            <div key={idx} style={{ padding: '6px 8px', borderRadius: '4px', backgroundColor: '#FFFFFF', border: '1px solid var(--border-subtle)', fontSize: '11.5px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', marginBottom: '2px' }}>
+                                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{claim.claim_text}</span>
+                                <span style={{
+                                  fontSize: '10px',
+                                  fontWeight: 700,
+                                  padding: '1px 5px',
+                                  borderRadius: '3px',
+                                  backgroundColor: claim.evidence_status === 'SUPPORTED' ? '#DEF7EC' : (claim.evidence_status === 'PARTIALLY_SUPPORTED' ? '#FEF3C7' : '#FEE2E2'),
+                                  color: claim.evidence_status === 'SUPPORTED' ? '#03543F' : (claim.evidence_status === 'PARTIALLY_SUPPORTED' ? '#92400E' : '#991B1B')
+                                }}>
+                                  {claim.evidence_status}
+                                </span>
+                              </div>
+                              {claim.evidence_excerpt && (
+                                <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '11px' }}>
+                                  "{claim.evidence_excerpt}" (Page {claim.source_page || 1})
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

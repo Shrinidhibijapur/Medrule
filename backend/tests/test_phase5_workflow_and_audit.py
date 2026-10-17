@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, timezone
 from fastapi.testclient import TestClient
 
 from app.main import app, note_extractor_service, registry_service, criteria_service
@@ -90,8 +91,8 @@ def phase5_test_case_and_policy(tmp_path):
         procedure_requested="CT Scan of Head with Contrast",
         insurance_plan="United Healthcare",
         policy_id=policy_id,
-        created_at="2026-10-17T12:00:00Z",
-        updated_at="2026-10-17T12:00:00Z",
+        created_at=datetime.now(timezone.utc).isoformat(),
+        updated_at=datetime.now(timezone.utc).isoformat(),
         facts={
             "acute_neuro_symptoms": ExtractedFact(
                 fact_key="acute_neuro_symptoms",

@@ -39,7 +39,7 @@
       "reviewer_override": {
         "is_overridden": true,
         "overridden_by": "Dr. Eleanor Vance, MD",
-        "overridden_at": "2026-10-17T11:53:25.330930+00:00",
+        "overridden_at": "2026-10-17T13:34:34.148943+00:00",
         "original_value": null,
         "corrected_value": true,
         "original_status": "ABSENT",
@@ -97,7 +97,7 @@
   "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
   "audit_trail": [
     {
-      "timestamp": "2026-10-17T11:53:25.330930+00:00",
+      "timestamp": "2026-10-17T13:34:34.148943+00:00",
       "action": "FACT_OVERRIDE",
       "fact_key": "focal_neuro_deficit",
       "reviewer": "Dr. Eleanor Vance, MD",
@@ -111,5 +111,5 @@
   "latest_outcome": null,
   "latest_evaluation": null,
   "created_at": "2026-10-15T00:00:00Z",
-  "updated_at": "2026-10-17T11:53:25.330930+00:00"
+  "updated_at": "2026-10-17T13:34:34.148943+00:00"
 }

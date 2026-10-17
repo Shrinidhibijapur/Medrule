@@ -11,6 +11,22 @@ class TraceConcordanceStatus(str, Enum):
     CONCORDANT = "CONCORDANT"
     SERVICE_DOCUMENT_MISMATCH = "SERVICE_DOCUMENT_MISMATCH"
 
+class ClaimEvidenceStatus(str, Enum):
+    SUPPORTED = "SUPPORTED"
+    PARTIALLY_SUPPORTED = "PARTIALLY_SUPPORTED"
+    NOT_FOUND = "NOT_FOUND"
+    CONFLICTING = "CONFLICTING"
+
+class VerifiedClaim(BaseModel):
+    claim_text: str
+    evidence_excerpt: Optional[str] = None
+    source_document_id: Optional[str] = None
+    source_document_sha256: Optional[str] = None
+    source_page: Optional[int] = None
+    evidence_status: ClaimEvidenceStatus = ClaimEvidenceStatus.NOT_FOUND
+    is_verified: bool = False
+    verification_notes: List[str] = Field(default_factory=list)
+
 class TraceFactEntry(BaseModel):
     fact_key: str
     label: str
@@ -88,6 +104,7 @@ class AgentTrace(BaseModel):
     narrative_validation_status: str = "NOT_APPLICABLE"
     narrative_validation_passed: Optional[bool] = None
     narrative_validation_notes: List[str] = Field(default_factory=list)
+    verified_claims: List[VerifiedClaim] = Field(default_factory=list)
     
     # Human Review & Audit Trail
     human_overrides: List[Dict[str, Any]] = Field(default_factory=list)

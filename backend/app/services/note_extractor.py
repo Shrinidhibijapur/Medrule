@@ -4,10 +4,12 @@ import io
 import json
 import hashlib
 import uuid
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+logger = logging.getLogger("note_extractor")
 import pypdf
 from app.models.note import (
     ClinicalFactStatus,
@@ -139,8 +141,42 @@ class ClinicalNoteExtractorService:
         storage_path, checksum = self.save_uploaded_pdf(file_bytes, filename)
 
         # 2. Page-by-page extraction
-        reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-        total_pages = len(reader.pages)
+        try:
+            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+            total_pages = len(reader.pages)
+        except Exception as e:
+            logger.error(f"Failed to read PDF structure: {e}")
+            case_id = f"NOTE-{uuid.uuid4().hex[:8].upper()}"
+            doc_id = f"doc_{uuid.uuid4().hex[:12]}"
+            failed_record = ClinicalNoteRecord(
+                case_id=case_id,
+                document_id=doc_id,
+                patient_name=patient_name_override or "Unknown Patient (Unreadable Document)",
+                patient_age=None,
+                gender=None,
+                facility="Unknown Facility",
+                date_of_visit=None,
+                procedure_requested=procedure_requested_override or "Unspecified Procedure",
+                insurance_plan=insurance_plan or "Unknown Payer",
+                policy_id=policy_id,
+                total_pages=0,
+                original_filename=filename,
+                sha256_checksum=checksum,
+                storage_path=str(storage_path),
+                scanned_pages_count=0,
+                overall_quality="FAILED",
+                ocr_engine_status=f"Extraction failed: {str(e)}",
+                is_synthetic=False,
+                governance_warning=f"Document corrupted or invalid PDF format: {str(e)}",
+                facts={},
+                raw_pages_text=[],
+                audit_trail=[],
+                created_at=datetime.utcnow().isoformat(),
+                updated_at=datetime.utcnow().isoformat()
+            )
+            self.save_note_record(failed_record)
+            return failed_record
+
         pages_data: List[Dict[str, Any]] = []
         scanned_count = 0
         all_text_blocks: List[Tuple[int, str]] = []
@@ -286,7 +322,7 @@ class ClinicalNoteExtractorService:
         # 5. Extract Clinical Facts matching Policy Evidence Schema
         facts = self._extract_clinical_facts(all_text_blocks, policy_id, policy_rules)
 
-        case_id = f"CASE-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+        case_id = f"CASE-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6].upper()}"
         doc_id = f"DOC-{uuid.uuid4().hex[:12].upper()}"
 
         extracted_impression = self._extract_regex(

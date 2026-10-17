@@ -340,4 +340,17 @@ export interface CSRFTokenResponse {
   header_name: string;
 }
 
+export type ClaimEvidenceStatus = 'SUPPORTED' | 'PARTIALLY_SUPPORTED' | 'NOT_FOUND' | 'CONFLICTING';
+
+export interface VerifiedClaimItem {
+  claim_text: string;
+  evidence_excerpt?: string;
+  source_document_id?: string;
+  source_document_sha256?: string;
+  source_page?: number;
+  evidence_status: ClaimEvidenceStatus;
+  is_verified: boolean;
+  verification_notes?: string[];
+}
+
 

@@ -64,6 +64,7 @@ from app.models.terminology import (
 )
 from app.services.terminology_service import TerminologyService
 from app.services.agent_service import AgentService, AgentIntent
+from app.services.claim_verifier import ClaimVerifierService
 
 app = FastAPI(
     title="MedRule Decision-Support API",
@@ -119,6 +120,7 @@ registry_service = PolicyRegistryService()
 criteria_service = CriteriaService(DATA_DIR)
 note_extractor_service = ClinicalNoteExtractorService(data_dir=DATA_DIR)
 terminology_service = TerminologyService(data_dir=DATA_DIR)
+claim_verifier_service = ClaimVerifierService()
 
 def check_case_tenant(case_record: ClinicalNoteRecord, current_user: AuthenticatedUser) -> None:
     """Enforces tenant isolation. Users cannot view or modify cases outside their organization."""
@@ -1237,6 +1239,7 @@ class AgentChatResponse(BaseModel):
     trace: Optional[Dict[str, Any]] = None
     compatibility_status: Optional[str] = "COMPATIBLE"
     citations: List[AgentCitation] = Field(default_factory=list)
+    verified_claims: List[Dict[str, Any]] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
 
 @app.get("/api/agent/status")
@@ -1245,12 +1248,8 @@ def get_agent_status(current_user: AuthenticatedUser = Depends(get_current_user)
     has_key = AgentService.is_configured()
     return {
         "groq_configured": has_key,
-        "active_model": settings.GROQ_MODEL or "llama-3.3-70b-versatile",
-        "supported_models": [
-            "llama-3.3-70b-versatile",
-            "llama-3.1-8b-instant",
-            "mixtral-8x7b-32768"
-        ],
+        "active_model": settings.GROQ_MODEL or AgentService.DEFAULT_MODEL,
+        "supported_models": AgentService.CANDIDATE_MODELS,
         "status": "ONLINE_GROQ_POWERED" if has_key else "DETERMINISTIC_MODE_GROQ_KEY_AVAILABLE"
     }
 
@@ -1516,7 +1515,8 @@ async def chat_with_agent(
                     document_id=doc_primary.document_id or doc_primary.case_id,
                     document_filename=doc_primary.original_filename
                 )
-                all_warnings = warnings + cite_warnings
+                verified_claims, claim_warnings = ClaimVerifierService.verify_all_claims_in_text(final_text, doc_primary)
+                all_warnings = warnings + cite_warnings + claim_warnings
                 trace = AgentService.generate_agent_trace(
                     case_id=doc_primary.case_id,
                     note_record=doc_primary,
@@ -1525,17 +1525,18 @@ async def chat_with_agent(
                     compatibility_status="COMPATIBLE",
                     llm_invoked=True,
                     llm_model=model_used,
-                    narrative_passed=is_consistent,
+                    narrative_passed=is_consistent and not any(c.evidence_status.value == "CONFLICTING" for c in verified_claims),
                     narrative_notes=all_warnings,
                     intent=active_intent.value,
-                    document_id=doc_primary.document_id
+                    document_id=doc_primary.document_id,
+                    verified_claims=verified_claims
                 )
                 audit_service.log_event(
                     action="AGENT_DOCUMENT_ANALYSIS",
                     user=current_user,
                     resource=f"document:{doc_primary.document_id or doc_primary.case_id}",
                     status="SUCCESS",
-                    details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id}
+                    details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id, "claims_count": len(verified_claims)}
                 )
                 return AgentChatResponse(
                     response=final_text,
@@ -1555,6 +1556,7 @@ async def chat_with_agent(
                     trace=trace.model_dump(),
                     compatibility_status="NOT_APPLICABLE",
                     citations=[AgentCitation(**c) for c in citations],
+                    verified_claims=[c.model_dump() for c in verified_claims],
                     warnings=all_warnings
                 )
 
@@ -1564,6 +1566,7 @@ async def chat_with_agent(
             resolved_docs,
             error_reason=err if resolved_key else "CONFIG_ERROR: Groq inference service is not configured on the server."
         )
+        fallback_claims, fb_warnings = ClaimVerifierService.verify_all_claims_in_text(fallback_text, doc_primary)
         trace = AgentService.generate_agent_trace(
             case_id=doc_primary.case_id,
             note_record=doc_primary,
@@ -1572,14 +1575,15 @@ async def chat_with_agent(
             compatibility_status="COMPATIBLE",
             llm_invoked=False,
             intent=active_intent.value,
-            document_id=doc_primary.document_id
+            document_id=doc_primary.document_id,
+            verified_claims=fallback_claims
         )
         audit_service.log_event(
             action="AGENT_DOCUMENT_ANALYSIS",
             user=current_user,
             resource=f"document:{doc_primary.document_id or doc_primary.case_id}",
             status="SUCCESS",
-            details={"model": "deterministic-extractor", "is_groq": False, "trace_id": trace.trace_id}
+            details={"model": "deterministic-extractor", "is_groq": False, "trace_id": trace.trace_id, "claims_count": len(fallback_claims)}
         )
         return AgentChatResponse(
             response=fallback_text,
@@ -1597,7 +1601,9 @@ async def chat_with_agent(
             evaluation=None,
             extracted_facts={k: f.model_dump() for k, f in doc_primary.facts.items()} if doc_primary.facts else None,
             trace=trace.model_dump(),
-            compatibility_status="NOT_APPLICABLE"
+            compatibility_status="NOT_APPLICABLE",
+            verified_claims=[c.model_dump() for c in fallback_claims],
+            warnings=fb_warnings
         )
 
     # -------------------------------------------------------------
@@ -1629,6 +1635,7 @@ async def chat_with_agent(
             policy=policy,
             compatibility_status=comp_status
         )
+        appeal_claims, appeal_warnings = ClaimVerifierService.verify_all_claims_in_text(appeal_text, primary_note_record)
         trace = AgentService.generate_agent_trace(
             case_id=primary_note_record.case_id if primary_note_record else "CASE-UNKNOWN",
             note_record=primary_note_record,
@@ -1638,14 +1645,15 @@ async def chat_with_agent(
             compatibility_reasons=comp_reasons,
             llm_invoked=False,
             intent=active_intent.value,
-            document_id=primary_note_record.document_id if primary_note_record else None
+            document_id=primary_note_record.document_id if primary_note_record else None,
+            verified_claims=appeal_claims
         )
         audit_service.log_event(
             action="AGENT_APPEAL_DRAFT",
             user=current_user,
             resource=f"case:{primary_note_record.case_id if primary_note_record else 'unknown'}",
             status="SUCCESS",
-            details={"is_groq": False, "trace_id": trace.trace_id, "comp_status": comp_status}
+            details={"is_groq": False, "trace_id": trace.trace_id, "comp_status": comp_status, "claims_count": len(appeal_claims)}
         )
         return AgentChatResponse(
             response=appeal_text,
@@ -1663,7 +1671,9 @@ async def chat_with_agent(
             evaluation=evaluation.model_dump() if evaluation else None,
             extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
             trace=trace.model_dump(),
-            compatibility_status=comp_status
+            compatibility_status=comp_status,
+            verified_claims=[c.model_dump() for c in appeal_claims],
+            warnings=appeal_warnings
         )
 
     # -------------------------------------------------------------
@@ -1771,6 +1781,8 @@ async def chat_with_agent(
                 evaluation_report=evaluation
             )
             answer = final_text
+            eval_claims, eval_claim_warnings = ClaimVerifierService.verify_all_claims_in_text(final_text, primary_note_record)
+            all_eval_warnings = warnings + eval_claim_warnings
 
             trace = AgentService.generate_agent_trace(
                 case_id=primary_note_record.case_id if primary_note_record else (req.case_id or "CASE-GENERAL"),
@@ -1780,10 +1792,11 @@ async def chat_with_agent(
                 compatibility_status="COMPATIBLE",
                 llm_invoked=True,
                 llm_model=model_used,
-                narrative_passed=is_consistent,
-                narrative_notes=warnings,
+                narrative_passed=is_consistent and not any(c.evidence_status.value == "CONFLICTING" for c in eval_claims),
+                narrative_notes=all_eval_warnings,
                 intent=active_intent.value,
-                document_id=primary_note_record.document_id if primary_note_record else None
+                document_id=primary_note_record.document_id if primary_note_record else None,
+                verified_claims=eval_claims
             )
 
             audit_service.log_event(
@@ -1791,7 +1804,7 @@ async def chat_with_agent(
                 user=current_user,
                 resource=f"case:{primary_note_record.case_id if primary_note_record else 'general'}",
                 status="SUCCESS",
-                details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id}
+                details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id, "claims_count": len(eval_claims)}
             )
             return AgentChatResponse(
                 response=answer,
@@ -1809,7 +1822,9 @@ async def chat_with_agent(
                 evaluation=evaluation.model_dump() if evaluation else None,
                 extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
                 trace=trace.model_dump(),
-                compatibility_status="COMPATIBLE"
+                compatibility_status="COMPATIBLE",
+                verified_claims=[c.model_dump() for c in eval_claims],
+                warnings=all_eval_warnings
             )
 
         logger.warning(f"Groq API error encountered, using deterministic fallback: {err}")
