@@ -1,0 +1,192 @@
+{
+  "case_id": "CASE-2026-002",
+  "patient_name": "Jane Smith",
+  "patient_age": 35,
+  "gender": "M",
+  "dob": "04/22/1991",
+  "facility": "Riverside Regional Medical Center",
+  "date_of_visit": "10/08/2026",
+  "procedure_requested": "CT Scan of Head with Contrast (CPT 70460)",
+  "procedure_type": "CT Scan",
+  "insurance_plan": "United Healthcare",
+  "organization_id": "org_riverside",
+  "policy_id": "P-UHC-CT-2026",
+  "policy_version": "2026.1",
+  "chief_complaint": "Intermittent tension-type headaches persisting for 2 weeks following occupational stress.",
+  "history_of_present_illness": null,
+  "clinical_findings": [
+    "Physical and neurological evaluation documented."
+  ],
+  "impression": "Rule out intracranial pathology or space-occupying lesion.",
+  "physician_recommendation": "CT Scan of Head with Contrast (CPT 70460)",
+  "original_filename": "02_Jane_Smith_Denied_Short_Duration.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\eb42fe49594b_02_Jane_Smith_Denied_Short_Duration.pdf",
+  "sha256_checksum": "eb42fe49594b0a91069fee2117ee4ad6b460aedc6ff2f299b40939d26baf3beb",
+  "total_pages": 1,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR engine (tesseract binary) not accessible on system PATH: tesseract is not installed or it's not in your PATH. See README file for more information.. Scanned pages flagged for manual review.",
+  "facts": {
+    "neurological_symptoms": {
+      "fact_key": "neurological_symptoms",
+      "label": "Neurological Symptoms Documented",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.; HISTORY OF PRESENT ILLNESS (HPI): 35-year-old female presents with bilateral band-like tension headaches for 2 weeks.",
+      "source_page": 1,
+      "confidence": 0.98,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "symptom_duration_weeks": {
+      "fact_key": "symptom_duration_weeks",
+      "label": "Symptom Duration (Weeks)",
+      "value": 2.0,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.",
+      "source_page": 1,
+      "confidence": 0.99,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "conservative_treatment_attempted": {
+      "fact_key": "conservative_treatment_attempted",
+      "label": "Conservative Treatment Trial",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "PRIOR CONSERVATIVE MANAGEMENT: Trial of conservative treatment attempted with rest, hydration, and acetaminophen with partial relief.",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "neurological_exam_abnormal": {
+      "fact_key": "neurological_exam_abnormal",
+      "label": "Abnormal Neurological Examination",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "Neurological examination normal: Cranial nerves II-XII intact, motor strength 5/5 globally, reflexes 2+ symmetric, gait steady.",
+      "source_page": 1,
+      "confidence": 0.97,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "rule_out_pathology": {
+      "fact_key": "rule_out_pathology",
+      "label": "Rule Out Intracranial Pathology",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_requested": {
+      "fact_key": "contrast_requested",
+      "label": "Intravenous Contrast Requested",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.",
+      "source_page": 1,
+      "confidence": 0.99,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_justified": {
+      "fact_key": "contrast_justified",
+      "label": "Contrast Enhancement Justification",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "Contrast indicated per ordering note.",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "fact_key": "contrast_anaphylaxis_unmitigated",
+      "label": "Unmitigated Anaphylactic Contrast Allergy",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    }
+  },
+  "extracted_facts": {
+    "neurological_symptoms": {
+      "value": true,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.; HISTORY OF PRESENT ILLNESS (HPI): 35-year-old female presents with bilateral band-like tension headaches for 2 weeks.",
+      "source_page": 1,
+      "confidence": 0.98
+    },
+    "symptom_duration_weeks": {
+      "value": 2.0,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "conservative_treatment_attempted": {
+      "value": true,
+      "excerpt": "PRIOR CONSERVATIVE MANAGEMENT: Trial of conservative treatment attempted with rest, hydration, and acetaminophen with partial relief.",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "neurological_exam_abnormal": {
+      "value": false,
+      "excerpt": "Neurological examination normal: Cranial nerves II-XII intact, motor strength 5/5 globally, reflexes 2+ symmetric, gait steady.",
+      "source_page": 1,
+      "confidence": 0.97
+    },
+    "rule_out_pathology": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_requested": {
+      "value": true,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109 ENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909 CHIEF COMPLAINT: Intermittent tension-type headaches persisting for 2 weeks following occupational stress.",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "contrast_justified": {
+      "value": true,
+      "excerpt": "Contrast indicated per ordering note.",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "value": false,
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [
+    {
+      "page_number": 1,
+      "text": "RIVERSIDE REGIONAL MEDICAL CENTER\nDepartment of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501\nTel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214\nPATIENT NAME: Jane Smith DOB: 04/22/1991 (35yo, Female) MRN: #RMC-772109\nENCOUNTER DATE: 10/08/2026 PLAN: United Healthcare STATUS: Outpatient\nREQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G43.909\nCHIEF COMPLAINT:\nIntermittent tension-type headaches persisting for 2 weeks following occupational stress.\nHISTORY OF PRESENT ILLNESS (HPI):\n35-year-old female presents with bilateral band-like tension headaches for 2 weeks. Mild photophobia, no nausea or focal deficits.\nPRIOR CONSERVATIVE MANAGEMENT:\nTrial of conservative treatment attempted with rest, hydration, and acetaminophen with partial relief.\nPHYSICAL & NEUROLOGICAL EXAMINATION:\nVitals: BP 118/74, HR 68, SpO2 99% RA. Neurological examination normal: Cranial nerves II-XII intact, motor strength 5/5 globally,\nreflexes 2+ symmetric, gait steady.\nCLINICAL IMPRESSION & ASSESSMENT:\n1. Acute tension-type headache.\n2. No red flags or signs of intracranial pathology.\nORDER & CLINICAL RATIONALE:\nCT Scan of Head with Contrast (CPT 70460) requested per patient preference. Contrast indicated per ordering note.\nElectronically Signed by: Dr. Marcus Vance, MD, Attending Neurologist Date: 10/08/2026 14:32 PST\nConfidential Medical Document - For Health Plan Prior Authorization & Clinical Review Only | Page 1 of 1",
+      "char_count": 1475,
+      "is_scanned": false
+    }
+  ],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [],
+  "latest_outcome": "DENIED",
+  "latest_evaluation": null,
+  "created_at": "2026-10-17T06:53:45.870135+00:00",
+  "updated_at": "2026-10-17T06:53:45.870135+00:00"
+}

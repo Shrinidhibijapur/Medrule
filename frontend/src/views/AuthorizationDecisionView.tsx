@@ -91,12 +91,18 @@ export const AuthorizationDecisionView: React.FC<AuthorizationDecisionViewProps>
       const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
       if (res.ok) {
         const text = await res.text();
-        const blob = new Blob([text], { type: 'text/plain' });
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
+        a.style.display = 'none';
         a.href = url;
         a.download = `MedRule_Audit_${caseId}_${patientName.replace(/\s+/g, '_')}.txt`;
+        document.body.appendChild(a);
         a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 150);
         return;
       }
     } catch (e) {
@@ -150,12 +156,18 @@ ${evaluationReport?.governance_notice || 'DEVELOPMENT/DEMO MODE ONLY: Synthetic 
 ==================================================
     `.trim();
 
-    const blob = new Blob([reportText], { type: 'text/plain' });
+    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
     a.download = `MedRule_Authorization_Report_${caseId}_${patientName.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(a);
     a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 150);
   };
 
   const handleDownloadJson = async () => {
@@ -166,9 +178,15 @@ ${evaluationReport?.governance_notice || 'DEVELOPMENT/DEMO MODE ONLY: Synthetic 
         const blob = new Blob([jsonContent], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
+        a.style.display = 'none';
         a.href = url;
         a.download = `MedRule_Audit_${caseId}_${patientName.replace(/\s+/g, '_')}.json`;
+        document.body.appendChild(a);
         a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 150);
         return;
       }
     } catch (e) {
@@ -187,9 +205,15 @@ ${evaluationReport?.governance_notice || 'DEVELOPMENT/DEMO MODE ONLY: Synthetic 
     const blob = new Blob([JSON.stringify(fallbackJson, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
     a.download = `MedRule_Audit_${caseId}_${patientName.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(a);
     a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 150);
   };
 
   return (

@@ -41,6 +41,8 @@ class CriterionEvaluationResult(BaseModel):
     reviewer_overridden: bool = False
     reviewer_override_by: Optional[str] = None
     reviewer_override_reason: Optional[str] = None
+    evidence_status: Optional[str] = None
+    missing_or_conflicting_explanation: Optional[str] = None
 
 class EvaluationReport(BaseModel):
     case_id: str
@@ -61,3 +63,7 @@ class EvaluationReport(BaseModel):
     verification_gate_verified: bool = True
     is_synthetic_demo: bool = True
     governance_notice: str = "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."
+    compatibility_status: Optional[str] = "COMPATIBLE"
+    service_document_concordance: Optional[str] = "CONCORDANT"
+    concordance_notes: List[str] = Field(default_factory=list)
+    trace_id: Optional[str] = None

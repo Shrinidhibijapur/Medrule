@@ -72,7 +72,7 @@ class AuthenticatedUser(BaseModel):
 
     def can_access_tenant(self, target_org_id: Optional[str]) -> bool:
         """Enforces tenant isolation. Admins and Compliance Officers can view, clinicians bound to org."""
-        if not target_org_id:
+        if not target_org_id or target_org_id in ["*", "all"]:
             return True
         if self.role in [UserRole.SYSTEM_ADMIN, UserRole.COMPLIANCE_OFFICER] or self.organization_id == "*":
             return True

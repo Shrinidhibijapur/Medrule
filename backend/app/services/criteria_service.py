@@ -32,6 +32,14 @@ class PolicyVerificationGateError(Exception):
     """Raised when policy criteria or lifecycle status fails verification gate."""
     pass
 
+class PolicyMismatchError(Exception):
+    """Raised when an encounter/case is evaluated against an incompatible policy rulebook."""
+    def __init__(self, message: str, reasons: Optional[List[str]] = None, required_policy: Optional[str] = None):
+        super().__init__(message)
+        self.message = message
+        self.reasons = reasons or []
+        self.required_policy = required_policy
+
 class CriteriaService:
     """
     Phase 2: Authoritative Criteria Encoding, Verification Gate, and Deterministic Logic Engine.
@@ -88,6 +96,162 @@ class CriteriaService:
         
         cond_text = f" [Applicable only when {rule.conditional_prerequisite} is present]" if rule.conditional_prerequisite else ""
         return f"Requirement: {rule.section_name}. {rule.source_text[:120]}...{cond_text}"
+
+    @staticmethod
+    def normalize_modality(text: str) -> str:
+        t = text.lower()
+        if "mri" in t or "magnetic resonance" in t:
+            return "MRI"
+        if "ct" in t or "computed tomography" in t or "cat scan" in t:
+            return "CT"
+        if "x-ray" in t or "radiograph" in t:
+            return "X_RAY"
+        if "ultrasound" in t or "sonogram" in t or "echocardiogram" in t:
+            return "ULTRASOUND"
+        if "pet" in t:
+            return "PET"
+        return "OTHER"
+
+    @staticmethod
+    def normalize_anatomy(text: str) -> str:
+        t = text.lower()
+        if "lumbar" in t or "lumbosacral" in t or "l-spine" in t:
+            return "LUMBAR_SPINE"
+        if "cervical" in t or "c-spine" in t:
+            return "CERVICAL_SPINE"
+        if "thoracic" in t or "t-spine" in t:
+            return "THORACIC_SPINE"
+        if "spine" in t:
+            return "SPINE"
+        if "head" in t or "brain" in t or "cranial" in t or "intracranial" in t:
+            return "HEAD_BRAIN"
+        if "chest" in t or "thorax" in t:
+            return "CHEST"
+        if "abdomen" in t:
+            return "ABDOMEN"
+        if "pelvis" in t:
+            return "PELVIS"
+        if "knee" in t or "shoulder" in t or "hip" in t:
+            return "JOINT_EXTREMITY"
+        return "OTHER"
+
+    @staticmethod
+    def normalize_payer(text: str) -> str:
+        t = text.lower().strip()
+        if "united" in t or "uhc" in t:
+            return "UNITED_HEALTHCARE"
+        if "ambetter" in t or "centene" in t:
+            return "AMBETTER"
+        if "aetna" in t:
+            return "AETNA"
+        if "humana" in t:
+            return "HUMANA"
+        if "cigna" in t:
+            return "CIGNA"
+        if "blue" in t or "bcbs" in t:
+            return "BCBS"
+        return t.upper().replace(" ", "_")
+
+    def validate_policy_compatibility(
+        self,
+        policy: Optional[Policy],
+        note_record: Any
+    ) -> Tuple[bool, str, List[str], str]:
+        """
+        Fail-Closed Policy Compatibility Validator (Requirement §1.2 & §1.3).
+        Verifies:
+        1. Payer alignment: Policy insurer must match patient insurance plan.
+        2. Procedure modality alignment: (e.g. MRI vs CT).
+        3. Anatomical region alignment: (e.g. Lumbar Spine vs Head/Brain).
+        4. Lifecycle status: Must be APPROVED_FOR_USE.
+        """
+        reasons: List[str] = []
+
+        note_payer = getattr(note_record, "insurance_plan", None) or (note_record.get("insurance_plan") if isinstance(note_record, dict) else "")
+        note_proc = getattr(note_record, "procedure_requested", None) or (note_record.get("procedure_requested") if isinstance(note_record, dict) else "")
+        note_proc_type = getattr(note_record, "procedure_type", None) or (note_record.get("procedure_type") if isinstance(note_record, dict) else "")
+
+        if not policy:
+            req_pol = f"{note_payer} {note_proc} Policy".strip()
+            return False, "NO_APPLICABLE_VERIFIED_POLICY", [f"No applicable policy found. Encounter requires an approved and verified {req_pol}."], req_pol
+
+        note_text_combined = f"{note_proc} {note_proc_type}".strip()
+        policy_text_combined = f"{policy.procedure_type} {policy.procedure_full_name} {policy.policy_name}".strip()
+
+        # 1. Payer Alignment
+        if note_payer and policy.insurer:
+            norm_note_payer = self.normalize_payer(note_payer)
+            norm_pol_payer = self.normalize_payer(policy.insurer)
+            if norm_note_payer != "OTHER" and norm_pol_payer != "OTHER" and norm_note_payer != norm_pol_payer:
+                reasons.append(
+                    f"Payer Mismatch: Encounter insurance plan is '{note_payer}', but policy '{policy.id}' is issued by '{policy.insurer}'. "
+                    "Cross-payer rule evaluation is prohibited."
+                )
+
+        # 2. Modality Alignment
+        mod_note = self.normalize_modality(note_text_combined)
+        mod_pol = self.normalize_modality(policy_text_combined)
+        if mod_note != "OTHER" and mod_pol != "OTHER" and mod_note != mod_pol:
+            reasons.append(
+                f"Procedure Modality Mismatch: Requested service is '{mod_note}' ({note_proc}), "
+                f"while policy '{policy.id}' governs '{mod_pol}' ({policy.procedure_full_name})."
+            )
+
+        # 3. Anatomical Region Alignment
+        anat_note = self.normalize_anatomy(note_text_combined)
+        anat_pol = self.normalize_anatomy(policy_text_combined)
+        if anat_note != "OTHER" and anat_pol != "OTHER" and anat_note != anat_pol:
+            reasons.append(
+                f"Anatomical Region Mismatch: Requested anatomical region is '{anat_note.replace('_', ' ').title()}', "
+                f"while policy '{policy.id}' governs '{anat_pol.replace('_', ' ').title()}'."
+            )
+
+        # 4. Lifecycle Status (Strict Policy Gate)
+        if policy.lifecycle_status != PolicyLifecycleStatus.APPROVED_FOR_USE:
+            raise PolicyVerificationGateError(
+                f"Policy Gate Blocked: Policy '{policy.id}' is currently in state '{policy.lifecycle_status.value}'. "
+                "Policies must be 'APPROVED_FOR_USE' before clinical evaluation."
+            )
+
+        anat_display = anat_note.replace('_', ' ').title() if anat_note != "OTHER" else "Clinical"
+        mod_display = mod_note if mod_note != "OTHER" else "Guideline"
+        required_policy = f"{note_payer} {anat_display} {mod_display}".strip()
+
+        if reasons:
+            return False, "POLICY_MISMATCH", reasons, required_policy
+
+        return True, "COMPATIBLE", [], ""
+
+    def check_service_document_concordance(
+        self,
+        note_record: Any
+    ) -> Tuple[bool, str, List[str]]:
+        """
+        Validates concordance between the ordered/requested service and the uploaded document text.
+        Flags cases where uploaded document primarily supports a different clinical service
+        (e.g. Lumbar brace L0650 and TF ESI injections vs an active Lumbar MRI request).
+        """
+        proc = getattr(note_record, "procedure_requested", None) or (note_record.get("procedure_requested") if isinstance(note_record, dict) else "")
+        raw_pages = getattr(note_record, "raw_pages_text", None) or (note_record.get("raw_pages_text") if isinstance(note_record, dict) else [])
+        
+        full_text = " ".join([p.get("text", "") for p in raw_pages]).lower() if raw_pages else ""
+        if not full_text:
+            return True, "CONCORDANT", []
+
+        proc_lower = proc.lower()
+        if "mri" in proc_lower:
+            has_brace = "l0650" in full_text or "lumbar brace" in full_text or "brace lumbar" in full_text
+            has_injection = "tf esi" in full_text or "64483" in full_text or "epidural steroid" in full_text
+            has_mri_order = "order: mri" in full_text or "order mri" in full_text or "mri requested" in full_text or "prior authorization for mri" in full_text
+
+            if (has_brace or has_injection) and not has_mri_order and ("image studies" in full_text or "image study was reviewed" in full_text or "mri findings" in full_text):
+                return False, "SERVICE_DOCUMENT_MISMATCH", [
+                    "Uploaded consultation note primarily documents durable medical equipment (Lumbar brace L0650) "
+                    "and interventional pain management (TF ESI injections 64483/64484). Prior MRI studies are cited "
+                    "as already reviewed. Document does not contain an active physician order or clinical justification for an MRI."
+                ]
+
+        return True, "CONCORDANT", []
 
     def verify_ruleset_gate(
         self,
@@ -266,7 +430,9 @@ class CriteriaService:
         self,
         rule: CriterionRule,
         facts: Dict[str, Any],
-        policy: Policy
+        policy: Policy,
+        procedure_requested: Optional[str] = None,
+        total_pages: Optional[int] = None
     ) -> Tuple[CriterionEvaluationResult, List[CriterionEvaluationResult]]:
         """
         Recursively evaluates a criterion rule or logic group against patient facts.
@@ -323,7 +489,7 @@ class CriteriaService:
         # 3. Logic Group Evaluation (AND, OR, MINIMUM_COUNT)
         if rule.criterion_type == CriterionType.LOGIC_GROUP and rule.children:
             for child in rule.children:
-                c_res, c_sub = self.evaluate_rule(child, facts, policy)
+                c_res, c_sub = self.evaluate_rule(child, facts, policy, procedure_requested=procedure_requested, total_pages=total_pages)
                 child_results.append(c_res)
                 child_results.extend(c_sub)
 
@@ -426,12 +592,50 @@ class CriteriaService:
             return group_res, child_results
 
         # 4. Atomic Criterion / Threshold / Duration / Exclusion
+        # Check if rule is contrast-specific on a non-contrast procedure
+        is_contrast_rule = (
+            "contrast" in rule.id.lower() or 
+            (rule.fact_key and "contrast" in rule.fact_key.lower()) or 
+            "contrast" in rule.section_name.lower()
+        )
+        proc_str = (procedure_requested or "").lower()
+        is_non_contrast = (
+            "without contrast" in proc_str or 
+            "non-contrast" in proc_str or 
+            "w/o contrast" in proc_str or
+            "no contrast" in proc_str
+        )
+        if is_contrast_rule and is_non_contrast:
+            res = CriterionEvaluationResult(
+                rule_id=rule.id,
+                criterion_name=rule.section_name,
+                section=rule.section_number,
+                requirement=rule.source_text,
+                evidence_excerpt="",
+                source_page=None,
+                status=CriterionStatus.NOT_APPLICABLE,
+                ui_symbol="–",
+                ui_label="Not applicable",
+                comment="Contrast requirements and contraindications are not applicable to non-contrast imaging requests.",
+                policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
+                logic_group="NOT_APPLICABLE",
+                plain_english_rationale=rule.plain_english_description,
+                is_exclusion=rule.is_exclusion,
+                fact_key=rule.fact_key,
+                evidence_status="NOT_APPLICABLE"
+            )
+            return res, child_results
+
         raw_fact = facts.get(rule.fact_key) if rule.fact_key else None
         unpacked = self.unpack_fact(raw_fact)
 
         value = unpacked["value"]
         excerpt = unpacked["excerpt"]
-        page = unpacked["source_page"] or rule.source_page
+        
+        # Provenance: Clinical document source page MUST come strictly from the patient note, NEVER rule.source_page!
+        page = unpacked["source_page"]
+        if page is not None and total_pages is not None and total_pages > 0 and page > total_pages:
+            page = None
         conf = unpacked["confidence"]
 
         # Track reviewer override
@@ -448,8 +652,8 @@ class CriteriaService:
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt or "No matching clinical documentation found in submitted records",
-                source_page=page,
+                evidence_excerpt="",
+                source_page=None,
                 status=CriterionStatus.NOT_DOCUMENTED,
                 ui_symbol="❌",
                 ui_label="Not documented",
@@ -462,7 +666,9 @@ class CriteriaService:
                 fact_confidence=conf,
                 reviewer_overridden=is_overridden,
                 reviewer_override_by=override_by,
-                reviewer_override_reason=override_reason
+                reviewer_override_reason=override_reason,
+                evidence_status="ABSENT",
+                missing_or_conflicting_explanation="No matching clinical documentation found in searched medical record."
             )
             return res, child_results
 
@@ -474,7 +680,7 @@ class CriteriaService:
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt or "Ambiguous or conflicting clinical notes",
+                evidence_excerpt=excerpt or "",
                 source_page=page,
                 status=CriterionStatus.UNCLEAR_CONFLICTING,
                 ui_symbol="❌",
@@ -488,13 +694,14 @@ class CriteriaService:
                 fact_confidence=conf,
                 reviewer_overridden=is_overridden,
                 reviewer_override_by=override_by,
-                reviewer_override_reason=override_reason
+                reviewer_override_reason=override_reason,
+                evidence_status="UNCLEAR_CONFLICTING",
+                missing_or_conflicting_explanation="Ambiguous or contradictory clinical notes present in record."
             )
             return res, child_results
 
         # C. Exclusion Contraindication check
         if rule.is_exclusion:
-            # If the exclusion fact is present/true, it triggers an immediate denial
             if value is True:
                 res = CriterionEvaluationResult(
                     rule_id=rule.id,
@@ -515,15 +722,16 @@ class CriteriaService:
                     fact_confidence=conf,
                     reviewer_overridden=is_overridden,
                     reviewer_override_by=override_by,
-                    reviewer_override_reason=override_reason
+                    reviewer_override_reason=override_reason,
+                    evidence_status="EXPLICIT"
                 )
-            else:
+            elif value is False and unpacked["status"] in ("EXPLICIT", "NEGATED"):
                 res = CriterionEvaluationResult(
                     rule_id=rule.id,
                     criterion_name=rule.section_name,
                     section=rule.section_number,
                     requirement=rule.source_text,
-                    evidence_excerpt=excerpt or "No exclusion or contraindication present",
+                    evidence_excerpt=excerpt or "Explicitly documented negation of contraindication",
                     source_page=page,
                     status=CriterionStatus.MET,
                     ui_symbol="✅",
@@ -537,7 +745,33 @@ class CriteriaService:
                     fact_confidence=conf,
                     reviewer_overridden=is_overridden,
                     reviewer_override_by=override_by,
-                    reviewer_override_reason=override_reason
+                    reviewer_override_reason=override_reason,
+                    evidence_status="EXPLICIT"
+                )
+            else:
+                # Value is None / not explicitly documented -> Undocumented allergy history does not mean no allergy!
+                res = CriterionEvaluationResult(
+                    rule_id=rule.id,
+                    criterion_name=rule.section_name,
+                    section=rule.section_number,
+                    requirement=rule.source_text,
+                    evidence_excerpt="",
+                    source_page=None,
+                    status=CriterionStatus.NOT_DOCUMENTED,
+                    ui_symbol="⚠️",
+                    ui_label="Not documented",
+                    comment=f"Pre-procedure allergy/contraindication screening is not documented in the medical record{override_suffix}",
+                    policy_citation=f"{policy.policy_name} v{policy.version}, {rule.section_number}, Page {rule.source_page}",
+                    logic_group="CONTRAINDICATION",
+                    plain_english_rationale=rule.plain_english_description,
+                    is_exclusion=True,
+                    fact_key=rule.fact_key,
+                    fact_confidence=conf,
+                    reviewer_overridden=is_overridden,
+                    reviewer_override_by=override_by,
+                    reviewer_override_reason=override_reason,
+                    evidence_status="ABSENT",
+                    missing_or_conflicting_explanation="No allergy history documented in record. Undocumented allergy does not prove absence of allergy."
                 )
             return res, child_results
 
@@ -661,8 +895,8 @@ class CriteriaService:
                 criterion_name=rule.section_name,
                 section=rule.section_number,
                 requirement=rule.source_text,
-                evidence_excerpt=excerpt or "No clinical documentation found",
-                source_page=page,
+                evidence_excerpt="",
+                source_page=None,
                 status=CriterionStatus.NOT_DOCUMENTED,
                 ui_symbol="❌",
                 ui_label="Not documented",
@@ -675,7 +909,9 @@ class CriteriaService:
                 fact_confidence=conf,
                 reviewer_overridden=is_overridden,
                 reviewer_override_by=override_by,
-                reviewer_override_reason=override_reason
+                reviewer_override_reason=override_reason,
+                evidence_status="ABSENT",
+                missing_or_conflicting_explanation="No matching clinical documentation found in searched medical record."
             )
         return res, child_results
 
@@ -685,7 +921,9 @@ class CriteriaService:
         case_id: str,
         patient_name: str,
         facts: Dict[str, Any],
-        evaluation_date: Optional[str] = None
+        evaluation_date: Optional[str] = None,
+        procedure_requested: Optional[str] = None,
+        total_pages: Optional[int] = None
     ) -> EvaluationReport:
         """
         Master Plan Deterministic Evaluation Engine:
@@ -746,7 +984,9 @@ class CriteriaService:
 
         all_results: List[CriterionEvaluationResult] = []
         for rule in ruleset.rules:
-            primary_res, sub_results = self.evaluate_rule(rule, facts, policy)
+            primary_res, sub_results = self.evaluate_rule(
+                rule, facts, policy, procedure_requested=procedure_requested, total_pages=total_pages
+            )
             all_results.append(primary_res)
             all_results.extend(sub_results)
 
@@ -865,7 +1105,23 @@ class CriteriaService:
         Phase 4: Bridges extracted clinical facts from Phase 3 note records
         to the deterministic criteria engine. Reads fact status, values,
         excerpts, source-page citations, confidences, and reviewer overrides.
+        Enforces fail-closed policy compatibility and service concordance.
         """
+        # 1. Fail-closed policy compatibility validation (Requirement §1.2 & §1.3)
+        is_compat, compat_status, compat_reasons, req_policy = self.validate_policy_compatibility(policy, note_record)
+        if not is_compat:
+            reasons_str = "; ".join(compat_reasons)
+            note_proc = getattr(note_record, "procedure_requested", None) or (note_record.get("procedure_requested") if isinstance(note_record, dict) else "Unknown Procedure")
+            case_id = getattr(note_record, "case_id", None) or (note_record.get("case_id") if isinstance(note_record, dict) else "CASE-UNKNOWN")
+            raise PolicyMismatchError(
+                f"POLICY_MISMATCH: Incompatible policy '{policy.id}' ({policy.policy_name}) for case '{case_id}' requesting '{note_proc}'. {reasons_str}",
+                reasons=compat_reasons,
+                required_policy=req_policy
+            )
+
+        # 2. Check service-document concordance
+        is_concordant, concordance_status, concordance_notes = self.check_service_document_concordance(note_record)
+
         # Extract facts dictionary
         facts_map: Dict[str, Any] = {}
         if hasattr(note_record, "facts") and note_record.facts:
@@ -881,14 +1137,33 @@ class CriteriaService:
         patient_name = getattr(note_record, "patient_name", None) or (note_record.get("patient_name") if isinstance(note_record, dict) else "Unknown Patient")
         eval_date = getattr(note_record, "date_of_visit", None) or (note_record.get("date_of_visit") if isinstance(note_record, dict) else None)
         is_synthetic = getattr(note_record, "is_synthetic", True) if not isinstance(note_record, dict) else note_record.get("is_synthetic", True)
+        proc_req = getattr(note_record, "procedure_requested", None) or (note_record.get("procedure_requested") if isinstance(note_record, dict) else None)
+        total_pgs = getattr(note_record, "total_pages", None) or (note_record.get("total_pages") if isinstance(note_record, dict) else 1)
 
         report = self.evaluate_policy_case(
             policy=policy,
             case_id=case_id,
             patient_name=patient_name,
             facts=facts_map,
-            evaluation_date=eval_date
+            evaluation_date=eval_date,
+            procedure_requested=proc_req,
+            total_pages=total_pgs
         )
         report.is_synthetic_demo = is_synthetic
+        report.compatibility_status = "COMPATIBLE"
+        report.service_document_concordance = concordance_status
+        report.concordance_notes = concordance_notes
+
+        # If document does not support the ordered service, block automatic approval
+        if not is_concordant:
+            report.requires_human_review = True
+            for cn in concordance_notes:
+                if cn not in report.review_reasons:
+                    report.review_reasons.append(cn)
+            if report.decision_outcome == DecisionOutcome.APPROVED:
+                report.decision_outcome = DecisionOutcome.ADDITIONAL_DOCUMENTATION_REQUIRED
+                report.verdict = Verdict.NOT_APPROVED
+                report.verdict_sentence = f"[DOCUMENT-ORDER CONCORDANCE REVIEW REQUIRED] {report.verdict_sentence}"
+
         return report
 

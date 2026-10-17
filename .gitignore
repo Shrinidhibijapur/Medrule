@@ -19,12 +19,24 @@ Thumbs.db
 
 # Dynamic test note uploads and runtime audit logs
 data/audit/*.jsonl
+data/notes/CASE-202*
+!data/notes/CASE-2026-001.json
+!data/notes/CASE-2026-002.json
+!data/notes/CASE-2026-003.json
+!data/notes/CASE-PHASE5-001.json
+!data/notes/CASE-GATE-TEST.json
+!data/notes/CASE-P4-API-EVAL.json
+!data/notes/CASE-P4-OVERRIDE-TEST.json
+!data/notes/CASE-RULESET-GATE-TEST.json
+!data/notes/case_001_john_doe_ct_head.json
+backend/storage/*.pdf
 backend/storage/notes/*
 !backend/storage/notes/.gitkeep
 backend/storage/policies/*
 !backend/storage/policies/uhc_ct_head_2026.pdf
 !backend/storage/policies/.gitkeep
 
-
-
+scratch/
 medauth_ui_slides_separate_images/
+!sample_clinical_notes/
+!sample_clinical_notes/*.pdf

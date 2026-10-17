@@ -1,0 +1,192 @@
+{
+  "case_id": "CASE-VIVEK-001",
+  "patient_name": "Vivek Pampattiwar",
+  "patient_age": 55,
+  "gender": "M",
+  "dob": "11/10/1969",
+  "facility": "Atlantic Adv Spine And Neurology",
+  "date_of_visit": "01/09/2025",
+  "procedure_requested": "MRI : Lumbar without contrast",
+  "procedure_type": "Advanced Imaging",
+  "insurance_plan": "Ambetter",
+  "organization_id": "org_riverside",
+  "policy_id": "P-UHC-CT-2026",
+  "policy_version": "2026.1",
+  "chief_complaint": null,
+  "history_of_present_illness": null,
+  "clinical_findings": [
+    "Physical and neurological evaluation documented."
+  ],
+  "impression": "Rule out intracranial pathology or space-occupying lesion.",
+  "physician_recommendation": "MRI : Lumbar without contrast",
+  "original_filename": "04_Vivek_Pampattiwar_Lumbar_MRI_Encounter_1.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\85623ae579a6_04_Vivek_Pampattiwar_Lumbar_MRI_Encounter_1.pdf",
+  "sha256_checksum": "85623ae579a6827ec3a60e815ec18a9d802a267694bf334d7767cf50a000ca26",
+  "total_pages": 1,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR engine (tesseract binary) not accessible on system PATH: tesseract is not installed or it's not in your PATH. See README file for more information.. Scanned pages flagged for manual review.",
+  "facts": {
+    "neurological_symptoms": {
+      "fact_key": "neurological_symptoms",
+      "label": "Neurological Symptoms Documented",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "symptom_duration_weeks": {
+      "fact_key": "symptom_duration_weeks",
+      "label": "Symptom Duration (Weeks)",
+      "value": null,
+      "status": "CONFLICTING",
+      "excerpt": "Contradictory durations documented: Page 1: 'Onset: chronic for 4-5 years and progressive worsen in last 3 months VAS is: 6-8/10 Duration: varies.' (12.0 wks) vs Page 1: 'Onset: chronic for 4-5 years and progressive worsen in last 3 months VAS is: 6-8/10 Duration: varies.' (260.0 wks)",
+      "source_page": 1,
+      "confidence": 0.45,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "conservative_treatment_attempted": {
+      "fact_key": "conservative_treatment_attempted",
+      "label": "Conservative Treatment Trial",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "PT/home exercise Not effective MRI of lumbar spine was not performed 2.",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "neurological_exam_abnormal": {
+      "fact_key": "neurological_exam_abnormal",
+      "label": "Abnormal Neurological Examination",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "rule_out_pathology": {
+      "fact_key": "rule_out_pathology",
+      "label": "Rule Out Intracranial Pathology",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_requested": {
+      "fact_key": "contrast_requested",
+      "label": "Intravenous Contrast Requested",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "Imaging: MRI : Lumbar without contrast 2.",
+      "source_page": 1,
+      "confidence": 0.98,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_justified": {
+      "fact_key": "contrast_justified",
+      "label": "Contrast Enhancement Justification",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "fact_key": "contrast_anaphylaxis_unmitigated",
+      "label": "Unmitigated Anaphylactic Contrast Allergy",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    }
+  },
+  "extracted_facts": {
+    "neurological_symptoms": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "symptom_duration_weeks": {
+      "value": null,
+      "excerpt": "Contradictory durations documented: Page 1: 'Onset: chronic for 4-5 years and progressive worsen in last 3 months VAS is: 6-8/10 Duration: varies.' (12.0 wks) vs Page 1: 'Onset: chronic for 4-5 years and progressive worsen in last 3 months VAS is: 6-8/10 Duration: varies.' (260.0 wks)",
+      "source_page": 1,
+      "confidence": 0.45
+    },
+    "conservative_treatment_attempted": {
+      "value": true,
+      "excerpt": "PT/home exercise Not effective MRI of lumbar spine was not performed 2.",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "neurological_exam_abnormal": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "rule_out_pathology": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_requested": {
+      "value": false,
+      "excerpt": "Imaging: MRI : Lumbar without contrast 2.",
+      "source_page": 1,
+      "confidence": 0.98
+    },
+    "contrast_justified": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "value": false,
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [
+    {
+      "page_number": 1,
+      "text": "PAMPATTIWAR, VIVEK DOB: 11/10/1969 (55 yo M) Acc No. 13717 DOS: 01/09/2025\nConsultation Notes for VIVEK PAMPATTIWAR on 01/09/2025\nHistory of Present Illness\nPatient is a 55 yo Indian American who presented in our clinic today for the following problems:\n1. back pain_ axial pain\nLocation of pain: lower back. Right lower leg cramps randomly. worse when he used R leg for driving. denied family history of\nneuropathy, myopathy. routine electrolyte tests were normal. He is a vegetarian.\nOnset: chronic for 4-5 years and progressive worsen in last 3 months\nVAS is: 6-8/10\nDuration: varies.\nQuality of the pain: The patient describes the pain as dull, spastic, burning and aching\nW/: Worse by twisting, extension, standing and walking.\nB/: Some pain relief by taking oral and topical analgesics, and bed rest.\nPT/home exercise Not effective\nMRI of lumbar spine was not performed\n2. leg pain and heaviness with worse pain after walking for a short distance. Patient had to sit down for rest before walking again.\nPatient reports he already went to vein clinic few years ago and ultrasound was negative.\nPatient denied bowel or bladder dysfunction.\nPatient has history of hypertension, hyperlipidemia, and diabetes.\nPatient denied history of smoking, heavy drinking or illicit drug use.\nVital Signs\nPain scale: 10 1-10, Temp: 98.7 F, BP: 133/83 mm Hg, HR: 73 /min, Wt: 118 lbs, Ht: 62 in, BMI: 21.58 Index, Wt-kg: 53.52 kg.\nExamination\nGeneral: Well nourished, well developed, cooperative. Cardiac: Regular rate and rhythm.\nNeuro: awake, alert, oriented to person, time and place. Language fluent. CN II-XII grossly intact. Motor and sensory exam are\ngrossly normal except mild decreased sensation in leg.\nSpine: Tenderness at lumbar local region as patient described in HPI. Scooped posture and wide based gait with slight limping.\nOther positive special tests include:\n- Lumbar facet pain causing decreased ROM, Lumbar facet loading test\n- Lumbar radiculopathy / sciatica pain causing Straight leg raise (SLR) test, Sciatic notch tenderness.\nTreatment Plan & Orders\n1. Spondylosis without myelopathy or radiculopathy, lumbar region (M47.816)\n   Imaging: MRI : Lumbar without contrast\n2. Spinal stenosis, lumbar region with neurogenic claudication (M48.062)\n   Imaging: MRI : Lumbar without contrast\n3. Idiopathic peripheral neuropathy (G60.9) - EMG 95886 TWO units inHouse\nProvider: KEWEI YU, MD | Date: 01/09/2025 | Atlantic Adv Spine And Neurology\n4035 JOHNS CREEK PKWY, SUITE A, SUWANEE GA 30024-1213",
+      "char_count": 2500,
+      "is_scanned": false
+    }
+  ],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [],
+  "latest_outcome": null,
+  "latest_evaluation": null,
+  "created_at": "2026-10-17T08:02:30.373167+00:00",
+  "updated_at": "2026-10-17T08:02:30.373167+00:00"
+}

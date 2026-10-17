@@ -67,7 +67,13 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
 
       const record: ClinicalNoteRecord = await response.json();
       onSelectCaseRecord(record);
-      setUploadSuccess(`Note processed successfully: ${record.patient_name} (${record.total_pages} pages, quality: ${record.overall_quality})`);
+      if (record.procedure_requested) {
+        setSelectedProcedure(record.procedure_requested);
+      }
+      if (record.insurance_plan) {
+        setSelectedPlan(record.insurance_plan);
+      }
+      setUploadSuccess(`Note processed successfully: ${record.patient_name} — Auto-detected: ${record.procedure_requested} (${record.total_pages} page${record.total_pages > 1 ? 's' : ''}, quality: ${record.overall_quality})`);
     } catch (err: any) {
       setUploadError(err.message || 'Network error processing clinical note.');
     } finally {
@@ -374,6 +380,15 @@ export const NewReviewView: React.FC<NewReviewViewProps> = ({
       </div>
 
       {/* Target Policy & Procedure Form */}
+      <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontSize: '12px', fontWeight: 600, color: '#315B45', backgroundColor: '#EBF3EE', padding: '3px 10px', borderRadius: '4px' }}>
+          ✓ Auto-Detected from Clinical Note
+        </span>
+        <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+          (The system automatically identifies the requested procedure and plan from the document text)
+        </span>
+      </div>
+
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',

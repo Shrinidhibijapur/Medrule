@@ -1,13 +1,14 @@
+import os
 import io
 import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,8 @@ from app.models.criteria import (
     VerificationGateRequest,
     CriteriaEvaluationRequest,
 )
-from app.services.criteria_service import CriteriaService, PolicyVerificationGateError
+from app.services.criteria_service import CriteriaService, PolicyVerificationGateError, PolicyMismatchError
+from app.models.trace import AgentTrace
 from app.models.note import (
     ClinicalNoteRecord,
     ExtractedFact,
@@ -61,6 +63,7 @@ from app.models.terminology import (
     TerminologyLookupResponse,
 )
 from app.services.terminology_service import TerminologyService
+from app.services.agent_service import AgentService, AgentIntent
 
 app = FastAPI(
     title="MedRule Decision-Support API",
@@ -82,17 +85,30 @@ app.add_middleware(
 async def security_headers_middleware(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
-        "img-src 'self' data: blob:; "
-        "font-src 'self' data:; "
-        "style-src 'self' 'unsafe-inline'; "
-        "script-src 'self'; "
-        "frame-ancestors 'none';"
-    )
+
+    # Allow PDF clinical documents to be previewed inside the trusted MedRule frontend iframe
+    if request.url.path.endswith("/document"):
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self'; "
+            "frame-ancestors 'self' http://localhost:5173 http://127.0.0.1:5173;"
+        )
+    else:
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self'; "
+            "frame-ancestors 'none';"
+        )
     return response
 
 # Mount Authentication Router (OIDC PKCE, session management, CSRF)
@@ -459,6 +475,8 @@ def evaluate_criteria(
                 return criteria_service.evaluate_note_record(policy=policy, note_record=note_record)
             except PolicyVerificationGateError as e:
                 raise HTTPException(status_code=400, detail=str(e))
+            except PolicyMismatchError as e:
+                raise HTTPException(status_code=422, detail=str(e))
 
     try:
         report = criteria_service.evaluate_policy_case(
@@ -470,6 +488,8 @@ def evaluate_criteria(
         return report
     except PolicyVerificationGateError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except PolicyMismatchError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 # --- Decision Evaluation & Case Endpoints ---
 
@@ -550,11 +570,11 @@ def get_ocr_status(
 @app.post("/api/notes/upload", response_model=ClinicalNoteRecord, status_code=status.HTTP_201_CREATED)
 async def upload_clinical_note(
     file: UploadFile = File(...),
-    policy_id: str = Form("P-UHC-CT-2026"),
+    policy_id: Optional[str] = Form(None),
     patient_name: Optional[str] = Form(None),
     facility: Optional[str] = Form(None),
     procedure_requested: Optional[str] = Form(None),
-    insurance_plan: Optional[str] = Form("United Healthcare"),
+    insurance_plan: Optional[str] = Form(None),
     current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_UPLOAD)),
     _csrf: None = Depends(verify_csrf_if_cookie)
 ):
@@ -586,10 +606,12 @@ async def upload_clinical_note(
     if len(file_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
+    effective_policy_id = policy_id
     policy_rules = None
-    ruleset = criteria_service.get_ruleset(policy_id)
-    if ruleset:
-        policy_rules = ruleset.rules
+    if effective_policy_id:
+        ruleset = criteria_service.get_ruleset(effective_policy_id)
+        if ruleset:
+            policy_rules = ruleset.rules
 
     try:
         record = note_extractor_service.extract_note(
@@ -610,6 +632,7 @@ async def upload_clinical_note(
             status="SUCCESS",
             details={
                 "filename": file.filename,
+                "document_id": record.document_id,
                 "policy_id": policy_id,
                 "procedure": record.procedure_requested,
                 "organization_id": current_user.organization_id
@@ -621,6 +644,92 @@ async def upload_clinical_note(
             status_code=422,
             detail=f"Clinical note processing failed: {str(e)}"
         )
+
+@app.post("/api/documents/upload", status_code=status.HTTP_201_CREATED)
+async def upload_document_standalone(
+    file: UploadFile = File(...),
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_UPLOAD)),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
+    """
+    Dedicated Standalone Document Upload API for Ask MedRule:
+    - Extracts PDF page-by-page text
+    - Generates unique document ID and computes SHA-256
+    - Does NOT require an insurance policy or case assignment
+    - Returns document metadata, page count, and extracted clinical facts
+    """
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file format. MedRule accepts only valid clinical PDF documents."
+        )
+
+    file_bytes = await file.read()
+    max_size = 15 * 1024 * 1024  # 15MB
+    if len(file_bytes) > max_size:
+        raise HTTPException(status_code=413, detail="File too large. Maximum clinical note PDF size is 15MB.")
+    if len(file_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    try:
+        record = note_extractor_service.extract_note(
+            file_bytes=file_bytes,
+            filename=file.filename,
+            policy_id=None,
+            organization_id=current_user.organization_id,
+        )
+        audit_service.log_event(
+            action="DOCUMENT_UPLOAD",
+            user=current_user,
+            resource=f"document:{record.document_id or record.case_id}",
+            status="SUCCESS",
+            details={
+                "filename": file.filename,
+                "document_id": record.document_id or record.case_id,
+                "sha256": record.sha256_checksum,
+                "pages": record.total_pages,
+                "organization_id": current_user.organization_id
+            }
+        )
+        return {
+            "document_id": record.document_id or record.case_id,
+            "case_id": record.case_id,
+            "filename": record.original_filename,
+            "sha256_checksum": record.sha256_checksum,
+            "total_pages": record.total_pages,
+            "patient_name": record.patient_name,
+            "date_of_visit": record.date_of_visit,
+            "procedure_requested": record.procedure_requested,
+            "insurance_plan": record.insurance_plan,
+            "facts": {k: f.model_dump() for k, f in record.facts.items()} if record.facts else {},
+            "raw_pages_text": record.raw_pages_text
+        }
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Document processing failed: {str(e)}")
+
+@app.get("/api/documents/{document_id}")
+def get_document_details(
+    document_id: str,
+    current_user: AuthenticatedUser = Depends(require_permission(Permission.CASE_VIEW))
+):
+    """Retrieves extracted document text, metadata, and facts by document_id or case_id."""
+    record = note_extractor_service.get_note_record(document_id)
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Document '{document_id}' not found.")
+    check_case_tenant(record, current_user)
+    return {
+        "document_id": record.document_id or record.case_id,
+        "case_id": record.case_id,
+        "filename": record.original_filename,
+        "sha256_checksum": record.sha256_checksum,
+        "total_pages": record.total_pages,
+        "patient_name": record.patient_name,
+        "date_of_visit": record.date_of_visit,
+        "procedure_requested": record.procedure_requested,
+        "insurance_plan": record.insurance_plan,
+        "facts": {k: f.model_dump() for k, f in record.facts.items()} if record.facts else {},
+        "raw_pages_text": record.raw_pages_text
+    }
 
 @app.get("/api/notes/{case_id}", response_model=ClinicalNoteRecord)
 def get_clinical_note(
@@ -797,7 +906,11 @@ def list_cases(
 ):
     """Lists all saved cases with clinical note records filtered by tenant isolation."""
     all_cases = note_extractor_service.list_note_records()
-    return [c for c in all_cases if current_user.can_access_tenant(getattr(c, "organization_id", "org_riverside"))]
+    return [
+        c for c in all_cases
+        if current_user.can_access_tenant(getattr(c, "organization_id", "org_riverside"))
+        and not (c.case_id and c.case_id.endswith("-TEST"))
+    ]
 
 @app.get("/api/cases/{case_id}", response_model=ClinicalNoteRecord)
 def get_case(
@@ -848,8 +961,11 @@ def evaluate_case(
         return report
     except PolicyVerificationGateError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except PolicyMismatchError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 @app.get("/api/cases/{case_id}/export")
+@app.get("/api/cases/{case_id}/export-decision")
 def export_case_audit_report(
     case_id: str,
     format: str = Query("txt", description="Export format: 'txt' or 'json'"),
@@ -866,9 +982,9 @@ def export_case_audit_report(
         raise HTTPException(status_code=404, detail=f"Case record '{case_id}' not found.")
     check_case_tenant(note_record, current_user)
 
-    policy = registry_service.get_by_id(note_record.policy_id)
-    if not policy:
-        raise HTTPException(status_code=404, detail=f"Policy '{note_record.policy_id}' not found.")
+    policy = registry_service.get_by_id(note_record.policy_id) if note_record.policy_id else None
+    if not policy and note_record.policy_id:
+        policy = registry_service.get_by_id(note_record.policy_id)
 
     audit_service.log_event(
         action="DECISION_EXPORT",
@@ -1078,5 +1194,666 @@ def get_terminology_audit_log(
     Retrieves the immutable audit log of all clinical terminology lookups.
     """
     return terminology_service.get_audit_trail()
+
+
+# --- Phase 9: Interactive Agent Copilot (Groq Llama 3.3 & Deterministic Engine) ---
+
+class AgentCitation(BaseModel):
+    document_id: Optional[str] = None
+    document_filename: Optional[str] = None
+    page_number: int
+    excerpt: Optional[str] = None
+
+class AgentChatRequest(BaseModel):
+    message: str
+    case_id: Optional[str] = None
+    document_id: Optional[str] = None
+    document_ids: Optional[List[str]] = None
+    policy_id: Optional[str] = None
+    intent: Optional[str] = None
+    request_id: Optional[str] = None
+    groq_api_key: Optional[str] = None
+    model: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = None
+
+class SetGroqKeyRequest(BaseModel):
+    groq_api_key: str
+
+class AgentChatResponse(BaseModel):
+    response: str
+    intent: str = "DOCUMENT_ANALYSIS"
+    model_used: str
+    is_groq_powered: bool
+    request_id: Optional[str] = None
+    case_id: Optional[str] = None
+    document_id: Optional[str] = None
+    document_ids: List[str] = Field(default_factory=list)
+    document_filename: Optional[str] = None
+    valid_page_count: Optional[int] = None
+    patient_name: Optional[str] = None
+    procedure: Optional[str] = None
+    evaluation: Optional[Dict[str, Any]] = None
+    extracted_facts: Optional[Dict[str, Any]] = None
+    trace: Optional[Dict[str, Any]] = None
+    compatibility_status: Optional[str] = "COMPATIBLE"
+    citations: List[AgentCitation] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
+
+@app.get("/api/agent/status")
+def get_agent_status(current_user: AuthenticatedUser = Depends(get_current_user)):
+    """Reports whether Groq AI Copilot is active and lists supported models."""
+    has_key = AgentService.is_configured()
+    return {
+        "groq_configured": has_key,
+        "active_model": settings.GROQ_MODEL or "llama-3.3-70b-versatile",
+        "supported_models": [
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant",
+            "mixtral-8x7b-32768"
+        ],
+        "status": "ONLINE_GROQ_POWERED" if has_key else "DETERMINISTIC_MODE_GROQ_KEY_AVAILABLE"
+    }
+
+@app.post("/api/agent/set-groq-key")
+def set_groq_key(
+    payload: SetGroqKeyRequest,
+    current_user: AuthenticatedUser = Depends(get_current_user),
+    _csrf: None = Depends(verify_csrf_if_cookie)
+):
+    """Configures or updates Groq API key for the active session (Administrative)."""
+    key = payload.groq_api_key.strip()
+    if not key.startswith("gsk_") and len(key) < 20:
+        raise HTTPException(status_code=400, detail="Invalid Groq API Key format. Groq keys typically start with 'gsk_'.")
+    settings.GROQ_API_KEY = key
+    os.environ["GROQ_API_KEY"] = key
+    audit_service.log_event(
+        action="GROQ_API_KEY_CONFIGURED",
+        user=current_user,
+        resource="system:groq_agent",
+        status="SUCCESS",
+        details={"model": settings.GROQ_MODEL}
+    )
+    return {
+        "status": "SUCCESS",
+        "message": "Groq API key activated successfully. Interactive Agent is now live with Llama 3.3.",
+        "model": settings.GROQ_MODEL
+    }
+
+@app.get("/api/agent/trace/{case_id}", response_model=AgentTrace)
+def get_case_agent_trace(
+    case_id: str,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
+    """
+    Retrieves the structured, auditable decision trace for a case assessment.
+    Links encounter, document hash, valid page bounds, policy compatibility,
+    extracted facts, criterion evaluations, evidence citations, narrative validation, and audit history.
+    """
+    note_record = note_extractor_service.get_note_record(case_id)
+    if not note_record:
+        raise HTTPException(status_code=404, detail=f"Case record '{case_id}' not found.")
+    check_case_tenant(note_record, current_user)
+
+    policy = None
+    if note_record.policy_id:
+        policy = registry_service.get_by_id(note_record.policy_id)
+
+    evaluation = None
+    if note_record.latest_evaluation:
+        try:
+            evaluation = EvaluationReport(**note_record.latest_evaluation)
+        except Exception:
+            pass
+
+    trace = AgentService.generate_agent_trace(
+        case_id=case_id,
+        note_record=note_record,
+        evaluation_report=evaluation,
+        policy=policy,
+        compatibility_status="COMPATIBLE",
+        llm_invoked=False
+    )
+    return trace
+
+@app.post("/api/agent/analyze-document", response_model=AgentChatResponse)
+async def analyze_document_endpoint(
+    req: AgentChatRequest,
+    request: Request,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
+    """
+    Dedicated Document-Analysis Conversational Endpoint for Ask MedRule:
+    Forces DOCUMENT_ANALYSIS intent regardless of query phrasing, analyzing
+    explicitly selected document(s) with Groq without requiring a payer policy.
+    """
+    req.intent = AgentIntent.DOCUMENT_ANALYSIS.value
+    return await chat_with_agent(req, request, current_user)
+
+def resolve_policy_for_encounter(
+    note_record: Optional[ClinicalNoteRecord],
+    requested_policy_id: Optional[str],
+    registry_svc: PolicyRegistryService,
+    criteria_svc: CriteriaService
+) -> Tuple[Optional[Policy], Optional[str], str]:
+    """
+    Resolves an authentic, verified, approved policy from the policy registry.
+    Handles explicit IDs and the 'UNSPECIFIED' default lookup case.
+    Distinguishes:
+    - SPECIFIED_POLICY_NOT_FOUND (invalid lookup key)
+    - POLICY_NOT_APPROVED (registered but in NEEDS_REVIEW or ARCHIVED status)
+    - POLICY_MISMATCH (payer, modality, or anatomy incompatibility)
+    - NO_APPLICABLE_VERIFIED_POLICY (missing policy ingestion for encounter payer/procedure)
+    - COMPATIBLE_RESOLVED (compatible approved policy found)
+    """
+    if not note_record:
+        return None, "No active clinical note record loaded for policy resolution.", "NO_RECORD"
+
+    target_id = (requested_policy_id or getattr(note_record, "policy_id", None) or "").strip()
+
+    # Case 1: Specific Policy ID requested or explicitly bound
+    if target_id and target_id.upper() != "UNSPECIFIED":
+        policy = registry_svc.get_by_id(target_id)
+        if not policy:
+            diag = (
+                f"Specified policy ID '{target_id}' was not found in the MedRule policy registry. "
+                "Failure is caused by an incorrect lookup key or missing policy ingestion."
+            )
+            return None, diag, "SPECIFIED_POLICY_NOT_FOUND"
+
+        if policy.lifecycle_status != PolicyLifecycleStatus.APPROVED_FOR_USE:
+            diag = (
+                f"Policy '{policy.id}' is registered in the database but currently in '{policy.lifecycle_status.value}' status. "
+                "MedRule governance gate blocks clinical evaluation on unapproved guidelines."
+            )
+            return policy, diag, "POLICY_NOT_APPROVED"
+
+        is_compat, status, reasons, req_pol = criteria_svc.validate_policy_compatibility(policy, note_record)
+        if not is_compat:
+            reasons_str = "; ".join(reasons)
+            diag = f"POLICY_MISMATCH: Incompatible policy '{policy.id}' ({policy.policy_name}). {reasons_str}"
+            return policy, diag, "POLICY_MISMATCH"
+
+        return policy, None, "COMPATIBLE_RESOLVED"
+
+    # Case 2: Policy ID was NOT specified ('UNSPECIFIED' case)
+    # Check registry for an authentic, verified, approved policy matching payer, modality, and anatomy
+    approved_policies = registry_svc.get_all(status=PolicyLifecycleStatus.APPROVED_FOR_USE)
+    compatible_approved: List[Policy] = []
+
+    for p in approved_policies:
+        is_compat, _, _, _ = criteria_svc.validate_policy_compatibility(p, note_record)
+        if is_compat:
+            compatible_approved.append(p)
+
+    if compatible_approved:
+        return compatible_approved[0], None, "COMPATIBLE_RESOLVED"
+
+    # If no compatible approved policy exists in the registry, diagnose precisely what is missing
+    norm_payer = criteria_svc.normalize_payer(note_record.insurance_plan)
+    norm_mod = criteria_svc.normalize_modality(note_record.procedure_requested)
+    norm_anat = criteria_svc.normalize_anatomy(note_record.procedure_requested).replace("_", " ").title()
+
+    all_policies = registry_svc.get_all()
+    unapproved_matches = [
+        p for p in all_policies
+        if criteria_svc.normalize_payer(p.insurer) == norm_payer and p.lifecycle_status != PolicyLifecycleStatus.APPROVED_FOR_USE
+    ]
+
+    avail_approved = [f"{p.id} ({p.insurer} - {p.procedure_type})" for p in approved_policies]
+    avail_str = ", ".join(avail_approved) if avail_approved else "None"
+
+    if unapproved_matches:
+        cand = unapproved_matches[0]
+        diag = (
+            f"Policy ID was unspecified, and candidate guideline '{cand.id}' for payer '{note_record.insurance_plan}' "
+            f"is currently in '{cand.lifecycle_status.value}' status. "
+            "Governance requires an APPROVED_FOR_USE policy before evaluating prior authorization."
+        )
+        return None, diag, "POLICY_NOT_APPROVED"
+
+    diag = (
+        f"Policy ID was unspecified and no compatible approved policy exists in the registry for this encounter. "
+        f"Failure cause: Missing Policy Ingestion. "
+        f"Encounter requires an authentic, approved coverage guideline for payer '{note_record.insurance_plan}' "
+        f"governing '{note_record.procedure_requested}' (Modality: {norm_mod}, Anatomy: {norm_anat}). "
+        f"Currently approved policies in registry: [{avail_str}]. Fail-closed governance blocks evaluation."
+    )
+    return None, diag, "NO_APPLICABLE_VERIFIED_POLICY"
+
+@app.post("/api/agent/chat", response_model=AgentChatResponse)
+async def chat_with_agent(
+    req: AgentChatRequest,
+    request: Request,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
+    """
+    MedRule Conversational Copilot Router:
+    Routes questions by intent:
+    - DOCUMENT_ANALYSIS: Summarizes / extracts from uploaded document without requiring a policy.
+    - WORKFLOW_QUERY: Answers review readiness and trace questions for an encounter.
+    - EVALUATION_QUERY: Invokes deterministic rules engine, strictly fail-closed on policy mismatch.
+    - APPEAL_DRAFT: Generates evidence-based appeal draft with placeholders if policy unverified.
+    """
+    # 1. Resolve Document Context (Least-privilege, request-scoped)
+    requested_doc_ids: List[str] = []
+    if req.document_ids:
+        for d in req.document_ids:
+            if d and d not in requested_doc_ids:
+                requested_doc_ids.append(d)
+    if req.document_id and req.document_id not in requested_doc_ids:
+        requested_doc_ids.append(req.document_id)
+
+    resolved_docs: List[ClinicalNoteRecord] = []
+    for d_id in requested_doc_ids:
+        doc_rec = note_extractor_service.get_note_record(d_id)
+        if not doc_rec:
+            raise HTTPException(status_code=404, detail=f"Document '{d_id}' not found.")
+        check_case_tenant(doc_rec, current_user)
+        resolved_docs.append(doc_rec)
+
+    primary_note_record: Optional[ClinicalNoteRecord] = None
+    if resolved_docs:
+        primary_note_record = resolved_docs[0]
+    elif req.case_id:
+        c_rec = note_extractor_service.get_note_record(req.case_id)
+        if c_rec:
+            check_case_tenant(c_rec, current_user)
+            primary_note_record = c_rec
+            resolved_docs = [c_rec]
+
+    # 2. Classify Intent
+    classified_intent, confidence, rationale = AgentService.classify_intent(req.message)
+    active_intent = AgentIntent(req.intent) if (req.intent and req.intent in [e.value for e in AgentIntent]) else classified_intent
+
+    # Resolve Groq API key from server configuration
+    header_key = request.headers.get("x-groq-api-key")
+    resolved_key = AgentService.get_api_key(req.groq_api_key or header_key)
+
+    # -------------------------------------------------------------
+    # INTENT A: DOCUMENT ANALYSIS
+    # -------------------------------------------------------------
+    if active_intent == AgentIntent.DOCUMENT_ANALYSIS:
+        if not resolved_docs:
+            return AgentChatResponse(
+                response=(
+                    "### 📄 Document Analysis\n\n"
+                    "No clinical document is currently selected or attached. "
+                    "Please attach a clinical note PDF or select an encounter to analyze its symptoms, findings, and treatments."
+                ),
+                intent=active_intent.value,
+                model_used="MedRule Conversational Engine",
+                is_groq_powered=False,
+                request_id=req.request_id,
+                compatibility_status="NOT_APPLICABLE"
+            )
+
+        doc_primary = resolved_docs[0]
+        # Check if Groq is available for document analysis
+        if resolved_key:
+            sys_prompt = AgentService.build_document_analysis_system_prompt()
+            user_prompt = AgentService.build_document_analysis_user_prompt(req.message, resolved_docs)
+            messages = [{"role": "system", "content": sys_prompt}]
+            if req.history:
+                for turn in req.history[-6:]:
+                    if turn.get("role") in ["user", "assistant"] and turn.get("content"):
+                        messages.append({"role": turn["role"], "content": turn["content"]})
+            messages.append({"role": "user", "content": user_prompt})
+
+            answer, model_used, err = await AgentService.call_groq_api(
+                messages=messages,
+                api_key=resolved_key,
+                model=req.model
+            )
+            if answer and not err:
+                is_consistent, warnings, final_text = AgentService.validate_narrative_consistency(
+                    narrative=answer,
+                    note_record=doc_primary,
+                    evaluation_report=None
+                )
+                citations, cite_warnings = AgentService.extract_and_validate_citations(
+                    final_text,
+                    doc_primary.total_pages,
+                    document_id=doc_primary.document_id or doc_primary.case_id,
+                    document_filename=doc_primary.original_filename
+                )
+                all_warnings = warnings + cite_warnings
+                trace = AgentService.generate_agent_trace(
+                    case_id=doc_primary.case_id,
+                    note_record=doc_primary,
+                    evaluation_report=None,
+                    policy=None,
+                    compatibility_status="COMPATIBLE",
+                    llm_invoked=True,
+                    llm_model=model_used,
+                    narrative_passed=is_consistent,
+                    narrative_notes=all_warnings,
+                    intent=active_intent.value,
+                    document_id=doc_primary.document_id
+                )
+                audit_service.log_event(
+                    action="AGENT_DOCUMENT_ANALYSIS",
+                    user=current_user,
+                    resource=f"document:{doc_primary.document_id or doc_primary.case_id}",
+                    status="SUCCESS",
+                    details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id}
+                )
+                return AgentChatResponse(
+                    response=final_text,
+                    intent=active_intent.value,
+                    model_used=f"{model_used} (Groq)",
+                    is_groq_powered=True,
+                    request_id=req.request_id,
+                    case_id=doc_primary.case_id,
+                    document_id=doc_primary.document_id or doc_primary.case_id,
+                    document_ids=[d.document_id or d.case_id for d in resolved_docs],
+                    document_filename=doc_primary.original_filename,
+                    valid_page_count=doc_primary.total_pages,
+                    patient_name=doc_primary.patient_name,
+                    procedure=doc_primary.procedure_requested,
+                    evaluation=None,
+                    extracted_facts={k: f.model_dump() for k, f in doc_primary.facts.items()} if doc_primary.facts else None,
+                    trace=trace.model_dump(),
+                    compatibility_status="NOT_APPLICABLE",
+                    citations=[AgentCitation(**c) for c in citations],
+                    warnings=all_warnings
+                )
+
+        # Fallback to deterministic extraction summary if Groq unavailable
+        fallback_text = AgentService.generate_document_analysis_fallback(
+            req.message,
+            resolved_docs,
+            error_reason=err if resolved_key else "CONFIG_ERROR: Groq inference service is not configured on the server."
+        )
+        trace = AgentService.generate_agent_trace(
+            case_id=doc_primary.case_id,
+            note_record=doc_primary,
+            evaluation_report=None,
+            policy=None,
+            compatibility_status="COMPATIBLE",
+            llm_invoked=False,
+            intent=active_intent.value,
+            document_id=doc_primary.document_id
+        )
+        audit_service.log_event(
+            action="AGENT_DOCUMENT_ANALYSIS",
+            user=current_user,
+            resource=f"document:{doc_primary.document_id or doc_primary.case_id}",
+            status="SUCCESS",
+            details={"model": "deterministic-extractor", "is_groq": False, "trace_id": trace.trace_id}
+        )
+        return AgentChatResponse(
+            response=fallback_text,
+            intent=active_intent.value,
+            model_used="MedRule Digital Text Extraction Engine",
+            is_groq_powered=False,
+            request_id=req.request_id,
+            case_id=doc_primary.case_id,
+            document_id=doc_primary.document_id or doc_primary.case_id,
+            document_ids=[d.document_id or d.case_id for d in resolved_docs],
+            document_filename=doc_primary.original_filename,
+            valid_page_count=doc_primary.total_pages,
+            patient_name=doc_primary.patient_name,
+            procedure=doc_primary.procedure_requested,
+            evaluation=None,
+            extracted_facts={k: f.model_dump() for k, f in doc_primary.facts.items()} if doc_primary.facts else None,
+            trace=trace.model_dump(),
+            compatibility_status="NOT_APPLICABLE"
+        )
+
+    # -------------------------------------------------------------
+    # INTENT D: APPEAL DRAFTING
+    # -------------------------------------------------------------
+    if active_intent == AgentIntent.APPEAL_DRAFT:
+        policy, policy_diag, resolution_code = resolve_policy_for_encounter(
+            primary_note_record, req.policy_id, registry_service, criteria_service
+        ) if primary_note_record else (None, None, "NO_RECORD")
+
+        evaluation = None
+        comp_status = "COMPATIBLE"
+        comp_reasons = []
+
+        if policy_diag:
+            comp_status = "POLICY_MISMATCH" if "POLICY_MISMATCH" in policy_diag else "NO_APPLICABLE_VERIFIED_POLICY"
+            comp_reasons = [policy_diag]
+        elif policy and primary_note_record:
+            try:
+                evaluation = criteria_service.evaluate_note_record(policy=policy, note_record=primary_note_record)
+            except (PolicyMismatchError, PolicyVerificationGateError) as e:
+                comp_status = "POLICY_MISMATCH"
+                comp_reasons = [str(e)]
+
+        appeal_text = AgentService.generate_appeal_draft(
+            user_query=req.message,
+            note_record=primary_note_record,
+            evaluation_report=evaluation,
+            policy=policy,
+            compatibility_status=comp_status
+        )
+        trace = AgentService.generate_agent_trace(
+            case_id=primary_note_record.case_id if primary_note_record else "CASE-UNKNOWN",
+            note_record=primary_note_record,
+            evaluation_report=evaluation,
+            policy=policy,
+            compatibility_status=comp_status,
+            compatibility_reasons=comp_reasons,
+            llm_invoked=False,
+            intent=active_intent.value,
+            document_id=primary_note_record.document_id if primary_note_record else None
+        )
+        audit_service.log_event(
+            action="AGENT_APPEAL_DRAFT",
+            user=current_user,
+            resource=f"case:{primary_note_record.case_id if primary_note_record else 'unknown'}",
+            status="SUCCESS",
+            details={"is_groq": False, "trace_id": trace.trace_id, "comp_status": comp_status}
+        )
+        return AgentChatResponse(
+            response=appeal_text,
+            intent=active_intent.value,
+            model_used="MedRule Clinical Appeal Generator",
+            is_groq_powered=False,
+            request_id=req.request_id,
+            case_id=primary_note_record.case_id if primary_note_record else None,
+            document_id=primary_note_record.document_id if primary_note_record else None,
+            document_ids=[d.document_id or d.case_id for d in resolved_docs],
+            document_filename=primary_note_record.original_filename if primary_note_record else None,
+            valid_page_count=primary_note_record.total_pages if primary_note_record else None,
+            patient_name=primary_note_record.patient_name if primary_note_record else None,
+            procedure=primary_note_record.procedure_requested if primary_note_record else None,
+            evaluation=evaluation.model_dump() if evaluation else None,
+            extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
+            trace=trace.model_dump(),
+            compatibility_status=comp_status
+        )
+
+    # -------------------------------------------------------------
+    # INTENT C & B: AUTHORIZATION EVALUATION & WORKFLOW QUERIES
+    # -------------------------------------------------------------
+    policy = None
+    evaluation = None
+    policy_mismatch_error = None
+
+    if primary_note_record:
+        policy, policy_diag, resolution_code = resolve_policy_for_encounter(
+            primary_note_record, req.policy_id, registry_service, criteria_service
+        )
+        if policy_diag:
+            policy_mismatch_error = policy_diag
+        elif policy:
+            try:
+                evaluation = criteria_service.evaluate_note_record(policy=policy, note_record=primary_note_record)
+            except PolicyMismatchError as e:
+                policy_mismatch_error = str(e)
+            except PolicyVerificationGateError as e:
+                policy_mismatch_error = str(e)
+            except Exception as e:
+                logger.warning(f"Agent evaluation notice: {e}")
+
+    # Fail closed on policy mismatch or missing verified policy
+    if policy_mismatch_error and primary_note_record:
+        mismatch_narrative = (
+            f"### 🛑 POLICY INCOMPATIBILITY DETECTED (FAIL-CLOSED)\n\n"
+            f"**Evaluation Blocked:** {policy_mismatch_error}\n\n"
+            f"- **Requested Case:** {primary_note_record.patient_name} (Case ID: {primary_note_record.case_id})\n"
+            f"- **Requested Procedure:** {primary_note_record.procedure_requested}\n"
+            f"- **Payer:** {primary_note_record.insurance_plan}\n"
+            f"- **Selected Policy:** {policy.policy_id if policy else 'None'} ({policy.policy_name if policy else 'None'})\n\n"
+            f"**MedRule Governance Policy:**\n"
+            f"- The deterministic rules engine remains the sole authority for clinical authorization outcomes.\n"
+            f"- Cross-payer or cross-modality policy evaluation is strictly prohibited (e.g. evaluating an Ambetter Lumbar Spine MRI under a UnitedHealthcare Head CT policy).\n"
+            f"- Please ingest and approve an authentic verified {primary_note_record.insurance_plan} policy for {primary_note_record.procedure_requested} to proceed."
+        )
+        trace = AgentService.generate_agent_trace(
+            case_id=primary_note_record.case_id,
+            note_record=primary_note_record,
+            evaluation_report=None,
+            policy=policy,
+            compatibility_status="POLICY_MISMATCH",
+            compatibility_reasons=[policy_mismatch_error],
+            llm_invoked=False,
+            intent=active_intent.value,
+            document_id=primary_note_record.document_id
+        )
+
+        audit_service.log_event(
+            action="AGENT_POLICY_MISMATCH_BLOCKED",
+            user=current_user,
+            resource=f"case:{primary_note_record.case_id}",
+            status="BLOCKED",
+            details={"policy_id": policy.policy_id if policy else None, "reason": policy_mismatch_error}
+        )
+
+        return AgentChatResponse(
+            response=mismatch_narrative,
+            intent=active_intent.value,
+            model_used="MedRule Deterministic Rules Engine",
+            is_groq_powered=False,
+            request_id=req.request_id,
+            case_id=primary_note_record.case_id,
+            document_id=primary_note_record.document_id or primary_note_record.case_id,
+            document_ids=[d.document_id or d.case_id for d in resolved_docs],
+            document_filename=primary_note_record.original_filename,
+            valid_page_count=primary_note_record.total_pages,
+            patient_name=primary_note_record.patient_name,
+            procedure=primary_note_record.procedure_requested,
+            evaluation=None,
+            extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
+            trace=trace.model_dump(),
+            compatibility_status="POLICY_MISMATCH"
+        )
+
+    # Groq-powered generation with strict evidence grounding for compatible evaluation
+    if resolved_key and evaluation:
+        system_prompt = AgentService.build_system_prompt()
+        context_prompt = AgentService.build_user_context_prompt(
+            user_query=req.message,
+            note_record=primary_note_record,
+            evaluation_report=evaluation
+        )
+
+        messages = [{"role": "system", "content": system_prompt}]
+        if req.history:
+            for turn in req.history[-6:]:
+                if turn.get("role") in ["user", "assistant"] and turn.get("content"):
+                    messages.append({"role": turn["role"], "content": turn["content"]})
+        messages.append({"role": "user", "content": context_prompt})
+
+        answer, model_used, err = await AgentService.call_groq_api(
+            messages=messages,
+            api_key=resolved_key,
+            model=req.model
+        )
+
+        if answer and not err:
+            is_consistent, warnings, final_text = AgentService.validate_narrative_consistency(
+                narrative=answer,
+                note_record=primary_note_record,
+                evaluation_report=evaluation
+            )
+            answer = final_text
+
+            trace = AgentService.generate_agent_trace(
+                case_id=primary_note_record.case_id if primary_note_record else (req.case_id or "CASE-GENERAL"),
+                note_record=primary_note_record,
+                evaluation_report=evaluation,
+                policy=policy,
+                compatibility_status="COMPATIBLE",
+                llm_invoked=True,
+                llm_model=model_used,
+                narrative_passed=is_consistent,
+                narrative_notes=warnings,
+                intent=active_intent.value,
+                document_id=primary_note_record.document_id if primary_note_record else None
+            )
+
+            audit_service.log_event(
+                action="AGENT_CHAT_QUERY",
+                user=current_user,
+                resource=f"case:{primary_note_record.case_id if primary_note_record else 'general'}",
+                status="SUCCESS",
+                details={"model": model_used, "is_groq": True, "trace_id": trace.trace_id}
+            )
+            return AgentChatResponse(
+                response=answer,
+                intent=active_intent.value,
+                model_used=f"{model_used} (Groq)",
+                is_groq_powered=True,
+                request_id=req.request_id,
+                case_id=primary_note_record.case_id if primary_note_record else None,
+                document_id=primary_note_record.document_id if primary_note_record else None,
+                document_ids=[d.document_id or d.case_id for d in resolved_docs],
+                document_filename=primary_note_record.original_filename if primary_note_record else None,
+                valid_page_count=primary_note_record.total_pages if primary_note_record else None,
+                patient_name=primary_note_record.patient_name if primary_note_record else None,
+                procedure=primary_note_record.procedure_requested if primary_note_record else None,
+                evaluation=evaluation.model_dump() if evaluation else None,
+                extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
+                trace=trace.model_dump(),
+                compatibility_status="COMPATIBLE"
+            )
+
+        logger.warning(f"Groq API error encountered, using deterministic fallback: {err}")
+
+    # Fallback to deterministic clinical engine if no key or on error
+    fallback_answer = AgentService.generate_deterministic_fallback(
+        user_query=req.message,
+        note_record=primary_note_record,
+        evaluation_report=evaluation
+    )
+    trace = AgentService.generate_agent_trace(
+        case_id=primary_note_record.case_id if primary_note_record else (req.case_id or "CASE-GENERAL"),
+        note_record=primary_note_record,
+        evaluation_report=evaluation,
+        policy=policy,
+        compatibility_status="COMPATIBLE",
+        llm_invoked=False,
+        intent=active_intent.value,
+        document_id=primary_note_record.document_id if primary_note_record else None
+    )
+    audit_service.log_event(
+        action="AGENT_CHAT_QUERY",
+        user=current_user,
+        resource=f"case:{primary_note_record.case_id if primary_note_record else 'general'}",
+        status="SUCCESS",
+        details={"model": "deterministic-rules-engine", "is_groq": False, "trace_id": trace.trace_id}
+    )
+    return AgentChatResponse(
+        response=fallback_answer,
+        intent=active_intent.value,
+        model_used="MedRule Deterministic Rules Engine",
+        is_groq_powered=False,
+        request_id=req.request_id,
+        case_id=primary_note_record.case_id if primary_note_record else None,
+        document_id=primary_note_record.document_id if primary_note_record else None,
+        document_ids=[d.document_id or d.case_id for d in resolved_docs],
+        document_filename=primary_note_record.original_filename if primary_note_record else None,
+        valid_page_count=primary_note_record.total_pages if primary_note_record else None,
+        patient_name=primary_note_record.patient_name if primary_note_record else None,
+        procedure=primary_note_record.procedure_requested if primary_note_record else None,
+        evaluation=evaluation.model_dump() if evaluation else None,
+        extracted_facts={k: f.model_dump() for k, f in primary_note_record.facts.items()} if primary_note_record and primary_note_record.facts else None,
+        trace=trace.model_dump(),
+        compatibility_status="COMPATIBLE"
+    )
 
 

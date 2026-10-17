@@ -320,33 +320,41 @@ def test_api_note_upload_validation_and_streaming():
     assert upload_resp.status_code == 201
     note_data = upload_resp.json()
     case_id = note_data["case_id"]
-    assert note_data["patient_name"] == "Jane Doe"
-    assert note_data["is_synthetic"] is True
+    try:
+        assert note_data["patient_name"] == "Jane Doe"
+        assert note_data["is_synthetic"] is True
 
-    # 4. GET note by case_id
-    get_resp = client.get(f"/api/notes/{case_id}")
-    assert get_resp.status_code == 200
-    assert get_resp.json()["case_id"] == case_id
+        # 4. GET note by case_id
+        get_resp = client.get(f"/api/notes/{case_id}")
+        assert get_resp.status_code == 200
+        assert get_resp.json()["case_id"] == case_id
 
-    # 5. GET note document streams original PDF
-    doc_resp = client.get(f"/api/notes/{case_id}/document")
-    assert doc_resp.status_code == 200
-    assert doc_resp.headers["content-type"] == "application/pdf"
-    assert len(doc_resp.content) > 100
+        # 5. GET note document streams original PDF
+        doc_resp = client.get(f"/api/notes/{case_id}/document")
+        assert doc_resp.status_code == 200
+        assert doc_resp.headers["content-type"] == "application/pdf"
+        assert len(doc_resp.content) > 100
 
-    # 6. PATCH fact correction via API
-    patch_resp = client.patch(
-        f"/api/notes/{case_id}/facts/symptom_duration_weeks",
-        json={
-            "fact_key": "symptom_duration_weeks",
-            "corrected_value": 14.0,
-            "corrected_status": "EXPLICIT",
-            "reviewer_name": "Dr. Sarah Jenkins, MD",
-            "reason": "Corrected per intake notes"
-        }
-    )
-    assert patch_resp.status_code == 200
-    assert patch_resp.json()["facts"]["symptom_duration_weeks"]["value"] == 14.0
+        # 6. PATCH fact correction via API
+        patch_resp = client.patch(
+            f"/api/notes/{case_id}/facts/symptom_duration_weeks",
+            json={
+                "fact_key": "symptom_duration_weeks",
+                "corrected_value": 14.0,
+                "corrected_status": "EXPLICIT",
+                "reviewer_name": "Dr. Sarah Jenkins, MD",
+                "reason": "Corrected per intake notes"
+            }
+        )
+        assert patch_resp.status_code == 200
+        assert patch_resp.json()["facts"]["symptom_duration_weeks"]["value"] == 14.0
+    finally:
+        # Clean up temporary test case file
+        from app.main import DATA_DIR
+        import os
+        temp_case_file = os.path.join(DATA_DIR, "notes", f"{case_id}.json")
+        if os.path.exists(temp_case_file):
+            os.remove(temp_case_file)
 
 def test_ocr_capability_reporting():
     """

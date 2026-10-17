@@ -1,0 +1,192 @@
+{
+  "case_id": "CASE-2026-003",
+  "patient_name": "Robert Chen",
+  "patient_age": 48,
+  "gender": "M",
+  "dob": "08/14/1978",
+  "facility": "Riverside Regional Medical Center",
+  "date_of_visit": "10/11/2026",
+  "procedure_requested": "CT Scan of Head with Contrast (CPT 70460)",
+  "procedure_type": "CT Scan",
+  "insurance_plan": "United Healthcare",
+  "organization_id": "org_riverside",
+  "policy_id": "P-UHC-CT-2026",
+  "policy_version": "2026.1",
+  "chief_complaint": "Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+  "history_of_present_illness": null,
+  "clinical_findings": [
+    "Physical and neurological evaluation documented."
+  ],
+  "impression": "Rule out intracranial pathology or space-occupying lesion.",
+  "physician_recommendation": "CT Scan of Head with Contrast (CPT 70460)",
+  "original_filename": "03_Robert_Chen_Missing_Conservative_Therapy.pdf",
+  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\58d08c21720a_03_Robert_Chen_Missing_Conservative_Therapy.pdf",
+  "sha256_checksum": "58d08c21720a7abfd2e1b9487c99f72c37ae1ba0f2e1ec2a0003696f988c49f2",
+  "total_pages": 1,
+  "scanned_pages_count": 0,
+  "overall_quality": "HIGH",
+  "ocr_engine_status": "OCR engine (tesseract binary) not accessible on system PATH: tesseract is not installed or it's not in your PATH. See README file for more information.. Scanned pages flagged for manual review.",
+  "facts": {
+    "neurological_symptoms": {
+      "fact_key": "neurological_symptoms",
+      "label": "Neurological Symptoms Documented",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.; HISTORY OF PRESENT ILLNESS (HPI): 48-year-old male with new onset right frontotemporal throbbing headaches persisting for 8 weeks.",
+      "source_page": 1,
+      "confidence": 0.98,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "symptom_duration_weeks": {
+      "fact_key": "symptom_duration_weeks",
+      "label": "Symptom Duration (Weeks)",
+      "value": 8.0,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.99,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "conservative_treatment_attempted": {
+      "fact_key": "conservative_treatment_attempted",
+      "label": "Conservative Treatment Trial",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.96,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "neurological_exam_abnormal": {
+      "fact_key": "neurological_exam_abnormal",
+      "label": "Abnormal Neurological Examination",
+      "value": null,
+      "status": "CONFLICTING",
+      "excerpt": "Contradictory physical exam entries: Page 1: 'Neurological examination abnormal: mild hyperreflexia on right lower extremity, cranial nerves intact.' vs Page 1: 'Neurological examination abnormal: mild hyperreflexia on right lower extremity, cranial nerves intact.'",
+      "source_page": 1,
+      "confidence": 0.48,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "rule_out_pathology": {
+      "fact_key": "rule_out_pathology",
+      "label": "Rule Out Intracranial Pathology",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_requested": {
+      "fact_key": "contrast_requested",
+      "label": "Intravenous Contrast Requested",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.99,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_justified": {
+      "fact_key": "contrast_justified",
+      "label": "Contrast Enhancement Justification",
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "IV contrast indicated for vascular evaluation.",
+      "source_page": 1,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "fact_key": "contrast_anaphylaxis_unmitigated",
+      "label": "Unmitigated Anaphylactic Contrast Allergy",
+      "value": false,
+      "status": "EXPLICIT",
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95,
+      "is_flagged_for_review": false,
+      "flag_reason": null,
+      "reviewer_override": null
+    }
+  },
+  "extracted_facts": {
+    "neurological_symptoms": {
+      "value": true,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.; HISTORY OF PRESENT ILLNESS (HPI): 48-year-old male with new onset right frontotemporal throbbing headaches persisting for 8 weeks.",
+      "source_page": 1,
+      "confidence": 0.98
+    },
+    "symptom_duration_weeks": {
+      "value": 8.0,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "conservative_treatment_attempted": {
+      "value": false,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.96
+    },
+    "neurological_exam_abnormal": {
+      "value": null,
+      "excerpt": "Contradictory physical exam entries: Page 1: 'Neurological examination abnormal: mild hyperreflexia on right lower extremity, cranial nerves intact.' vs Page 1: 'Neurological examination abnormal: mild hyperreflexia on right lower extremity, cranial nerves intact.'",
+      "source_page": 1,
+      "confidence": 0.48
+    },
+    "rule_out_pathology": {
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
+    },
+    "contrast_requested": {
+      "value": true,
+      "excerpt": "RIVERSIDE REGIONAL MEDICAL CENTER Department of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501 Tel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214 PATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024 ENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient REQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1 CHIEF COMPLAINT: Vascular throbbing headaches lasting 8 weeks with no prior treatment trial.",
+      "source_page": 1,
+      "confidence": 0.99
+    },
+    "contrast_justified": {
+      "value": true,
+      "excerpt": "IV contrast indicated for vascular evaluation.",
+      "source_page": 1,
+      "confidence": 0.95
+    },
+    "contrast_anaphylaxis_unmitigated": {
+      "value": false,
+      "excerpt": "No history of contrast anaphylaxis documented",
+      "source_page": null,
+      "confidence": 0.95
+    }
+  },
+  "raw_pages_text": [
+    {
+      "page_number": 1,
+      "text": "RIVERSIDE REGIONAL MEDICAL CENTER\nDepartment of Ambulatory Neurology | 100 Medical Plaza, Suite 400, Riverside, CA 92501\nTel: (951) 555-0199 | Fax: (951) 555-0198 | CLIA: #05D98214\nPATIENT NAME: Robert Chen DOB: 08/14/1978 (48yo, Male) MRN: #RMC-551024\nENCOUNTER DATE: 10/11/2026 PLAN: United Healthcare STATUS: Outpatient\nREQUESTED PROCEDURE:CT Scan of Head with Contrast (CPT 70460) | ICD-10: G44.1\nCHIEF COMPLAINT:\nVascular throbbing headaches lasting 8 weeks with no prior treatment trial.\nHISTORY OF PRESENT ILLNESS (HPI):\n48-year-old male with new onset right frontotemporal throbbing headaches persisting for 8 weeks. No prior neurologic history.\nPRIOR CONSERVATIVE MANAGEMENT:\nNo conservative treatment trial attempted or documented prior to imaging request. Patient declined physical therapy or medication trials.\nPHYSICAL & NEUROLOGICAL EXAMINATION:\nVitals: BP 130/84, HR 76. Neurological examination abnormal: mild hyperreflexia on right lower extremity, cranial nerves intact.\nCLINICAL IMPRESSION & ASSESSMENT:\n1. Chronic headache refractory.\n2. Rule out structural intracranial pathology.\nORDER & CLINICAL RATIONALE:\nCT Scan of Head with Contrast (CPT 70460) requested. IV contrast indicated for vascular evaluation.\nElectronically Signed by: Dr. Sarah Jenkins, MD, Board Certified Neurologist Date: 10/11/2026 14:32 PST\nConfidential Medical Document - For Health Plan Prior Authorization & Clinical Review Only | Page 1 of 1",
+      "char_count": 1438,
+      "is_scanned": false
+    }
+  ],
+  "is_synthetic": true,
+  "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
+  "audit_trail": [],
+  "latest_outcome": "CANNOT_BE_DETERMINED",
+  "latest_evaluation": null,
+  "created_at": "2026-10-17T06:53:45.893150+00:00",
+  "updated_at": "2026-10-17T06:53:45.893150+00:00"
+}

@@ -54,8 +54,9 @@ class ClinicalNoteRecord(BaseModel):
     procedure_type: Optional[str] = None
     insurance_plan: str = "United Healthcare"
     organization_id: str = "org_riverside"
-    policy_id: str = "P-UHC-CT-2026"
-    policy_version: Optional[str] = "2026.1"
+    document_id: Optional[str] = None
+    policy_id: Optional[str] = None
+    policy_version: Optional[str] = None
     chief_complaint: Optional[str] = None
     history_of_present_illness: Optional[str] = None
     clinical_findings: List[str] = Field(default_factory=list)

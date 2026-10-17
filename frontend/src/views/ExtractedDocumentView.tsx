@@ -29,7 +29,7 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
 
   const record = caseRecord;
   const caseId = record?.case_id || 'CASE-2026-001';
-  const totalPages = record?.total_pages || 3;
+  const totalPages = record?.total_pages || (record?.raw_pages_text && record.raw_pages_text.length > 0 ? record.raw_pages_text.length : 1);
   const isScanned = record?.overall_quality === 'LOW_NEEDS_OCR';
 
   const pagesArray = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -134,121 +134,105 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
         </div>
       </div>
 
-      {/* Main Split Viewer */}
+      {/* Main Full-Width Document Viewer */}
       <div style={{
-        display: 'flex',
-        gap: '20px',
         backgroundColor: '#FFFFFF',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '20px',
         marginBottom: '24px',
-        minHeight: '620px'
+        minHeight: '640px',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
-        {/* Thumbnails Sidebar */}
-        <div style={{ width: '130px', display: 'flex', flexDirection: 'column', gap: '14px', flexShrink: 0 }}>
-          <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Pages ({totalPages})
-          </span>
+        {/* Document Header & Navigation Controls */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px',
+          paddingBottom: '12px',
+          borderBottom: '1px solid var(--border-subtle)',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
+              Viewing: <strong style={{ color: 'var(--text-primary)' }}>{record?.original_filename || 'John_Doe_Clinical_Note.pdf'}</strong>
+            </div>
+            {totalPages > 1 ? (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#FAF9F6', padding: '3px 6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+                {pagesArray.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setActivePage(p)}
+                    style={{
+                      padding: '3px 8px',
+                      fontSize: '11.5px',
+                      fontWeight: activePage === p ? '700' : '500',
+                      borderRadius: 'var(--radius-sm)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: activePage === p ? 'var(--primary)' : 'transparent',
+                      color: activePage === p ? '#FFFFFF' : 'var(--text-secondary)'
+                    }}
+                  >
+                    Page {p}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                backgroundColor: '#EBF3EE',
+                color: '#315B45',
+                padding: '3px 8px',
+                borderRadius: 'var(--radius-sm)'
+              }}>
+                1 Page (Complete Note)
+              </span>
+            )}
+          </div>
 
-          {pagesArray.map((pageNum) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              type="button"
-              key={pageNum}
-              onClick={() => setActivePage(pageNum)}
+              onClick={() => setZoomLevel((z) => Math.max(z - 10, 70))}
+              style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}
+              title="Zoom Out"
+            >
+              <Minus size={16} color="var(--text-secondary)" />
+            </button>
+            <span style={{ fontSize: '12px', fontWeight: '600', minWidth: '40px', textAlign: 'center' }}>
+              {zoomLevel}%
+            </span>
+            <button
+              onClick={() => setZoomLevel((z) => Math.min(z + 10, 150))}
+              style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}
+              title="Zoom In"
+            >
+              <Plus size={16} color="var(--text-secondary)" />
+            </button>
+            <a
+              href={documentPdfUrl}
+              target="_blank"
+              rel="noreferrer"
               style={{
-                cursor: 'pointer',
-                textAlign: 'center',
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                width: '100%'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '12px',
+                color: 'var(--primary)',
+                textDecoration: 'none',
+                fontWeight: '600',
+                marginLeft: '8px'
               }}
             >
-              <div style={{
-                height: '130px',
-                border: activePage === pageNum ? '2px solid var(--primary)' : '1px solid var(--border-strong)',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: '#FAF9F6',
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                boxShadow: activePage === pageNum ? 'var(--shadow-md)' : 'none',
-                transition: 'border 0.15s ease'
-              }}>
-                <div style={{ height: '8px', backgroundColor: '#E0DDD3', width: '70%', borderRadius: '2px' }} />
-                <div style={{ height: '6px', backgroundColor: '#EAE7DF', width: '100%', borderRadius: '2px' }} />
-                <div style={{ height: '6px', backgroundColor: '#EAE7DF', width: '90%', borderRadius: '2px' }} />
-                <div style={{ height: '6px', backgroundColor: '#EAE7DF', width: '95%', borderRadius: '2px' }} />
-                <div style={{ height: '6px', backgroundColor: '#EAE7DF', width: '80%', borderRadius: '2px' }} />
-              </div>
-              <span style={{
-                fontSize: '12px',
-                fontWeight: activePage === pageNum ? '700' : '500',
-                color: activePage === pageNum ? 'var(--primary)' : 'var(--text-secondary)',
-                marginTop: '4px',
-                display: 'inline-block'
-              }}>
-                Page {pageNum}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* Document Sheet Display */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Zoom controls bar */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '12px',
-            paddingBottom: '10px',
-            borderBottom: '1px solid var(--border-subtle)'
-          }}>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Viewing: <strong>{record?.original_filename || 'John_Doe_Clinical_Note.pdf'}</strong> (Page {activePage} of {totalPages})
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button
-                onClick={() => setZoomLevel((z) => Math.max(z - 10, 70))}
-                style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}
-                title="Zoom Out"
-              >
-                <Minus size={16} color="var(--text-secondary)" />
-              </button>
-              <span style={{ fontSize: '12px', fontWeight: '600', minWidth: '40px', textAlign: 'center' }}>
-                {zoomLevel}%
-              </span>
-              <button
-                onClick={() => setZoomLevel((z) => Math.min(z + 10, 150))}
-                style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}
-                title="Zoom In"
-              >
-                <Plus size={16} color="var(--text-secondary)" />
-              </button>
-              <a
-                href={documentPdfUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '12px',
-                  color: 'var(--primary)',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                  marginLeft: '8px'
-                }}
-              >
-                <ExternalLink size={14} />
-                <span>Open in Tab</span>
-              </a>
-            </div>
+              <ExternalLink size={14} />
+              <span>Open in Tab</span>
+            </a>
           </div>
+        </div>
 
           {/* View Container */}
           <div style={{
@@ -261,17 +245,44 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
             minHeight: '520px'
           }}>
             {viewMode === 'pdf' ? (
-              <iframe
-                src={`${documentPdfUrl}#page=${activePage}&zoom=${zoomLevel}`}
-                title="Clinical Note PDF"
+              <object
+                data={`${documentPdfUrl}#page=${activePage}&zoom=${zoomLevel}`}
+                type="application/pdf"
                 style={{
                   width: '100%',
                   height: '100%',
-                  minHeight: '520px',
+                  minHeight: '560px',
                   border: 'none',
                   backgroundColor: '#FAF9F6'
                 }}
-              />
+              >
+                <iframe
+                  src={`${documentPdfUrl}#page=${activePage}&zoom=${zoomLevel}`}
+                  title="Clinical Note PDF"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '560px',
+                    border: 'none',
+                    backgroundColor: '#FAF9F6'
+                  }}
+                >
+                  <div style={{ padding: '40px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                      PDF preview loaded. You can view it directly or open in a dedicated tab.
+                    </p>
+                    <a
+                      href={documentPdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-primary"
+                      style={{ display: 'inline-flex' }}
+                    >
+                      Open PDF in Full Tab
+                    </a>
+                  </div>
+                </iframe>
+              </object>
             ) : (
               <div style={{ padding: '28px 36px', backgroundColor: '#FFFFFF', minHeight: '100%', fontFamily: 'serif', lineHeight: 1.7 }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '14px', fontFamily: 'var(--font-sans)', color: '#1F211E' }}>
@@ -288,7 +299,6 @@ export const ExtractedDocumentView: React.FC<ExtractedDocumentViewProps> = ({
               </div>
             )}
           </div>
-        </div>
       </div>
 
       {/* Action Footer */}

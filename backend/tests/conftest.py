@@ -11,8 +11,8 @@ def default_test_auth_override(request):
     For Phase 8 security tests, this override is bypassed so real authentication
     and authorization checks are exercised.
     """
-    # Do NOT apply default auth override to Phase 8 security test files
-    if "test_phase8_auth" in request.node.nodeid:
+    # Do NOT apply default auth override to Phase 8 security test files or conversational routing tests
+    if "test_phase8_auth" in request.node.nodeid or "test_conversational_routing" in request.node.nodeid:
         yield
         return
 

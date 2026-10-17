@@ -1,37 +1,37 @@
 {
-  "case_id": "CASE-20261016185407",
-  "patient_name": "John Doe",
-  "patient_age": 1,
+  "case_id": "CASE-SYNTHETIC-AMBETTER-MRI-001",
+  "patient_name": "Synthetic Patient A",
+  "patient_age": 55,
   "gender": "M",
-  "dob": null,
-  "facility": "Riverside Medical Center",
-  "date_of_visit": "10/16/2026",
-  "procedure_requested": "CT Scan of Head with Contrast",
-  "procedure_type": "CT Scan",
-  "insurance_plan": "United Healthcare",
+  "dob": "01/01/1970",
+  "facility": "Riverside Spine Clinic",
+  "date_of_visit": "04/09/2026",
+  "procedure_requested": "MRI of Lumbar Spine without Contrast",
+  "procedure_type": "Advanced Imaging",
+  "insurance_plan": "Ambetter",
+  "organization_id": "org_riverside",
+  "document_id": null,
   "policy_id": "P-UHC-CT-2026",
   "policy_version": "2026.1",
-  "chief_complaint": null,
+  "chief_complaint": "Low back pain and radiculopathy",
   "history_of_present_illness": null,
-  "clinical_findings": [
-    "Physical and neurological evaluation documented."
-  ],
-  "impression": "Rule out intracranial pathology or space-occupying lesion.",
-  "physician_recommendation": "CT Scan of Head with Contrast",
-  "original_filename": "test.pdf",
-  "storage_path": "E:\\Medrule\\backend\\storage\\notes\\998750bae487_test.pdf",
-  "sha256_checksum": "998750bae487d4867e36c2bf62bed10a02122c392cc56ab7eec8b037099a0e41",
+  "clinical_findings": [],
+  "impression": null,
+  "physician_recommendation": null,
+  "original_filename": "synthetic_lumbar_note.pdf",
+  "storage_path": "storage/notes/synthetic_lumbar_note.pdf",
+  "sha256_checksum": "abc123def4567890syntheticchecksum",
   "total_pages": 2,
   "scanned_pages_count": 0,
   "overall_quality": "HIGH",
-  "ocr_engine_status": "OCR engine (pytesseract) is not installed in the Python environment. Scanned pages routed to manual clinician review.",
+  "ocr_engine_status": "Native Digital",
   "facts": {
     "neurological_symptoms": {
       "fact_key": "neurological_symptoms",
       "label": "Neurological Symptoms Documented",
       "value": true,
       "status": "EXPLICIT",
-      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.; On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal",
+      "excerpt": "Patient: Test Patient DOB: 01/01/1970 DOS: 04/09/2026 Insurance: Ambetter Order: MRI of Lumbar Spine without Contrast Chief Complaint: Low back pain rated 7/10 with radiculopathy into right lower extremity.",
       "source_page": 1,
       "confidence": 0.98,
       "is_flagged_for_review": false,
@@ -41,11 +41,11 @@
     "symptom_duration_weeks": {
       "fact_key": "symptom_duration_weeks",
       "label": "Symptom Duration (Weeks)",
-      "value": 2.0,
-      "status": "EXPLICIT",
-      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
-      "source_page": 1,
-      "confidence": 0.99,
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0,
       "is_flagged_for_review": false,
       "flag_reason": null,
       "reviewer_override": null
@@ -65,11 +65,11 @@
     "neurological_exam_abnormal": {
       "fact_key": "neurological_exam_abnormal",
       "label": "Abnormal Neurological Examination",
-      "value": null,
-      "status": "CONFLICTING",
-      "excerpt": "Contradictory physical exam entries: Page 1: 'Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.' vs Page 2: 'On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal'",
-      "source_page": 2,
-      "confidence": 0.48,
+      "value": true,
+      "status": "EXPLICIT",
+      "excerpt": "Straight leg raise positive on right.",
+      "source_page": 1,
+      "confidence": 0.97,
       "is_flagged_for_review": false,
       "flag_reason": null,
       "reviewer_override": null
@@ -90,10 +90,10 @@
       "fact_key": "contrast_requested",
       "label": "Intravenous Contrast Requested",
       "value": false,
-      "status": "ABSENT",
-      "excerpt": null,
-      "source_page": null,
-      "confidence": 0.9,
+      "status": "EXPLICIT",
+      "excerpt": "Patient: Test Patient DOB: 01/01/1970 DOS: 04/09/2026 Insurance: Ambetter Order: MRI of Lumbar Spine without Contrast Chief Complaint: Low back pain rated 7/10 with radiculopathy into right lower extremity.",
+      "source_page": 1,
+      "confidence": 0.98,
       "is_flagged_for_review": false,
       "flag_reason": null,
       "reviewer_override": null
@@ -113,11 +113,11 @@
     "contrast_anaphylaxis_unmitigated": {
       "fact_key": "contrast_anaphylaxis_unmitigated",
       "label": "Unmitigated Anaphylactic Contrast Allergy",
-      "value": false,
-      "status": "EXPLICIT",
-      "excerpt": "No history of contrast anaphylaxis documented",
+      "value": null,
+      "status": "ABSENT",
+      "excerpt": null,
       "source_page": null,
-      "confidence": 0.95,
+      "confidence": 1.0,
       "is_flagged_for_review": false,
       "flag_reason": null,
       "reviewer_override": null
@@ -126,15 +126,15 @@
   "extracted_facts": {
     "neurological_symptoms": {
       "value": true,
-      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.; On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal",
+      "excerpt": "Patient: Test Patient DOB: 01/01/1970 DOS: 04/09/2026 Insurance: Ambetter Order: MRI of Lumbar Spine without Contrast Chief Complaint: Low back pain rated 7/10 with radiculopathy into right lower extremity.",
       "source_page": 1,
       "confidence": 0.98
     },
     "symptom_duration_weeks": {
-      "value": 2.0,
-      "excerpt": "Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
-      "source_page": 1,
-      "confidence": 0.99
+      "value": null,
+      "excerpt": null,
+      "source_page": null,
+      "confidence": 1.0
     },
     "conservative_treatment_attempted": {
       "value": null,
@@ -143,10 +143,10 @@
       "confidence": 1.0
     },
     "neurological_exam_abnormal": {
-      "value": null,
-      "excerpt": "Contradictory physical exam entries: Page 1: 'Patient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.' vs Page 2: 'On detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal'",
-      "source_page": 2,
-      "confidence": 0.48
+      "value": true,
+      "excerpt": "Straight leg raise positive on right.",
+      "source_page": 1,
+      "confidence": 0.97
     },
     "rule_out_pathology": {
       "value": null,
@@ -156,9 +156,9 @@
     },
     "contrast_requested": {
       "value": false,
-      "excerpt": null,
-      "source_page": null,
-      "confidence": 0.9
+      "excerpt": "Patient: Test Patient DOB: 01/01/1970 DOS: 04/09/2026 Insurance: Ambetter Order: MRI of Lumbar Spine without Contrast Chief Complaint: Low back pain rated 7/10 with radiculopathy into right lower extremity.",
+      "source_page": 1,
+      "confidence": 0.98
     },
     "contrast_justified": {
       "value": null,
@@ -167,29 +167,27 @@
       "confidence": 1.0
     },
     "contrast_anaphylaxis_unmitigated": {
-      "value": false,
-      "excerpt": "No history of contrast anaphylaxis documented",
+      "value": null,
+      "excerpt": null,
       "source_page": null,
-      "confidence": 0.95
+      "confidence": 1.0
     }
   },
   "raw_pages_text": [
     {
       "page_number": 1,
-      "text": "Clinic Triage Note - Page 1\nPatient reports headaches started 2 weeks ago after stress. Neurological examination is normal and non-focal.",
-      "char_count": 137,
-      "is_scanned": false
+      "text": "Patient: Test Patient DOB: 01/01/1970\nDOS: 04/09/2026\nInsurance: Ambetter\nOrder: MRI of Lumbar Spine without Contrast\nChief Complaint: Low back pain rated 7/10 with radiculopathy into right lower extremity.\nPhysical Exam: Gait disturbance noted. Straight leg raise positive on right.\nPlan: Prescribe lumbar brace L0650 and setup TF ESI injection. Discussed home exercises."
     },
     {
       "page_number": 2,
-      "text": "Neurology Specialist Assessment - Page 2\nOn detailed review, patient has persistent severe headaches lasting for 4 months. Neurological examination abnormal\nwith focal asymmetry and ataxia.",
-      "char_count": 189,
-      "is_scanned": false
+      "text": "Atlantic Advanced Spine\nReview of past imaging studies: Degenerative disc disease L4-L5.\nMedications: Magnesium Citrate 200mg daily.\nSigned electronically by Dr. Test Clinician, MD."
     }
   ],
   "is_synthetic": true,
   "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
   "audit_trail": [],
-  "created_at": "2026-10-16T18:54:07.797835Z",
-  "updated_at": "2026-10-16T18:54:07.797835Z"
+  "latest_outcome": null,
+  "latest_evaluation": null,
+  "created_at": "2026-04-09T10:00:00Z",
+  "updated_at": "2026-04-09T10:00:00Z"
 }

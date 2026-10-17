@@ -47,22 +47,41 @@ export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, 
     if (onNavigate) onNavigate('authorization_decision');
   };
 
+  const [exportingCaseId, setExportingCaseId] = useState<string | null>(null);
+
   const handleExportCase = async (e: React.MouseEvent, caseId: string, patientName: string) => {
     e.stopPropagation();
+    setExportingCaseId(caseId);
     try {
       const res = await apiFetch(`http://localhost:8000/api/cases/${caseId}/export?format=txt`);
       if (!res.ok) {
-        throw new Error('Server export endpoint failed');
+        let errMessage = 'Server export endpoint failed';
+        try {
+          const errData = await res.json();
+          errMessage = errData.detail || errMessage;
+        } catch {
+          errMessage = `Server error ${res.status}: ${res.statusText}`;
+        }
+        throw new Error(errMessage);
       }
       const text = await res.text();
-      const blob = new Blob([text], { type: 'text/plain' });
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = `MedRule_Audit_${caseId}_${patientName.replace(/\s+/g, '_')}.txt`;
+      document.body.appendChild(a);
       a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 150);
     } catch (err: any) {
+      console.error('Export error:', err);
       alert(`Export failed: ${err.message}`);
+    } finally {
+      setExportingCaseId(null);
     }
   };
 
@@ -311,10 +330,20 @@ export const CasesHistoryView: React.FC<CasesHistoryViewProps> = ({ onNavigate, 
                         onClick={(e) => handleExportCase(e, row.case_id, row.patient_name)}
                         className="btn btn-outline"
                         style={{ padding: '4px 8px', fontSize: '11px', gap: '4px' }}
+                        disabled={exportingCaseId === row.case_id}
                         title="Download Prior Authorization Audit Package"
                       >
-                        <Download size={12} />
-                        <span>Export</span>
+                        {exportingCaseId === row.case_id ? (
+                          <>
+                            <RefreshCw size={11} className="animate-spin" />
+                            <span>Exporting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={12} />
+                            <span>Export</span>
+                          </>
+                        )}
                       </button>
                     </td>
                   </tr>

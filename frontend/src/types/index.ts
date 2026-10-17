@@ -218,6 +218,7 @@ export interface ExtractedFact {
 
 export interface ClinicalNoteRecord {
   case_id: string;
+  document_id?: string;
   patient_name: string;
   patient_age?: number;
   gender?: string;
@@ -227,7 +228,7 @@ export interface ClinicalNoteRecord {
   procedure_requested: string;
   procedure_type?: string;
   insurance_plan: string;
-  policy_id: string;
+  policy_id?: string;
   policy_version?: string;
   chief_complaint?: string;
   history_of_present_illness?: string;

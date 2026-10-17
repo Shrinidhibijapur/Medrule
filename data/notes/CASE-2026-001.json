@@ -10,6 +10,7 @@
   "procedure_type": "CT Scan",
   "insurance_plan": "United Healthcare",
   "organization_id": "org_riverside",
+  "document_id": null,
   "policy_id": "P-UHC-CT-2026",
   "policy_version": "2026",
   "chief_complaint": "Persistent headaches and dizziness",
@@ -36,10 +37,19 @@
       "status": "EXPLICIT",
       "excerpt": "Headaches, dizziness, visual disturbances",
       "source_page": 1,
-      "confidence": 0.98,
+      "confidence": 1.0,
       "is_flagged_for_review": false,
       "flag_reason": null,
-      "reviewer_override": null
+      "reviewer_override": {
+        "is_overridden": true,
+        "overridden_by": "Dr. Test Reviewer",
+        "overridden_at": "2026-10-17T11:53:17.553099+00:00",
+        "original_value": true,
+        "corrected_value": true,
+        "original_status": "EXPLICIT",
+        "corrected_status": "EXPLICIT",
+        "reason": "Clinician confirmed ataxia documented in chart."
+      }
     },
     "symptom_duration_weeks": {
       "fact_key": "symptom_duration_weeks",
@@ -161,7 +171,217 @@
   "raw_pages_text": [],
   "is_synthetic": true,
   "governance_warning": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Patient Record - Production Clinical Verification Gate Remains Active",
-  "audit_trail": [],
+  "audit_trail": [
+    {
+      "timestamp": "2026-10-17T09:01:21.935317+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:02:18.560852+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:02:41.462997+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:03:06.841044+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:03:18.083964+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:06:16.332584+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:10:32.998755+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T09:13:56.608665+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:33:48.732094+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:36:10.128101+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:36:39.694566+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:36:55.796416+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:45:23.769763+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T10:51:16.960932+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T11:39:57.912631+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T11:43:28.804764+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T11:45:38.131049+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T11:48:40.420918+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    },
+    {
+      "timestamp": "2026-10-17T11:53:17.553099+00:00",
+      "action": "FACT_OVERRIDE",
+      "fact_key": "neurological_symptoms",
+      "reviewer": "Dr. Test Reviewer",
+      "original_value": true,
+      "corrected_value": true,
+      "original_status": "EXPLICIT",
+      "corrected_status": "EXPLICIT",
+      "reason": "Clinician confirmed ataxia documented in chart."
+    }
+  ],
   "latest_outcome": "APPROVED",
   "latest_evaluation": {
     "case_id": "CASE-2026-001",
@@ -191,7 +411,9 @@
         "fact_confidence": null,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-001",
@@ -203,16 +425,18 @@
         "status": "MET",
         "ui_symbol": "✅",
         "ui_label": "Satisfied",
-        "comment": "Clinical requirement documented and confirmed",
+        "comment": "Clinical requirement documented and confirmed [Clinician override by Dr. Test Reviewer: 'Clinician confirmed ataxia documented in chart.']",
         "policy_citation": "CT Scan of Head / Brain v2026.1, Section 4.2.1, Page 1",
         "logic_group": "CLINICAL_CRITERIA",
         "plain_english_rationale": "Requirement: Documented neurological symptoms or signs (atypical headache, dizziness, ataxia, visual changes).",
         "is_exclusion": false,
         "fact_key": "neurological_symptoms",
-        "fact_confidence": 0.98,
-        "reviewer_overridden": false,
-        "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "fact_confidence": 1.0,
+        "reviewer_overridden": true,
+        "reviewer_override_by": "Dr. Test Reviewer",
+        "reviewer_override_reason": "Clinician confirmed ataxia documented in chart.",
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-002",
@@ -233,7 +457,9 @@
         "fact_confidence": 0.99,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-003",
@@ -254,7 +480,9 @@
         "fact_confidence": 0.95,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-004",
@@ -275,7 +503,9 @@
         "fact_confidence": 0.97,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-005",
@@ -296,7 +526,9 @@
         "fact_confidence": 0.99,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-CRIT-006",
@@ -317,15 +549,17 @@
         "fact_confidence": 0.94,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CT-EXCL-001",
         "criterion_name": "Severe Anaphylactic Contrast Allergy Contraindication",
         "section": "Section 4.2.7",
         "requirement": "Documented prior anaphylactic shock or severe unmitigated hypersensitivity to iodinated radiocontrast without prophylactic preparation is a safety contraindication.",
-        "evidence_excerpt": "No matching clinical documentation found in submitted records",
-        "source_page": 4,
+        "evidence_excerpt": "",
+        "source_page": null,
         "status": "NOT_DOCUMENTED",
         "ui_symbol": "❌",
         "ui_label": "Not documented",
@@ -338,7 +572,9 @@
         "fact_confidence": 1.0,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": "ABSENT",
+        "missing_or_conflicting_explanation": "No matching clinical documentation found in searched medical record."
       }
     ],
     "key_reasoning": [
@@ -358,8 +594,12 @@
     "policy_checksum": "681f8ececb53bcacf5e0950b6a8058284dfc468d63c517ea2355a781cedc00a7",
     "verification_gate_verified": true,
     "is_synthetic_demo": true,
-    "governance_notice": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."
+    "governance_notice": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed.",
+    "compatibility_status": "COMPATIBLE",
+    "service_document_concordance": "CONCORDANT",
+    "concordance_notes": [],
+    "trace_id": null
   },
   "created_at": "2026-10-15T00:00:00Z",
-  "updated_at": "2026-10-15T00:00:00Z"
+  "updated_at": "2026-10-17T11:53:17.553099+00:00"
 }

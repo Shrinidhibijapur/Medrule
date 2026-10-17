@@ -16,7 +16,8 @@ import {
   RefreshCw, 
   AlertCircle, 
   ArrowLeft,
-  ChevronRight
+  ChevronRight,
+  Check
 } from 'lucide-react';
 
 export type CaseStage = 'document' | 'facts' | 'evaluation' | 'analysis' | 'decision';
@@ -277,7 +278,9 @@ export const CaseWorkflowView: React.FC<CaseWorkflowViewProps> = ({
         {/* Stage Tabs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
           {stagesList.map((item, index) => {
+            const currentIndex = stagesList.findIndex(s => s.key === stage);
             const isCurrent = stage === item.key;
+            const isCompleted = currentIndex > index;
             const Icon = item.icon;
 
             return (
@@ -292,9 +295,9 @@ export const CaseWorkflowView: React.FC<CaseWorkflowViewProps> = ({
                   gap: '6px',
                   padding: '6px 12px',
                   borderRadius: 'var(--radius-sm)',
-                  border: isCurrent ? '1px solid #C8E6D3' : '1px solid transparent',
-                  backgroundColor: isCurrent ? '#EAF5EE' : 'transparent',
-                  color: isCurrent ? '#26734D' : 'var(--text-secondary)',
+                  border: isCurrent ? '1px solid #C8E6D3' : isCompleted ? '1px solid #D6E8DC' : '1px solid transparent',
+                  backgroundColor: isCurrent ? '#EAF5EE' : isCompleted ? '#F4F9F6' : 'transparent',
+                  color: isCurrent ? '#26734D' : isCompleted ? '#315B45' : 'var(--text-secondary)',
                   fontSize: '13px',
                   fontWeight: isCurrent ? '700' : '500',
                   cursor: 'pointer',
@@ -305,17 +308,17 @@ export const CaseWorkflowView: React.FC<CaseWorkflowViewProps> = ({
                   width: '18px',
                   height: '18px',
                   borderRadius: '50%',
-                  backgroundColor: isCurrent ? '#315B45' : '#E5E2DA',
-                  color: isCurrent ? '#FFFFFF' : 'var(--text-secondary)',
+                  backgroundColor: isCurrent ? '#315B45' : isCompleted ? '#315B45' : '#E5E2DA',
+                  color: '#FFFFFF',
                   fontSize: '11px',
                   fontWeight: '700',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  {index + 1}
+                  {isCompleted ? <Check size={11} strokeWidth={3} /> : index + 1}
                 </span>
-                <Icon size={14} />
+                <Icon size={14} color={isCurrent || isCompleted ? '#315B45' : undefined} />
                 <span>{item.label}</span>
               </button>
             );

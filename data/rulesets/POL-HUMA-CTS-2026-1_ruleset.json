@@ -1,0 +1,11 @@
+{
+  "policy_id": "POL-HUMA-CTS-2026-1",
+  "policy_name": "Spine CT Guideline",
+  "policy_version": "2026.1",
+  "policy_checksum": "e54aa4f2fbc74a71960a33d8ffbedb5f2bf33309b9673b20b7bb796d27dc2cb2",
+  "procedure_type": "CT Scan",
+  "rules": [],
+  "verification_status": "DRAFT",
+  "signoff": null,
+  "last_updated": "2026-10-17T06:17:38.790183+00:00"
+}

@@ -10,8 +10,9 @@
   "procedure_type": null,
   "insurance_plan": "United Healthcare",
   "organization_id": "org_riverside",
+  "document_id": null,
   "policy_id": "P-TEST-CT-PHASE4",
-  "policy_version": "2026.1",
+  "policy_version": null,
   "chief_complaint": null,
   "history_of_present_illness": null,
   "clinical_findings": [],
@@ -94,7 +95,7 @@
     "insurer": "United Healthcare",
     "policy_id": "P-TEST-CT-PHASE4",
     "policy_version": "2026.1",
-    "evaluation_date": "2026-10-16",
+    "evaluation_date": "2026-10-17",
     "criteria_results": [
       {
         "rule_id": "CRIT-4-01",
@@ -115,7 +116,9 @@
         "fact_confidence": 0.98,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CRIT-4-02",
@@ -136,7 +139,9 @@
         "fact_confidence": 0.95,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CRIT-4-03",
@@ -157,7 +162,9 @@
         "fact_confidence": 0.95,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": "EXPLICIT",
+        "missing_or_conflicting_explanation": null
       },
       {
         "rule_id": "CRIT-4-04",
@@ -178,7 +185,9 @@
         "fact_confidence": null,
         "reviewer_overridden": false,
         "reviewer_override_by": null,
-        "reviewer_override_reason": null
+        "reviewer_override_reason": null,
+        "evidence_status": null,
+        "missing_or_conflicting_explanation": null
       }
     ],
     "key_reasoning": [
@@ -194,7 +203,11 @@
     "policy_checksum": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     "verification_gate_verified": true,
     "is_synthetic_demo": true,
-    "governance_notice": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed."
+    "governance_notice": "DEVELOPMENT/DEMO MODE ONLY: Synthetic Clinical Records. Real patient evaluation remains BLOCKED until authentic policy and clinical sign-offs are completed.",
+    "compatibility_status": "COMPATIBLE",
+    "service_document_concordance": "CONCORDANT",
+    "concordance_notes": [],
+    "trace_id": null
   },
   "created_at": "2026-10-15T00:00:00Z",
   "updated_at": "2026-10-15T00:00:00Z"

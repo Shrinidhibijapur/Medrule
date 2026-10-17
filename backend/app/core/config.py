@@ -1,6 +1,31 @@
 import os
+from pathlib import Path
 from typing import List, Optional
 from pydantic import BaseModel, Field
+
+def _load_env_file():
+    """Auto-loads variables from .env file into os.environ if present."""
+    curr = Path(__file__).resolve()
+    # Search from config directory up to workspace root
+    search_dirs = [curr.parent, curr.parent.parent, curr.parent.parent.parent, Path.cwd()]
+    for d in search_dirs:
+        env_path = d / ".env"
+        if env_path.is_file():
+            try:
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            k = k.strip()
+                            v = v.strip().strip("'\"")
+                            if k and (k not in os.environ or not os.environ[k].strip()):
+                                os.environ[k] = v
+                break
+            except Exception:
+                pass
+
+_load_env_file()
 
 class Settings(BaseModel):
     # Environment
@@ -43,6 +68,11 @@ class Settings(BaseModel):
     FAIL_CLOSED_ON_MISSING_IDP: bool = Field(
         default_factory=lambda: os.getenv("FAIL_CLOSED_ON_MISSING_IDP", "true").lower() == "true"
     )
+
+    # Groq AI Interactive Agent Copilot
+    GROQ_API_KEY: Optional[str] = Field(default_factory=lambda: os.getenv("GROQ_API_KEY", None))
+    GROQ_MODEL: str = Field(default_factory=lambda: os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"))
+    GROQ_API_BASE: str = Field(default_factory=lambda: os.getenv("GROQ_API_BASE", "https://api.groq.com/openai/v1"))
 
     @property
     def is_production(self) -> bool:
